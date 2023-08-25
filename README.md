@@ -1,3 +1,5 @@
 # BaseSwerve
 
-The base swerve code we use for both teams.
+Base swerve code for both teams.
+
+**CHANGE TEAM NUMBER AS NEEDED**
