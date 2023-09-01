@@ -1,5 +1,8 @@
 package frc.lib.pid;
 
+/**
+ * A container class for MotionMagic constants.
+ */
 public class MotionMagicConstants {
     public final double cruiseVelocity;//native units
     public final double acceleration;//native units

@@ -2,14 +2,32 @@ package frc.lib.deviceConfiguration;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import frc.robot.Constants.SwerveConstants;
+
+/**
+ *  A container class for device configurations. 
+ * */
 public class DeviceConfigs {
 	public static final int maxStatusFramePeriod = 255;
     public static final double kNominalVoltage = 12.6;
 
-    public static class CANCoderConfig {//TODO make all of the config classes(and other parts of the code) into records when we update to java 17 for the 2024 frc season.
+    public TalonFXConfiguration swerveAngleFXConfig;
+    public TalonFXConfiguration swerveDriveFXConfig;
+    public CANCoderConfiguration swerveCanCoderConfig;
+
+    public DeviceConfigs(){
+        configSwerve();
+    }
+
+    public static class CANCoderConfig {
         public int sensorDataPeriod = 20;
         public int vBatAndFaultsPeriod = 20;
         public AbsoluteSensorRange absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
@@ -87,61 +105,6 @@ public class DeviceConfigs {
         public int rawStatus_4_Mag = maxStatusFramePeriod;
     }
 
-    /*        DOCUMENTATION FOR CANSPARKMAX(because their API names are vague)   https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
-    Periodic Status 0 - Default Rate: 10ms	
-
-    Available Data	Description
-    Applied **** Output	The actual value sent to the motors from the motor controller. The frame stores this value as a 16-bit signed integer, and is converted to a floating point value between -1 and 1 by the roboRIO SDK. This value is also used by any follower controllers to set their output.
-    Faults	Each bit represents a different fault on the controller. These fault bits clear automatically when the fault goes away.
-    Sticky Faults	The same as the Faults field, however the bits do not reset until a power cycle or a 'Clear Faults' command is sent.
-    Is Follower	A single bit that is true if the controller is configured to follow another controller.
-
-
-    Periodic Status 1 - Default Rate: 20ms	
-
-    Available Data	Description
-    Motor Velocity	32-bit IEEE floating-point representation of the unconfiguredCANSparkMax velocity in RPM using the selected sensor.
-    Motor Temperature	"8-bit unsigned value representing:
-
-    Firmware version 1.0.381 - Voltage of the temperature sensor with 0 = 0V and 255 = 3.3V. Current firmware versions - Motor temperature in °C for the NEO Brushless Motor."
-    Motor Voltage	12-bit fixed-point value that is converted to a floating point voltage value (in Volts) by the roboRIO SDK. This is the input voltage to the controller.
-    Motor Current	12-bit fixed-point value that is converted to a floating point current value (in Amps) by the roboRIO SDK. This is the raw phase current of the unconfiguredCANSparkMax.
-
-
-    Periodic Status 2 - Default Rate: 20ms	
-
-    Available Data	Description
-    Motor Position	32-bit IEEE floating-point representation of the unconfiguredCANSparkMax position in rotations.
-
-
-    Periodic Status 3 - Default Rate: 50ms
-
-    Available Data	Description
-    Analog Sensor Voltage	10-bit fixed-point value that is converted to a floating point voltage value (in Volts) by the roboRIO SDK. This is the voltage being output by the analog sensor.
-    Analog Sensor Velocity	22-bit fixed-point value that is converted to a floating point voltage value (in RPM) by the roboRIO SDK. This is the velocity reported by the analog sensor.
-    Analog Sensor Position	32-bit IEEE floating-point representation of the velocity in RPM reported by the analog sensor.
-
-
-    Periodic Status 4 - Default Rate: 20ms	
-
-    Available Data	Description
-    Alternate Encoder Velocity	32-bit IEEE floating-point representation of the velocity in RPM of the alternate encoder.
-    Alternate Encoder Position	32-bit IEEE floating-point representation of the position in rotations of the alternate encoder.
-
-
-    Periodic Status 5 - Default Rate: 200ms	
-
-    Available Data	Description
-    Duty Cycle Absolute Encoder Position	32-bit IEEE floating-point representation of the position of the duty cycle absolute encoder.
-    Duty Cycle Absolute Encoder Absolute Angle	16-bit integer representation of the absolute angle of the duty cycle absolute encoder.
-
-
-    Periodic Status 6 - Default Rate: 200ms	
-
-    Available Data	Description
-    Duty Cycle Absolute Encoder Velocity	32-bit IEEE floating-point representation of the velocity in RPM of the duty cycle absolute encoder.
-    Duty Cycle Absolute Encoder Frequency	16-bit unsigned integer representation of the frequency at which the duty cycle signal is being sent.
-     */
     public static class CANSparkMaxConfig{
         public int status0 = 10;
         public int status1 = 50;
@@ -154,5 +117,45 @@ public class DeviceConfigs {
         public boolean enableVoltageCompensation = true;
         public double voltageCompSaturation = kNominalVoltage;
         public IdleMode idleMode = IdleMode.kCoast;
+    }
+
+    public void configSwerve() {
+        swerveAngleFXConfig = new TalonFXConfiguration();
+        swerveDriveFXConfig = new TalonFXConfiguration();
+        swerveCanCoderConfig = new CANCoderConfiguration();
+
+        // Swerve Angle Motor Configurations
+        SupplyCurrentLimitConfiguration angleSupplyLimit = new SupplyCurrentLimitConfiguration(
+                SwerveConstants.angleEnableCurrentLimit,
+                SwerveConstants.angleContinuousCurrentLimit,
+                SwerveConstants.anglePeakCurrentLimit,
+                SwerveConstants.anglePeakCurrentDuration);
+
+        swerveAngleFXConfig.slot0.kP = SwerveConstants.angleKP;
+        swerveAngleFXConfig.slot0.kI = SwerveConstants.angleKI;
+        swerveAngleFXConfig.slot0.kD = SwerveConstants.angleKD;
+        swerveAngleFXConfig.slot0.kF = SwerveConstants.angleKF;
+        swerveAngleFXConfig.supplyCurrLimit = angleSupplyLimit;
+
+        // Swerve Drive Motor Configuration
+        SupplyCurrentLimitConfiguration driveSupplyLimit = new SupplyCurrentLimitConfiguration(
+                SwerveConstants.driveEnableCurrentLimit,
+                SwerveConstants.driveContinuousCurrentLimit,
+                SwerveConstants.drivePeakCurrentLimit,
+                SwerveConstants.drivePeakCurrentDuration);
+
+        swerveDriveFXConfig.slot0.kP = SwerveConstants.driveKP;
+        swerveDriveFXConfig.slot0.kI = SwerveConstants.driveKI;
+        swerveDriveFXConfig.slot0.kD = SwerveConstants.driveKD;
+        swerveDriveFXConfig.slot0.kF = SwerveConstants.driveKF;
+        swerveDriveFXConfig.supplyCurrLimit = driveSupplyLimit;
+        swerveDriveFXConfig.openloopRamp = SwerveConstants.openLoopRamp;
+        swerveDriveFXConfig.closedloopRamp = SwerveConstants.closedLoopRamp;
+
+        // Swerve CANCoder Configuration
+        swerveCanCoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+        swerveCanCoderConfig.sensorDirection = SwerveConstants.canCoderInvert;
+        swerveCanCoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+        swerveCanCoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
     }
 }

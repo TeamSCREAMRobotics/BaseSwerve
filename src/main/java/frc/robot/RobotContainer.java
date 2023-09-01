@@ -25,8 +25,9 @@ public class RobotContainer {
     /* Shuffleboard */
     private final ShuffleboardTabManager m_shuffleboardTabManager;
 
+    
     /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
+     * Configures the subsystems, default commands, button bindings, and the autonomous chooser.
      */
     public RobotContainer() {
         m_controlboard = new Controlboard();
@@ -45,20 +46,38 @@ public class RobotContainer {
         configAutoChooser();
     }
 
+    /**
+     * Configures button bindings using methods from Controlboard.
+     */
     private void configButtonBindings() {
         new Trigger(() -> m_controlboard.getZeroGyro()).onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
     }
 
+    /**
+     * Configures the autonomous chooser on the SmartDashboard.
+     * <p>
+     * Add options using the <STRONG>addOption</STRONG> method.
+     */
     private void configAutoChooser() {
         SmartDashboard.putData(m_autoChooser);
 
         m_autoChooser.addOption("Example Option", AutoRoutines.exampleRoutine(m_swerve));
     }
 
+    /**
+     * Retrieves the selected autonomous command from the autonomous chooser.
+     *
+     * @return The selected autonomous command.
+     */
     public Command getAutonomousCommand() {
         return m_autoChooser.getSelected();
     }
 
+    /**
+     * Retrieves the Swerve subsystem.
+     *
+     * @return The Swerve subsystem.
+     */
     public Swerve getSwerve() {
         return m_swerve;
     }

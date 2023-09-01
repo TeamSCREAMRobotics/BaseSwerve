@@ -68,6 +68,7 @@ public class Robot extends TimedRobot {
 
   }
 
+    /** This function is called periodically when the robot is in Disabled mode. */
   @Override
   public void disabledPeriodic() {
   }
@@ -91,6 +92,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
   }
 
+    /** This function is called once each time the robot enters Tele-Op mode. */
   @Override
   public void teleopInit() {
     if (m_autonomousCommand != null) {

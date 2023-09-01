@@ -108,16 +108,17 @@ public class Conversions {
         return meters / (circumference / (gearRatio * 2048.0));
     }
 
-    /**
-     * 
-     * @param value Value to map
-     * @param oldBottom Old lowest possible value
-     * @param oldTop Old highest possible value
-     * @param newBottom New lowest value
-     * @param newTop New highest value
-     * @return Mapped value
-     */
 
+    /**
+     * Maps a value from one range to another range.
+     *
+     * @param value The value to be mapped
+     * @param oldBottom The bottom value of the old range
+     * @param oldTop The top value of the old range
+     * @param newBottom The bottom value of the new range
+     * @param newTop The top value of the new range
+     * @return The mapped value
+     */
     public static double mapRange(double value, double oldBottom, double oldTop, double newBottom, double newTop) {
         try {
             return (value - oldBottom) / (oldTop - oldBottom) * (newTop - newBottom);

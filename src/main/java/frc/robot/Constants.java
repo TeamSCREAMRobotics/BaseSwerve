@@ -9,6 +9,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
 
+/**
+ * A container class for constants used in various places in the project.
+ */
 public final class Constants {
     public static final double stickDeadband = 0.1;
     public static final boolean includeDebugTabs = true;
@@ -63,7 +66,7 @@ public final class Constants {
         /*
          * These values are used by the drive falcon to ramp in open loop and closed
          * loop driving.
-         * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc
+         * A small open loop ramp (0.25) can help with tread wear, tipping, etc.
          */
         public static final double openLoopRamp = 0.25;
         public static final double closedLoopRamp = 0.0;
@@ -85,8 +88,7 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* PathPlanner PIDConstants */
-        public static final PIDConstants pathTranslationConstants = new PIDConstants(0.0, 0.0, 0.0); // TODO Robot
-                                                                                                     // Specific
+        public static final PIDConstants pathTranslationConstants = new PIDConstants(0.0, 0.0, 0.0); // TODO Robot Specific
         public static final PIDConstants pathRotationConstants = new PIDConstants(0.0, 0.0, 0.0);
 
         /* Swerve Profiling Values */
@@ -143,7 +145,7 @@ public final class Constants {
 
     public static final class Ports {
         // Canivore
-        public static final String canivoreBusName = "NAME_HERE"; // TODO Delete if not using canivore
+        public static final String canivoreBusName = "NAME_HERE"; // TODO Delete if the robot does not use a canivore
 
         // Electrical component ports
         public static final int pdhID = 0;

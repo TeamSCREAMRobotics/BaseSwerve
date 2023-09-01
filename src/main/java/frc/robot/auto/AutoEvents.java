@@ -6,6 +6,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
+/**
+ * A container class for PathPlanner events.
+ * <p>
+ * Auto events are used by PathPlanner to trigger events along a path.
+ */
 public class AutoEvents extends SequentialCommandGroup {
 
     public AutoEvents() {}

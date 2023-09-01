@@ -1,5 +1,8 @@
 package frc.lib.util;
 
+/**
+ * Increments a time value within specified lower and upper bounds.
+ */
 public class TimeBoundIncrementor {
     
     private double mTime;

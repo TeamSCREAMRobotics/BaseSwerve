@@ -2,6 +2,9 @@ package frc.lib.util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
+/*
+ * Container class for SwerveModule constants.
+ */
 public class SwerveModuleConstants {
     public final int driveMotorID;
     public final int angleMotorID;

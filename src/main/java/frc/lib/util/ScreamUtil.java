@@ -13,6 +13,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.CircularBuffer;
 
+/**
+ *  Various utility methods 
+ * */
 public class ScreamUtil {
     public static final double kEpsilon = 1e-12;
 

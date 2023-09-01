@@ -8,8 +8,18 @@ import frc.lib.deviceConfiguration.ErrorChecker.DeviceConfiguration;
 import frc.lib.pid.MotionMagicConstants;
 import frc.lib.pid.PIDConstants;
 
+/**
+ * Utilities for configuring various motor controllers.
+ */
 public class DeviceUtil {
     
+    /**
+     * Configures the PID constants for a TalonFX motor controller.
+     *
+     * @param motor The TalonFX motor controller to configure.
+     * @param pidConstants The PID constants to set for the controller.
+     * @param printInfo Whether to print information about the configuration process.
+     */
     public static void configTalonFXPID(TalonFX motor, PIDConstants pidConstants, boolean printInfo){
 		DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
@@ -28,6 +38,13 @@ public class DeviceUtil {
         ErrorChecker.configureDevice(deviceConfig, "TalonFXPID", printInfo);
 	}
 	
+ 	/**
+  	* Configures the PID constants for a TalonSRX motor controller.
+  	*
+  	* @param motor The TalonSRX motor controller to configure.
+  	* @param pidConstants The PID constants to set for the controller.
+  	* @param printInfo Whether to print information about the configuration process.
+  	*/
 	public static void configTalonSRXPID(TalonSRX motor, PIDConstants pidConstants, boolean printInfo){
 		DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
@@ -46,6 +63,13 @@ public class DeviceUtil {
         ErrorChecker.configureDevice(deviceConfig, "TalonSRXPID", printInfo);
 	}
 
+	/**
+  	* Configures the PID constants for a SparkMax motor controller.
+  	*
+  	* @param motor The SparkMax motor controller to configure.
+  	* @param pidConstants The PID constants to set for the controller.
+  	* @param printInfo Whether to print information about the configuration process.
+  	*/
 	public static void configCANSparkMaxPID(CANSparkMax motor, PIDConstants pidConstants, boolean printInfo){
 		SparkMaxPIDController pidController = motor.getPIDController();
 
@@ -66,6 +90,13 @@ public class DeviceUtil {
         ErrorChecker.configureDevice(config, "TalonSRXPID", printInfo);
 	}	
 
+ 	/**
+  	* Configures TalonFX MotionMagic with the provided constants.
+  	*
+  	* @param motor The TalonFX motor to configure.
+  	* @param motionMagicConstants The motion magic constants to set for the motor.
+  	* @param printInfo Whether to print information about the configuration process.
+  	*/
 	public static void configTalonFXMotionMagic(TalonFX motor, MotionMagicConstants motionMagicConstants, boolean printInfo){
 		DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
@@ -80,6 +111,13 @@ public class DeviceUtil {
         ErrorChecker.configureDevice(deviceConfig, "TalonFXMotionMagic", printInfo);
 	}
 
+ 	/**
+  	* Configures TalonSRX MotionMagic with the provided constants.
+  	*
+  	* @param motor The TalonSRX motor to configure.
+  	* @param motionMagicConstants The motion magic constants to set for the motor.
+  	* @param printInfo Whether to print information about the configuration process.
+  	*/
 	public static void configTalonSRXMotionMagic(TalonSRX motor, MotionMagicConstants motionMagicConstants, boolean printInfo){
 
 		DeviceConfiguration deviceConfig = new DeviceConfiguration() {

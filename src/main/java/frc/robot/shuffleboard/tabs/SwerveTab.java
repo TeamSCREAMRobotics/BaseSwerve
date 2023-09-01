@@ -1,3 +1,4 @@
+
 package frc.robot.shuffleboard.tabs;
 
 import edu.wpi.first.networktables.GenericEntry;
@@ -10,10 +11,17 @@ public class SwerveTab extends ShuffleboardTabBase {
 
     private Swerve m_swerve;
 
+    /**
+     * A Shuffleboard tab for displaying and updating Swerve drive subsystem data.
+     */
     public SwerveTab(Swerve swerve) {
         m_swerve = swerve;
     }
-
+    
+    /**
+     * Represents a set of generic entries for the FL, FR, BL, and BR modules.
+     * Each position has three generic entries: Cancoder, Integrated, and Velocity.
+     */
     private GenericEntry m_FLCancoder;
     private GenericEntry m_FLIntegrated;
     private GenericEntry m_FLVelocity;
@@ -30,6 +38,11 @@ public class SwerveTab extends ShuffleboardTabBase {
     private GenericEntry m_BRIntegrated;
     private GenericEntry m_BRVelocity;
 
+    /**
+     * This method creates number entries for various sensors related to the Swerve subsystem.
+     * These entries are used to display and update values on the Shuffleboard.
+     * Set <STRONG>SwerveConstants.updateSwerveFromShuffleboard</STRONG> to true to update values.
+     */
     @Override
     public void createEntries() {
         mTab = Shuffleboard.getTab("Swerve");
@@ -55,6 +68,11 @@ public class SwerveTab extends ShuffleboardTabBase {
         }
     }
 
+    /**
+     * Updates the values of various Shuffleboard widgets with the current state of the swerve drive.
+     * The Cancoder, Integrated, and Velocity widgets for each module are updated periodically.
+     * Set <STRONG>SwerveConstants.updateSwerveFromShuffleboard</STRONG> to true to update values.
+     */
     @Override
     public void periodic() {
         m_FLCancoder.setDouble(m_swerve.getModules()[0].getCanCoder().getDegrees());

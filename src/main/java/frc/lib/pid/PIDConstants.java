@@ -1,5 +1,8 @@
 package frc.lib.pid;
 
+/**
+ * A container class for PID constants, along with additional methods.
+ */
 public class PIDConstants implements Cloneable{
     private double kP, kI, kD, kF = 0;
     private double period = 0.02;
