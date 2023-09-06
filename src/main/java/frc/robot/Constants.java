@@ -101,51 +101,38 @@ public final class Constants {
         public static final NeutralMode angleNeutralMode = NeutralMode.Brake;
         public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
 
-        /* Module Specific Constants */
-        /* Front Left Module */
-        public static final class Mod0 {
-            public static final int driveMotorID = 0;
-            public static final int angleMotorID = 0;
-            public static final int canCoderID = 0;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
-            public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
-                    canCoderID, angleOffset);
-        }
+        /* Front Left */
+        public static final SwerveModuleConstants Module0 = new SwerveModuleConstants(
+            0, 
+            0, 
+            0, 
+            Rotation2d.fromDegrees(0.0));
 
-        /* Front Right Module */
-        public static final class Mod1 {
-            public static final int driveMotorID = 0;
-            public static final int angleMotorID = 0;
-            public static final int canCoderID = 0;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
-            public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
-                    canCoderID, angleOffset);
-        }
+        /* Front Right */
+        public static final SwerveModuleConstants Module1 = new SwerveModuleConstants(
+            0, 
+            0, 
+            0, 
+            Rotation2d.fromDegrees(0.0));
 
-        /* Back Left Module */
-        public static final class Mod2 {
-            public static final int driveMotorID = 0;
-            public static final int angleMotorID = 0;
-            public static final int canCoderID = 0;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
-            public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
-                    canCoderID, angleOffset);
-        }
+        /* Back Left */
+        public static final SwerveModuleConstants Module2 = new SwerveModuleConstants(
+            0, 
+            0, 
+            0, 
+            Rotation2d.fromDegrees(0.0));
 
-        /* Back Right Module */
-        public static final class Mod3 { // TODO
-            public static final int driveMotorID = 0;
-            public static final int angleMotorID = 0;
-            public static final int canCoderID = 0;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(0.0);
-            public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
-                    canCoderID, angleOffset);
-        }
+        /* Back Right */
+        public static final SwerveModuleConstants Module3 = new SwerveModuleConstants(
+            0, 
+            0, 
+            0, 
+            Rotation2d.fromDegrees(0.0));
     }
 
     public static final class Ports {
         // Canivore
-        public static final String canivoreBusName = "NAME_HERE"; // TODO Delete if the robot does not use a canivore
+        public static final String canivoreBusName = "NAME_HERE"; // TODO Delete if the robot does not use a CANivore
 
         // Electrical component ports
         public static final int pdhID = 0;

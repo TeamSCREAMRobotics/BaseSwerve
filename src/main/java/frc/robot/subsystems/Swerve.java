@@ -3,10 +3,6 @@ package frc.robot.subsystems;
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Constants.SwerveConstants.Mod0;
-import frc.robot.Constants.SwerveConstants.Mod1;
-import frc.robot.Constants.SwerveConstants.Mod2;
-import frc.robot.Constants.SwerveConstants.Mod3;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -42,19 +38,17 @@ public class Swerve extends SubsystemBase {
      * Initializes the gyro, swerve modules, and pose estimator.
      */
     public Swerve() {
-        m_gyro = new Pigeon2(Ports.pigeonID, Ports.canivoreBusName);
+        m_gyro = new Pigeon2(Ports.pigeonID, Ports.canivoreBusName); //TODO delete Ports.canivoreBusName if the robot is not using a CANivore
         configGyro();
 
         /**
          * Initializes an array of SwerveModule objects with their respective names, IDs, and constants.
-         *
-         * @return An array of SwerveModule objects representing the swerve modules.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule("FL", 0, Mod0.constants),
-                new SwerveModule("FR", 1, Mod1.constants),
-                new SwerveModule("BL", 2, Mod2.constants),
-                new SwerveModule("BR", 3, Mod3.constants)
+                new SwerveModule("FL", 0, SwerveConstants.Module0),
+                new SwerveModule("FR", 1, SwerveConstants.Module1),
+                new SwerveModule("BL", 2, SwerveConstants.Module2),
+                new SwerveModule("BR", 3, SwerveConstants.Module3)
         };
         
         /**

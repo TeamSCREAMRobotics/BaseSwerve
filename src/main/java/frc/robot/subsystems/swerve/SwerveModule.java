@@ -24,7 +24,7 @@ import com.ctre.phoenix.sensors.CANCoder;
  */
 public class SwerveModule {
     private int m_moduleNumber;
-    private String m_name;
+    private String m_location;
     private Rotation2d m_angleOffset;
     private Rotation2d m_lastAngle;
 
@@ -40,13 +40,13 @@ public class SwerveModule {
     /**
      * Constructs a SwerveModule object with the given name, module number, and module constants.
      *<p>
-     * @param name The name of the SwerveModule.
+     * @param location The name of the SwerveModule.
      * @param moduleNumber The module number of the SwerveModule.
      * @param moduleConstants The constants specific to this SwerveModule.
      */
-    public SwerveModule(String name, int moduleNumber, SwerveModuleConstants moduleConstants) {
+    public SwerveModule(String location, int moduleNumber, SwerveModuleConstants moduleConstants) {
         this.m_moduleNumber = moduleNumber;
-        this.m_name = name;
+        this.m_location = location;
         this.m_angleOffset = moduleConstants.angleOffset;
 
         m_configs = new DeviceConfigs();
@@ -72,7 +72,7 @@ public class SwerveModule {
      * @return The name.
      */
     public String getName() {
-        return m_name;
+        return m_location;
     }
 
     /**
