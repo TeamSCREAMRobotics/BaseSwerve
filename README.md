@@ -22,16 +22,3 @@ Base swerve code for both teams.
            - Replace NAME_HERE with the assigned device name in the Ports class of Constants.java
            - Remember to add the constant in the initialization of any additional devices using it
 
-4. **Test the Robot and Measure Values**
-   - Prepare test scenarios and test cases.
-     - Test robot functionality in different environments.
-     - Measure performance metrics.
-   - Conduct unit tests on specific robot components.
-   - Perform integration testing with other project modules.
-     - Check compatibility with the new team number.
-   - Measure and record relevant values, such as:
-     - Robot speed and accuracy.
-     - Power consumption.
-     - Sensor data accuracy.
-   - Analyze test results and identify areas for improvement.
-
