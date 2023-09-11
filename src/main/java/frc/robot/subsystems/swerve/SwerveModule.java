@@ -71,7 +71,7 @@ public class SwerveModule {
      *<p>
      * @return The name.
      */
-    public String getName() {
+    public String getLocation() {
         return m_location;
     }
 

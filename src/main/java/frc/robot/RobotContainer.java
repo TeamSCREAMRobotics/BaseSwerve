@@ -1,7 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -24,8 +25,8 @@ public class RobotContainer {
 
     /* Shuffleboard */
     private final ShuffleboardTabManager m_shuffleboardTabManager;
+    private ShuffleboardTab m_autoTab;
 
-    
     /**
      * Configures the subsystems, default commands, button bindings, and the autonomous chooser.
      */
@@ -33,6 +34,7 @@ public class RobotContainer {
         m_controlboard = new Controlboard();
         m_swerve = new Swerve();
         m_shuffleboardTabManager = new ShuffleboardTabManager(this);
+        m_autoTab = Shuffleboard.getTab("Auto");
 
         m_swerve.setDefaultCommand(
                 new TeleopSwerve(
@@ -56,11 +58,12 @@ public class RobotContainer {
     /**
      * Configures the autonomous chooser on the SmartDashboard.
      * <p>
-     * Add options using the <STRONG>addOption</STRONG> method.
+     * Add options with <STRONG>addOption</STRONG>.
      */
     private void configAutoChooser() {
-        SmartDashboard.putData(m_autoChooser);
+        m_autoTab.add(m_autoChooser);
 
+        m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());
         m_autoChooser.addOption("Example Option", AutoRoutines.exampleRoutine(m_swerve));
     }
 

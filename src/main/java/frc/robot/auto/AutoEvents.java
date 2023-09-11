@@ -22,7 +22,7 @@ public class AutoEvents extends SequentialCommandGroup {
     public static HashMap<String, Command> exampleEvents() {
         HashMap<String, Command> exampleEvents = new HashMap<String, Command>();
 
-        exampleEvents.put("Example", new InstantCommand());
+        exampleEvents.put("Example", new InstantCommand(() -> System.out.println("test")));
         return exampleEvents;
     }
 }

@@ -13,7 +13,7 @@ import frc.lib.util.SwerveModuleConstants;
  * A container class for constants used in various places in the project.
  */
 public final class Constants {
-    public static final double stickDeadband = 0.1;
+    public static final double stickDeadband = 0.05;
     public static final boolean includeDebugTabs = true;
 
     public static final class SwerveConstants {
@@ -23,11 +23,11 @@ public final class Constants {
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
 
         public static final COTSFalconSwerveConstants chosenModule = COTSFalconSwerveConstants
-                .SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3);
+                            .SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); // TODO ROBOT SPECIFIC
 
         /* Drivetrain Constants */
-        public static final double trackWidth = 0; // TODO Robot Specific
-        public static final double wheelBase = 0;
+        public static final double trackWidth = 0.0; // TODO ROBOT SPECIFIC
+        public static final double wheelBase = 0.0; // TODO ROBOT SPECIFIC
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /*
@@ -78,24 +78,26 @@ public final class Constants {
         public static final double angleKF = chosenModule.angleKF;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.0; // TODO Robot Specific
+        public static final double driveKP = 0.0; // TODO ROBOT SPECIFIC
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
 
-        public static final double driveKS = (0.32 / 12); // TODO Robot Specific
+        public static final double driveKS = (0.32 / 12); // TODO ROBOT SPECIFIC
         public static final double driveKV = (1.51 / 12);
         public static final double driveKA = (0.27 / 12);
 
         /* PathPlanner PIDConstants */
-        public static final PIDConstants pathTranslationConstants = new PIDConstants(0.0, 0.0, 0.0); // TODO Robot Specific
+        public static final PIDConstants pathTranslationConstants = new PIDConstants(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
         public static final PIDConstants pathRotationConstants = new PIDConstants(0.0, 0.0, 0.0);
 
         /* Swerve Profiling Values */
-        /** Meters per Second */
-        public static final double maxSpeed = 0.0; // TODO Robot Specific
-        /** Radians per Second */
-        public static final double maxAngularVelocity = 0.0; // TODO Robot Specific
+
+        /* Meters per Second */
+        public static final double maxSpeed = 0.0; // TODO ROBOT SPECIFIC
+
+        /* Radians per Second */
+        public static final double maxAngularVelocity = 0.0; // TODO ROBOT SPECIFIC
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Brake;
@@ -103,41 +105,44 @@ public final class Constants {
 
         /* Front Left */
         public static final SwerveModuleConstants Module0 = new SwerveModuleConstants(
-            0, 
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0));
+            23, 
+            24, 
+            8, 
+            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
 
         /* Front Right */
         public static final SwerveModuleConstants Module1 = new SwerveModuleConstants(
-            0, 
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0));
+            13, 
+            14, 
+            3, 
+            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
 
         /* Back Left */
         public static final SwerveModuleConstants Module2 = new SwerveModuleConstants(
-            0, 
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0));
+            19, 
+            20, 
+            6, 
+            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
 
         /* Back Right */
         public static final SwerveModuleConstants Module3 = new SwerveModuleConstants(
-            0, 
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0));
+            11, 
+            12, 
+            2, 
+            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
     }
 
     public static final class Ports {
-        // Canivore
-        public static final String canivoreBusName = "NAME_HERE"; // TODO Delete if the robot does not use a CANivore
+        /* CANivore */
+        public static final String canivoreBusName = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
 
-        // Electrical component ports
+        /* Limelight */
+        public static final String limelightName = "limelight";
+
+        /* Electrical component ports */
         public static final int pdhID = 0;
 
-        // Sensor Ports
+        /* Sensor ports */
         public static final int pigeonID = 0;
     }
 

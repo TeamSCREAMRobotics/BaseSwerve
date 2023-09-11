@@ -38,6 +38,12 @@ public class SwerveTab extends ShuffleboardTabBase {
     private GenericEntry m_BRIntegrated;
     private GenericEntry m_BRVelocity;
 
+    private GenericEntry m_gyroYaw;
+
+    private GenericEntry m_odometryX;
+    private GenericEntry m_odometryY;
+    private GenericEntry m_odometryAngle;
+
     /**
      * This method creates number entries for various sensors related to the Swerve subsystem.
      * These entries are used to display and update values on the Shuffleboard.
@@ -62,6 +68,12 @@ public class SwerveTab extends ShuffleboardTabBase {
         m_BRCancoder = createNumberEntry("BR Cancoder", 0);
         m_BRIntegrated = createNumberEntry("BR Integrated", 0);
         m_BRVelocity = createNumberEntry("BR Velocity", 0);
+
+        m_gyroYaw = createNumberEntry("Gyro Yaw Reading", 0);
+
+        m_odometryX = createNumberEntry("Odometry X", 0);
+        m_odometryY = createNumberEntry("Odometry Y", 0);
+        m_odometryAngle = createNumberEntry("Odometry Angle", 0);
 
         if (SwerveConstants.updateSwerveFromShuffleboard) {
             /* Add code here */
@@ -90,6 +102,12 @@ public class SwerveTab extends ShuffleboardTabBase {
         m_BRCancoder.setDouble(m_swerve.getModules()[3].getCanCoder().getDegrees());
         m_BRIntegrated.setDouble(m_swerve.getModules()[3].getPosition().angle.getDegrees());
         m_BRVelocity.setDouble(m_swerve.getModules()[3].getState().speedMetersPerSecond);
+
+        m_gyroYaw.setDouble(m_swerve.getYaw().getDegrees());
+
+        m_odometryX.setDouble(m_swerve.getPose().getX());
+        m_odometryY.setDouble(m_swerve.getPose().getY());
+        m_odometryAngle.setDouble(m_swerve.getPose().getRotation().getDegrees());
 
         if (SwerveConstants.updateSwerveFromShuffleboard) {
             /* Add code here */
