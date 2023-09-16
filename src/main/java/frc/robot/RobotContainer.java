@@ -22,6 +22,7 @@ public class RobotContainer {
 
     /* Auto */
     private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
+    private final AutoRoutines m_autoRoutines;
 
     /* Shuffleboard */
     private final ShuffleboardTabManager m_shuffleboardTabManager;
@@ -31,8 +32,16 @@ public class RobotContainer {
      * Configures the subsystems, default commands, button bindings, and the autonomous chooser.
      */
     public RobotContainer() {
+        /* Controlboard */
         m_controlboard = new Controlboard();
+
+        /* Subsystems */
         m_swerve = new Swerve();
+
+        /* Auto */
+        m_autoRoutines = new AutoRoutines(m_swerve);
+
+        /* Shuffleboard */
         m_shuffleboardTabManager = new ShuffleboardTabManager(this);
         m_autoTab = Shuffleboard.getTab("Auto");
 
@@ -63,8 +72,8 @@ public class RobotContainer {
     private void configAutoChooser() {
         m_autoTab.add(m_autoChooser);
 
-        m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());
-        m_autoChooser.addOption("Example Option", AutoRoutines.exampleRoutine(m_swerve));
+        m_autoChooser.setDefaultOption("Do Nothing", m_autoRoutines.doNothing());
+        m_autoChooser.addOption("Example Option", m_autoRoutines.exampleRoutine());
     }
 
     /**

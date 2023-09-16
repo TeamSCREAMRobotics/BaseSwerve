@@ -6,7 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import frc.lib.deviceConfiguration.ErrorChecker.DeviceConfiguration;
 import frc.lib.pid.MotionMagicConstants;
-import frc.lib.pid.PIDConstants;
+import frc.lib.pid.ScreamPIDConstants;
 
 /**
  * Utilities for configuring various motor controllers.
@@ -20,7 +20,7 @@ public class DeviceUtil {
      * @param pidConstants The PID constants to set for the controller.
      * @param printInfo Whether to print information about the configuration process.
      */
-    public static void configTalonFXPID(TalonFX motor, PIDConstants pidConstants, boolean printInfo){
+    public static void configTalonFXPID(TalonFX motor, ScreamPIDConstants pidConstants, boolean printInfo){
 		DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
             public boolean configureSettings() {
@@ -45,7 +45,7 @@ public class DeviceUtil {
   	* @param pidConstants The PID constants to set for the controller.
   	* @param printInfo Whether to print information about the configuration process.
   	*/
-	public static void configTalonSRXPID(TalonSRX motor, PIDConstants pidConstants, boolean printInfo){
+	public static void configTalonSRXPID(TalonSRX motor, ScreamPIDConstants pidConstants, boolean printInfo){
 		DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
             public boolean configureSettings() {
@@ -70,7 +70,7 @@ public class DeviceUtil {
   	* @param pidConstants The PID constants to set for the controller.
   	* @param printInfo Whether to print information about the configuration process.
   	*/
-	public static void configCANSparkMaxPID(CANSparkMax motor, PIDConstants pidConstants, boolean printInfo){
+	public static void configCANSparkMaxPID(CANSparkMax motor, ScreamPIDConstants pidConstants, boolean printInfo){
 		SparkMaxPIDController pidController = motor.getPIDController();
 
 		DeviceConfiguration config = new DeviceConfiguration() {

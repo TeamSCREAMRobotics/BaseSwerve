@@ -38,9 +38,9 @@ public class SwerveModule {
             SwerveConstants.driveKA);
 
     /**
-     * Constructs a SwerveModule object with the given name, module number, and module constants.
+     * Constructs a SwerveModule object with the given location, module number, and module constants.
      *<p>
-     * @param location The name of the SwerveModule.
+     * @param location The location of the SwerveModule.
      * @param moduleNumber The module number of the SwerveModule.
      * @param moduleConstants The constants specific to this SwerveModule.
      */
@@ -67,9 +67,9 @@ public class SwerveModule {
     }
 
     /**
-     * Returns the name associated with this module.
+     * Returns the location associated with this module.
      *<p>
-     * @return The name.
+     * @return The location.
      */
     public String getLocation() {
         return m_location;

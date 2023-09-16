@@ -1,6 +1,6 @@
 package frc.lib.util;
 
-import frc.lib.pid.PIDConstants;
+import frc.lib.pid.ScreamPIDConstants;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -80,11 +80,11 @@ public class ScreamUtil {
 	}
 
 
-	public static ProfiledPIDController createProfiledPIDController(PIDConstants pidConstants, Constraints motionConstraints, double updatePeriod){
+	public static ProfiledPIDController createProfiledPIDController(ScreamPIDConstants pidConstants, Constraints motionConstraints, double updatePeriod){
 		return new ProfiledPIDController(pidConstants.kP(), pidConstants.kI(), pidConstants.kD(), motionConstraints, updatePeriod);
 	}
 
-	public static PIDController createPIDController(PIDConstants pidConstants, double updatePeriod){
+	public static PIDController createPIDController(ScreamPIDConstants pidConstants, double updatePeriod){
 		PIDController controller =  new PIDController(pidConstants.kP(), pidConstants.kI(), pidConstants.kD(), updatePeriod);
 		controller.setIntegratorRange(-pidConstants.integralZone(), pidConstants.integralZone());
 		return controller;

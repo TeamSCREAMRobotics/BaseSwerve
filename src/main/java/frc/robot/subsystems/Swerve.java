@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.subsystems.swerve.SwerveModule;
+import frc.lib.util.Tuple2;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -12,7 +13,8 @@ import java.util.HashMap;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.pathplanner.lib.commands.FollowPathWithEvents;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -34,10 +36,10 @@ public class Swerve extends SubsystemBase {
     /**
      * Constructs a new instance of the Swerve class.
      * <p>
-     * Initializes the gyro, swerve modules, and pose estimator.
+     * Initializes the gyro, swerve modules, and odometry.
      */
     public Swerve() {
-        m_gyro = new Pigeon2(Ports.pigeonID, Ports.canivoreBusName); //TODO delete Ports.canivoreBusName if the robot is not using a CANivore
+        m_gyro = new Pigeon2(Ports.pigeonID, Ports.canivoreBusName); //TODO delete canivoreBusName if the robot is not using a CANivore
         configGyro();
         
         /**
@@ -51,13 +53,11 @@ public class Swerve extends SubsystemBase {
         };
         
         /**
-         * Configures the pose estimator, which uses the kinematics, gyro reading, and module positions.
+         * Configures the odometry, which uses the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
         m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.swerveKinematics, getYaw(),
                 getModulePositions(), new Pose2d());
-
-        zeroPose();
     }
 
     /**
@@ -65,13 +65,6 @@ public class Swerve extends SubsystemBase {
      */
     public void zeroGyro() {
         m_gyro.setYaw(0);
-    }
-
-    /**
-     * Resets the pose of the pose estimator
-     */
-    public void zeroPose() {
-        m_swerveOdometry.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), new Pose2d());
     }
 
     /**
@@ -105,10 +98,10 @@ public class Swerve extends SubsystemBase {
      * Drives the swerve drive system based on the given chassis speeds.
      * Used as an input for SwerveAutoBuilder.
      *
-     * @param chassisSpeeds The desired chassis speeds to drive the swerve drive system.
+     * @param chassisSpeeds The desired chassis speeds to drive.
      */
-    public void drive(ChassisSpeeds chassisSpeeds) {
-        SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
+    public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
+        //SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed);
 
         for (SwerveModule mod : m_swerveModules) {
@@ -119,7 +112,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Resets the pose reported by the odometry to the specified pose.
      *
-     * @param pose The new pose to set for the swerve drive system.
+     * @param pose The new pose to set.
      */
     public void resetPose(Pose2d pose) {
         m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
@@ -171,7 +164,7 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Returns the yaw rotation in degrees.
-     * If <STRONG>SwerveConstants.invertGyro</STRONG> is set to true, the yaw rotation is inverted.
+     * If <STRONG>invertGyro</STRONG> is set to true, the yaw rotation is inverted.
      *
      * @return The yaw rotation in degrees.
      */
@@ -201,23 +194,27 @@ public class Swerve extends SubsystemBase {
      * Use an event map to trigger given events along the trajectory.
      *
      * @param traj The trajectory to follow.
-     * @param eventMap A map of events to be triggered during the trajectory.
-     * @param isFirstPath Indicates if this is the first path in the sequence.
-     * @param useAllianceColor Indicates if the alliance color should be used.
-     * @return The command to follow the path, including the triggered.
+     * @param eventMap The events to trigger along the path. Should always be the global event map.
+     * @param isFirstPath Whether the trajectory is the first in the sequence.
+     * @param useAllianceColor If the trajectory should be flipped according to alliance color.
+     * @return The command to follow the path, including the triggered events.
      */
-    public Command followTrajectoryCommand(PathPlannerTrajectory traj, HashMap<String, Command> eventMap,
-            boolean isFirstPath, boolean useAllianceColor) {
-        SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-                this::getPose,
-                this::resetPose,
-                SwerveConstants.pathTranslationConstants,
-                SwerveConstants.pathRotationConstants,
-                this::drive,
-                eventMap,
-                useAllianceColor,
-                this);
-
-        return autoBuilder.fullAuto(traj);
+    public Command followTrajectoryCommand(Tuple2<PathPlannerTrajectory, HashMap<String, Command>> set, boolean isFirstPath, boolean useAllianceColor) {
+        FollowPathWithEvents path = new FollowPathWithEvents(
+            new PPSwerveControllerCommand(
+                set.getItem1(), 
+                this::getPose, // Pose supplier
+                SwerveConstants.swerveKinematics, // SwerveDriveKinematics
+                SwerveConstants.pathTranslationController, // X controller
+                SwerveConstants.pathTranslationController, // Y controller 
+                SwerveConstants.pathRotationController, // Rotation controller
+                this::setModuleStates, // Module states consumer
+                useAllianceColor, // If the path should be mirrored depending on alliance color
+                this // Requires this drive subsystem
+            ), 
+            set.getItem1().getMarkers(), 
+            set.getItem2());
+            return path;
     }
+
 }

@@ -1,8 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.pathplanner.lib.auto.PIDConstants;
-
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -88,8 +87,8 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* PathPlanner PIDConstants */
-        public static final PIDConstants pathTranslationConstants = new PIDConstants(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
-        public static final PIDConstants pathRotationConstants = new PIDConstants(0.0, 0.0, 0.0);
+        public static final PIDController pathTranslationController = new PIDController(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
+        public static final PIDController pathRotationController = new PIDController(0.0, 0.0, 0.0);
 
         /* Swerve Profiling Values */
 
@@ -100,7 +99,7 @@ public final class Constants {
         public static final double maxAngularVelocity = 0.0; // TODO ROBOT SPECIFIC
 
         /* Neutral Modes */
-        public static final NeutralMode angleNeutralMode = NeutralMode.Brake;
+        public static final NeutralMode angleNeutralMode = NeutralMode.Coast; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
         public static final NeutralMode driveNeutralMode = NeutralMode.Brake;
 
         /* Front Left */
@@ -134,7 +133,7 @@ public final class Constants {
 
     public static final class Ports {
         /* CANivore */
-        public static final String canivoreBusName = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
+        public static final String canivoreBusName = ""; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
 
         /* Limelight */
         public static final String limelightName = "limelight";
