@@ -88,7 +88,7 @@ See [```configButtonBindings```](https://github.com/TeamSCREAM4522/BaseSwerve/bl
 <br><b>Controllers</b>
 * [```pathTranslationController```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/general-testing/src/main/java/frc/robot/Constants.java#L90): The PID controller used for following and correcting translation for the path's trajectory.
 * [```pathRotationController```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/general-testing/src/main/java/frc/robot/Constants.java#L91): The PID controller used for following and correcting rotation for the path's trajectory.
-* Use the guide in #13 to tune these controllers.
+* Use the guide in Angle Motor PID Values to tune these controllers.
 
 <br><b>Using paths to create Autonomous routines</b>
 * Create methods that return individual trajectories with their respective constraints. See [```AutoTrajectories.java```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/general-testing/src/main/java/frc/robot/auto/AutoTrajectories.java).
