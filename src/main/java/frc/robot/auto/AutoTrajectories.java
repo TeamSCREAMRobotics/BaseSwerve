@@ -10,6 +10,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 public class AutoTrajectories {
 
     public static PathPlannerTrajectory getExampleTrajectory() {
-        return PathPlanner.loadPath("Example", new PathConstraints(0, 0));
+        return PathPlanner.loadPath("ExamplePath", new PathConstraints(1, 1));
     }
 }

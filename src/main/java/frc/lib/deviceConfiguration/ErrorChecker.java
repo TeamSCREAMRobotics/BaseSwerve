@@ -1,7 +1,6 @@
 package frc.lib.deviceConfiguration;
 
 import com.ctre.phoenix.ErrorCode;
-import com.revrobotics.REVLibError;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -23,19 +22,6 @@ public class ErrorChecker {
         return okay;
     }
 
-    /**
-     * This method takes a list of RevLibErrors and returns true if they are all REVLibError.kOk. When we configure our devices, we wrap all our our calls to the devices in this method
-     * to tell us if the device has configured correctly, or if there are errors.
-     */
-    public static boolean hasConfiguredWithoutErrors(REVLibError... errors){
-        boolean okay = true;
-        for(REVLibError error : errors){
-            okay = okay && REVLibError.kOk == error;
-        }
-        return okay;
-    }
-
-    
     /**
      * This method does the actual configuration for the device. It repeatedly calls config.configureSettings() until there is a successful configuration or until it times out.
      * If printInfo is true, it will print if the configuration succeeded and how many tries it took

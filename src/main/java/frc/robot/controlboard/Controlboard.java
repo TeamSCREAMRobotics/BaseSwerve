@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
- * Represents the control board subsystem.
+ * A utility class that contains button bindings.
  * <p>
  * Controlboard allows easy reference of custom button associations.
  */
@@ -48,12 +48,9 @@ public class Controlboard extends SubsystemBase {
      * @return True if field-centric; false if robot-centric
      */
     public boolean getFieldCentric() {
-        /* Toggles field-centric mode between true and false when the back button is pressed */
-        new Trigger(m_driverController::getBackButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
+        /* Toggles field-centric mode between true and false when the start button is pressed */
+        new Trigger(m_driverController::getStartButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
         return fieldCentric;
     }
-
-    @Override
-    public void periodic(){}
 
 }

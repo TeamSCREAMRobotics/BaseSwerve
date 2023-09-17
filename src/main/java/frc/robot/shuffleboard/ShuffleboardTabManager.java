@@ -12,13 +12,13 @@ import frc.robot.shuffleboard.tabs.SwerveTab;
 public class ShuffleboardTabManager extends SubsystemBase {
 
     // Adds more tabs to use when debugging
-    public final boolean mDebug = true;
+    public final boolean m_debug = true;
 
     private final ArrayList<ShuffleboardTabBase> mTabs = new ArrayList<ShuffleboardTabBase>();
 
-    public ShuffleboardTabManager(RobotContainer robotContainer) {
-        if (mDebug) {
-            mTabs.add(new SwerveTab(robotContainer.getSwerve()));
+    public ShuffleboardTabManager(RobotContainer container) {
+        if (m_debug) {
+            mTabs.add(new SwerveTab(container.getSwerve()));
         } else {
             /* Add code here */
         }

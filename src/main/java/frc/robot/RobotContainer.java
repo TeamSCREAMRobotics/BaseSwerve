@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.auto.AutoEvents;
 import frc.robot.auto.AutoRoutines;
 import frc.robot.commands.*;
 import frc.robot.controlboard.Controlboard;
@@ -23,13 +24,14 @@ public class RobotContainer {
     /* Auto */
     private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
     private final AutoRoutines m_autoRoutines;
+    private final AutoEvents m_autoEvents;
 
     /* Shuffleboard */
     private final ShuffleboardTabManager m_shuffleboardTabManager;
-    private ShuffleboardTab m_autoTab;
+    private final ShuffleboardTab m_autoTab;
 
     /**
-     * Configures the subsystems, default commands, button bindings, and the autonomous chooser.
+     * Configures the subsystems, default commands, button bindings, and autonomous classes.
      */
     public RobotContainer() {
         /* Controlboard */
@@ -39,7 +41,8 @@ public class RobotContainer {
         m_swerve = new Swerve();
 
         /* Auto */
-        m_autoRoutines = new AutoRoutines(m_swerve);
+        m_autoRoutines = new AutoRoutines(this);
+        m_autoEvents = new AutoEvents(this);
 
         /* Shuffleboard */
         m_shuffleboardTabManager = new ShuffleboardTabManager(this);
@@ -82,6 +85,7 @@ public class RobotContainer {
      * @return The selected autonomous command.
      */
     public Command getAutonomousCommand() {
+        System.out.println("Selected auto routine: " + m_autoChooser.getSelected());
         return m_autoChooser.getSelected();
     }
 

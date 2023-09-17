@@ -3,8 +3,6 @@ package frc.lib.deviceConfiguration;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.*;
 import com.ctre.phoenix.sensors.*;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import frc.lib.deviceConfiguration.DeviceConfigs.*;
 import frc.lib.deviceConfiguration.ErrorChecker.*;
 
@@ -139,35 +137,5 @@ public class DeviceConfigurationUtil {
         ErrorChecker.configureDevice(deviceConfig, name, true);
 		
 		return unconfiguredPigeon2;
-	}
-
-	
-    public static CANSparkMax configCANSparkMax(CANSparkMax unconfiguredCANSparkMax, CANSparkMaxConfig config, String name){
-
-		DeviceConfiguration deviceConfig = new DeviceConfiguration() {
-            @Override
-            public boolean configureSettings() {
-                return ErrorChecker.hasConfiguredWithoutErrors(
-					unconfiguredCANSparkMax.restoreFactoryDefaults(),
-					unconfiguredCANSparkMax.clearFaults(),
-				
-					unconfiguredCANSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, config.status0),
-					unconfiguredCANSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus1, config.status0),
-					unconfiguredCANSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus2, config.status2),
-					unconfiguredCANSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus3, config.status3),
-					unconfiguredCANSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus4, config.status4),
-					unconfiguredCANSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus5, config.status5),
-					unconfiguredCANSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus6, config.status6),
-
-					unconfiguredCANSparkMax.setIdleMode(config.idleMode),
-
-					config.enableVoltageCompensation? unconfiguredCANSparkMax.enableVoltageCompensation(config.voltageCompSaturation)
-										: unconfiguredCANSparkMax.disableVoltageCompensation()
-                );
-            }
-        };
-        ErrorChecker.configureDevice(deviceConfig, name, true);
-		
-		return unconfiguredCANSparkMax;
 	}
 }

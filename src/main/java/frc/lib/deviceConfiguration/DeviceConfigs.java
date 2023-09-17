@@ -8,7 +8,6 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
-import com.revrobotics.CANSparkMax.IdleMode;
 
 import frc.robot.Constants.SwerveConstants;
 
@@ -103,20 +102,6 @@ public class DeviceConfigs {
         public int condStatus_6_SensorFusion = maxStatusFramePeriod;
         public int condStatus_9_SixDeg_YPR = 20;
         public int rawStatus_4_Mag = maxStatusFramePeriod;
-    }
-
-    public static class CANSparkMaxConfig{
-        public int status0 = 10;
-        public int status1 = 50;
-        public int status2 = 20;
-        public int status3 = 50;
-        public int status4 = maxStatusFramePeriod;
-        public int status5 = maxStatusFramePeriod;
-        public int status6 = maxStatusFramePeriod;
-
-        public boolean enableVoltageCompensation = true;
-        public double voltageCompSaturation = kNominalVoltage;
-        public IdleMode idleMode = IdleMode.kCoast;
     }
 
     public void configSwerve() {

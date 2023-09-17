@@ -35,7 +35,7 @@
         "x": 6.795082463203443,
         "y": 3.990974829310571
       },
-      "holonomicAngle": -56.633633998940525,
+      "holonomicAngle": -90.0,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
@@ -77,7 +77,7 @@
     {
       "position": 0.363636363636347,
       "names": [
-        "Example"
+        "ExampleEvent"
       ]
     }
   ]

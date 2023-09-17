@@ -47,7 +47,7 @@ public class SwerveTab extends ShuffleboardTabBase {
     /**
      * This method creates number entries for various sensors related to the Swerve subsystem.
      * These entries are used to display and update values on the Shuffleboard.
-     * Set <STRONG>SwerveConstants.updateSwerveFromShuffleboard</STRONG> to true to update values.
+     * Set {@code SwerveConstants.updateSwerveFromShuffleboard} equal to true to add and/or update values
      */
     @Override
     public void createEntries() {

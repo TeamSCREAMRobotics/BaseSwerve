@@ -2,8 +2,6 @@ package frc.lib.deviceConfiguration;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxPIDController;
 import frc.lib.deviceConfiguration.ErrorChecker.DeviceConfiguration;
 import frc.lib.pid.MotionMagicConstants;
 import frc.lib.pid.ScreamPIDConstants;
@@ -62,33 +60,6 @@ public class DeviceUtil {
         };
         ErrorChecker.configureDevice(deviceConfig, "TalonSRXPID", printInfo);
 	}
-
-	/**
-  	* Configures the PID constants for a SparkMax motor controller.
-  	*
-  	* @param motor The SparkMax motor controller to configure.
-  	* @param pidConstants The PID constants to set for the controller.
-  	* @param printInfo Whether to print information about the configuration process.
-  	*/
-	public static void configCANSparkMaxPID(CANSparkMax motor, ScreamPIDConstants pidConstants, boolean printInfo){
-		SparkMaxPIDController pidController = motor.getPIDController();
-
-		DeviceConfiguration config = new DeviceConfiguration() {
-			@Override
-			public boolean configureSettings() {
-				return ErrorChecker.hasConfiguredWithoutErrors(
-					pidController.setP(pidConstants.kP()),
-					pidController.setI(pidConstants.kI()),
-					pidController.setD(pidConstants.kD()),
-					pidController.setFF(pidConstants.kF()),
-					pidController.setIZone(pidConstants.integralZone()),
-					pidController.setIMaxAccum(pidConstants.maxIntegralAccumulator(), 0),
-					pidController.setOutputRange(pidConstants.minOutput(), pidConstants.maxOutput())
-				);
-			}
-		};
-        ErrorChecker.configureDevice(config, "TalonSRXPID", printInfo);
-	}	
 
  	/**
   	* Configures TalonFX MotionMagic with the provided constants.

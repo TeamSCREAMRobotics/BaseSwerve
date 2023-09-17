@@ -72,17 +72,6 @@ public abstract class ShuffleboardTabBase {
                 .withProperties(Map.of("min", minValue, "max", maxValue)).getEntry();
     }
 
-    /**
-     * Creates a graph entry with the given name and value.
-     *
-     * @param name The name of the graph entry.
-     * @param value The value of the graph entry.
-     * @return The created graph entry.
-     */
-    protected GenericEntry createGraph(String name, double value) {
-        return mTab.add(name, value).withWidget(BuiltInWidgets.kGraph).getEntry();
-    }
-
     public abstract void periodic();
 
     /**

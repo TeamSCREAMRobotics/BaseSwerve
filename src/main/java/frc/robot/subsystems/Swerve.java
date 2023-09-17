@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
 
 import frc.robot.subsystems.swerve.SwerveModule;
-import frc.lib.util.Tuple2;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.auto.AutoEvents;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -191,30 +191,56 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Generates a command that follows the given trajectory.
-     * Use an event map to trigger given events along the trajectory.
+     * Will automatically trigger events associated with that trajectory.
      *
-     * @param traj The trajectory to follow.
-     * @param eventMap The events to trigger along the path. Should always be the global event map.
-     * @param isFirstPath Whether the trajectory is the first in the sequence.
-     * @param useAllianceColor If the trajectory should be flipped according to alliance color.
-     * @return The command to follow the path, including the triggered events.
+     * @param trajectory The trajectory to follow.
+     * @param mirrorWithAlliance If the trajectory should be flipped according to alliance color.
+     * @return The full path, including the events triggered along it.
      */
-    public Command followTrajectoryCommand(Tuple2<PathPlannerTrajectory, HashMap<String, Command>> set, boolean isFirstPath, boolean useAllianceColor) {
+    public Command followTrajectoryCommand(PathPlannerTrajectory trajectory, boolean mirrorWithAlliance) {
+        HashMap<String, Command> autoEvents = AutoEvents.getEvents();
+
         FollowPathWithEvents path = new FollowPathWithEvents(
             new PPSwerveControllerCommand(
-                set.getItem1(), 
+                trajectory, 
                 this::getPose, // Pose supplier
                 SwerveConstants.swerveKinematics, // SwerveDriveKinematics
                 SwerveConstants.pathTranslationController, // X controller
                 SwerveConstants.pathTranslationController, // Y controller 
                 SwerveConstants.pathRotationController, // Rotation controller
                 this::setModuleStates, // Module states consumer
-                useAllianceColor, // If the path should be mirrored depending on alliance color
+                mirrorWithAlliance, // If the path should be mirrored depending on alliance color
                 this // Requires this drive subsystem
             ), 
-            set.getItem1().getMarkers(), 
-            set.getItem2());
+            trajectory.getMarkers(), 
+            autoEvents);
             return path;
     }
 
+    /**
+     * Generates a command that follows the given trajectory.
+     * Will automatically trigger events associated with that trajectory.
+     *
+     * @param trajectory The trajectory to follow.
+     * @return The full path, including the events triggered along it.
+     */
+    public Command followTrajectoryCommand(PathPlannerTrajectory trajectory) {
+        HashMap<String, Command> autoEvents = AutoEvents.getEvents();
+
+        FollowPathWithEvents path = new FollowPathWithEvents(
+            new PPSwerveControllerCommand(
+                trajectory, 
+                this::getPose, // Pose supplier
+                SwerveConstants.swerveKinematics, // SwerveDriveKinematics
+                SwerveConstants.pathTranslationController, // X controller
+                SwerveConstants.pathTranslationController, // Y controller 
+                SwerveConstants.pathRotationController, // Rotation controller
+                this::setModuleStates, // Module states consumer
+                true, // If the path should be mirrored depending on alliance color
+                this // Requires this drive subsystem
+            ), 
+            trajectory.getMarkers(), 
+            autoEvents);
+            return path;
+    }
 }

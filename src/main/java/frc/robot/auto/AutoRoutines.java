@@ -1,31 +1,20 @@
 package frc.robot.auto;
 
-import java.util.HashMap;
-
-import com.pathplanner.lib.PathPlannerTrajectory;
-
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.lib.util.Tuple2;
-import frc.robot.subsystems.Swerve;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.RobotContainer;
 
 /**
  * A utility class that contains predefined auto routines for use during the autonomous period.
- *
  */
-public class AutoRoutines {
+public class AutoRoutines extends CommandBase{
 
-    /* Add additional subsystems here and in the constructor */
-    private static Swerve m_swerve;
+    private static RobotContainer m_container;
 
-    private AutoEvents m_autoEvents;
-
-    private Tuple2<PathPlannerTrajectory, HashMap<String, Command>> exampleSet = new Tuple2<>(AutoTrajectories.getExampleTrajectory(), AutoEvents.getEvents());
-
-    public AutoRoutines(Swerve swerve){
-        m_swerve = swerve;
-
-        m_autoEvents = new AutoEvents(swerve);
+    public AutoRoutines(RobotContainer container){
+        m_container = container;
     }
 
     public Command doNothing(){
@@ -33,6 +22,9 @@ public class AutoRoutines {
     }
 
     public Command exampleRoutine(){
-        return m_swerve.followTrajectoryCommand(exampleSet, true, false);
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> m_container.getSwerve().resetPose(AutoTrajectories.getExampleTrajectory().getInitialHolonomicPose())),
+            m_container.getSwerve().followTrajectoryCommand(AutoTrajectories.getExampleTrajectory(), true)
+        );
     }
 }
