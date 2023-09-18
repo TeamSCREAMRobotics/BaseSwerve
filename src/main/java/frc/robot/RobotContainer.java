@@ -85,7 +85,7 @@ public class RobotContainer {
      * @return The selected autonomous command.
      */
     public Command getAutonomousCommand() {
-        System.out.println("Selected auto routine: " + m_autoChooser.getSelected());
+        System.out.println("Selected auto routine: " + m_autoChooser.getSelected().getName());
         return m_autoChooser.getSelected();
     }
 

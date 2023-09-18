@@ -22,9 +22,11 @@ public class AutoRoutines extends CommandBase{
     }
 
     public Command exampleRoutine(){
-        return new SequentialCommandGroup(
+        Command command = new SequentialCommandGroup(
             new InstantCommand(() -> m_container.getSwerve().resetPose(AutoTrajectories.getExampleTrajectory().getInitialHolonomicPose())),
             m_container.getSwerve().followTrajectoryCommand(AutoTrajectories.getExampleTrajectory(), true)
         );
+        command.setName("ExampleRoutine");
+        return command;
     }
 }

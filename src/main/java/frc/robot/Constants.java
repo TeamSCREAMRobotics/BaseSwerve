@@ -25,8 +25,8 @@ public final class Constants {
                             .SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); // TODO ROBOT SPECIFIC
 
         /* Drivetrain Constants */
-        public static final double trackWidth = 0.0; // TODO ROBOT SPECIFIC
-        public static final double wheelBase = 0.0; // TODO ROBOT SPECIFIC
+        public static final double trackWidth = 0.50165;
+        public static final double wheelBase = 0.57531; 
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /*
@@ -45,8 +45,8 @@ public final class Constants {
         public static final double angleGearRatio = chosenModule.angleGearRatio;
 
         /* Motor Inverts */
-        public static final boolean angleMotorInvert = chosenModule.angleMotorInvert;
-        public static final boolean driveMotorInvert = chosenModule.driveMotorInvert;
+        public static final boolean angleMotorInvert = true;//chosenModule.angleMotorInvert;
+        public static final boolean driveMotorInvert = true;//chosenModule.driveMotorInvert;
 
         /* Angle Encoder Invert */
         public static final boolean canCoderInvert = chosenModule.canCoderInvert;
@@ -77,7 +77,7 @@ public final class Constants {
         public static final double angleKF = chosenModule.angleKF;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.0; // TODO ROBOT SPECIFIC
+        public static final double driveKP = 0.05; // TODO ROBOT SPECIFIC
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
@@ -87,16 +87,16 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* PathPlanner PIDConstants */
-        public static final PIDController pathTranslationController = new PIDController(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
-        public static final PIDController pathRotationController = new PIDController(0.0, 0.0, 0.0);
+        public static final PIDController pathTranslationController = new PIDController(0.5, 0.0, 0.0); // TODO ROBOT SPECIFIC
+        public static final PIDController pathRotationController = new PIDController(0.5, 0.0, 0.0);
 
         /* Swerve Profiling Values */
 
         /* Meters per Second */
-        public static final double maxSpeed = 0.0; // TODO ROBOT SPECIFIC
+        public static final double maxSpeed = 5.7349; // TODO ROBOT SPECIFIC
 
         /* Radians per Second */
-        public static final double maxAngularVelocity = 0.0; // TODO ROBOT SPECIFIC
+        public static final double maxAngularVelocity = 8.0; // TODO ROBOT SPECIFIC
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
@@ -107,33 +107,33 @@ public final class Constants {
             23, 
             24, 
             8, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+            Rotation2d.fromDegrees(3.33984375)); // TODO ROBOT SPECIFIC
 
         /* Front Right */
         public static final SwerveModuleConstants Module1 = new SwerveModuleConstants(
             13, 
             14, 
             3, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+            Rotation2d.fromDegrees(-52.9101562)); // TODO ROBOT SPECIFIC
 
         /* Back Left */
         public static final SwerveModuleConstants Module2 = new SwerveModuleConstants(
             19, 
             20, 
             6, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+            Rotation2d.fromDegrees(-76.90429687500001)); // TODO ROBOT SPECIFIC
 
         /* Back Right */
         public static final SwerveModuleConstants Module3 = new SwerveModuleConstants(
             11, 
             12, 
             2, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+            Rotation2d.fromDegrees(-69.34570312500003)); // TODO ROBOT SPECIFIC
     }
 
     public static final class Ports {
         /* CANivore */
-        public static final String canivoreBusName = ""; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
+        public static final String canivoreBusName = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
 
         /* Limelight */
         public static final String limelightName = "limelight";
