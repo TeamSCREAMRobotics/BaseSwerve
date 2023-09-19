@@ -9,8 +9,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
-import java.util.HashMap;
-
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
@@ -56,7 +54,7 @@ public class Swerve extends SubsystemBase {
          * Configures the odometry, which uses the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
-        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.swerveKinematics, getYaw(),
+        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.SWERVE_KINEMATICS, getYaw(),
                 getModulePositions(), new Pose2d());
     }
 
@@ -77,7 +75,7 @@ public class Swerve extends SubsystemBase {
      * @param isOpenLoop Whether the drive should be open loop (Tele-Op driving) or closed loop (Autonomous driving).
      */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(
+        SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         translation.getX(),
                         translation.getY(),
@@ -207,13 +205,11 @@ public class Swerve extends SubsystemBase {
      * @return The full path, including the events triggered along it.
      */
     public Command followTrajectoryCommand(PathPlannerTrajectory trajectory, boolean mirrorWithAlliance) {
-        HashMap<String, Command> autoEvents = AutoEvents.getEvents();
-
         FollowPathWithEvents path = new FollowPathWithEvents(
             new PPSwerveControllerCommand(
                 trajectory, 
                 this::getPose, // Pose supplier
-                SwerveConstants.swerveKinematics, // SwerveDriveKinematics
+                SwerveConstants.SWERVE_KINEMATICS, // SwerveDriveKinematics
                 SwerveConstants.PATH_TRANSLATION_CONTROLLER, // X controller
                 SwerveConstants.PATH_TRANSLATION_CONTROLLER, // Y controller 
                 SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller
@@ -238,7 +234,7 @@ public class Swerve extends SubsystemBase {
             new PPSwerveControllerCommand(
                 trajectory, 
                 this::getPose, // Pose supplier
-                SwerveConstants.swerveKinematics, // SwerveDriveKinematics
+                SwerveConstants.SWERVE_KINEMATICS, // SwerveDriveKinematics
                 SwerveConstants.PATH_TRANSLATION_CONTROLLER, // X controller
                 SwerveConstants.PATH_TRANSLATION_CONTROLLER, // Y controller 
                 SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller

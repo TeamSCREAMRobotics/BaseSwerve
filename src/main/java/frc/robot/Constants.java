@@ -36,7 +36,7 @@ public final class Constants{
          * No need to ever change this unless you are not doing a traditional
          * rectangular/square 4 module swerve
          */
-        public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
+        public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
                 new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
                 new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
@@ -143,7 +143,7 @@ public final class Constants{
 
     public static final class Ports {
         /* CANivore */
-        public static final String CANIVORE_BUS_NAME = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore;
+        public static final String CANIVORE_BUS_NAME = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
 
         /* Sensor ports */
         public static final int PIGEON_ID = 0;

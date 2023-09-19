@@ -3,8 +3,6 @@ package frc.robot.auto;
 import java.util.HashMap;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import frc.robot.RobotContainer;
 
 /**
  * A utility class that holds all events for use during the autonomous period.
@@ -17,10 +15,8 @@ public class AutoEvents extends CommandBase{
         m_autoEventMap.put(key, command);
     }
 
-    public static void addEventMap(HashMap<String, Command>... events){
-        for(HashMap<String, Command> event : events){
-            m_autoEventMap.putAll(event);
-        }
+    public static void addEventMap(HashMap<String, Command> eventMap){
+        m_autoEventMap.putAll(eventMap);
     }
 
     public static void removeEvents(String... keys){

@@ -1,7 +1,6 @@
 package frc.lib.deviceConfiguration;
 
 import com.ctre.phoenix.ErrorCode;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -11,17 +10,17 @@ public class ErrorChecker {
     public static final int kTriesToGenerateWarning = 5;
     
     /**
-     * This method takes a list of ErrorCodes and returns true if they are all ErrorCode.OK. When we configure our devices, we wrap all our our calls to the devices in this method
+     * This method takes a list of StatusCodes and returns true if they are all OK. When we configure our devices, we wrap all our our calls to the devices in this method
      * to tell us if the device has configured correctly, or if there are errors.
      */
-    public static boolean hasConfiguredWithoutErrors(ErrorCode... errors){
+    public static boolean hasConfiguredWithoutErrors(ErrorCode... statusCodes){
         boolean okay = true;
-        for(ErrorCode error : errors){
-            okay = okay && ErrorCode.OK == error;
+        for(ErrorCode statusCode : statusCodes){
+            okay = okay && ErrorCode.OK == statusCode;
         }
         return okay;
     }
-
+    
     /**
      * This method does the actual configuration for the device. It repeatedly calls config.configureSettings() until there is a successful configuration or until it times out.
      * If printInfo is true, it will print if the configuration succeeded and how many tries it took

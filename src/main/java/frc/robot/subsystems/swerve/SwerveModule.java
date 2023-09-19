@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import frc.lib.deviceConfiguration.DeviceConfigs;
+import frc.lib.deviceConfiguration.DeviceConfig;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants.Ports;
@@ -31,8 +31,6 @@ public class SwerveModule {
     private TalonFX m_angleMotor;
     private TalonFX m_driveMotor;
     private CANCoder m_angleEncoder;
-
-    private DeviceConfigs m_configs;
 
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(SwerveConstants.DRIVE_KS, SwerveConstants.DRIVE_KV,
             SwerveConstants.DRIVE_KA);
@@ -189,8 +187,9 @@ public class SwerveModule {
      * Sets the angle encoder to its factory default settings and applies the provided configuration settings.
      */
     private void configAngleEncoder() {
-        m_angleEncoder.configFactoryDefault();
-        m_angleEncoder.configAllSettings(m_configs.swerveCanCoderConfig);
+        DeviceConfig.configSwerveCANCoder(
+            m_angleEncoder, 
+            SwerveConstants.CANCODER_INVERT);
     }
 
     /**
@@ -199,10 +198,11 @@ public class SwerveModule {
      * Configures basic settings, the inversion and neutral modes, and resets it to absolute.
      */
     private void configAngleMotor() {
-        m_angleMotor.configFactoryDefault();
-        m_angleMotor.configAllSettings(m_configs.swerveAngleFXConfig);
-        m_angleMotor.setInverted(SwerveConstants.ANGLE_MOTOR_INVERT);
-        m_angleMotor.setNeutralMode(SwerveConstants.ANGLE_NEUTRAL_MODE);
+        DeviceConfig.configSwerveAngleFX(
+            m_angleMotor, 
+            SwerveConstants.ANGLE_MOTOR_INVERT, 
+            SwerveConstants.ANGLE_NEUTRAL_MODE, 
+            SwerveConstants.ANGLE_CONSTANTS);
         resetToAbsolute();
     }
 
@@ -212,11 +212,11 @@ public class SwerveModule {
      * Configures basic settings, the inversion and neutral modes, and resets the position to zero.
      */
     private void configDriveMotor() {
-        m_driveMotor.configFactoryDefault();
-        m_driveMotor.configAllSettings(m_configs.swerveDriveFXConfig);
-        m_driveMotor.setInverted(SwerveConstants.DRIVE_MOTOR_INVERT);
-        m_driveMotor.setNeutralMode(SwerveConstants.DRIVE_NEUTRAL_MODE);
-        m_driveMotor.setSelectedSensorPosition(0);
+        DeviceConfig.configSwerveDriveFX(
+            m_angleMotor, 
+            SwerveConstants.DRIVE_MOTOR_INVERT, 
+            SwerveConstants.DRIVE_NEUTRAL_MODE, 
+            SwerveConstants.DRIVE_CONSTANTS);
     }
 
     /**
