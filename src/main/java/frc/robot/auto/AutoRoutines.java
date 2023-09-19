@@ -3,6 +3,7 @@ package frc.robot.auto;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 
@@ -11,22 +12,17 @@ import frc.robot.RobotContainer;
  */
 public class AutoRoutines extends CommandBase{
 
-    private static RobotContainer m_container;
-
-    public AutoRoutines(RobotContainer container){
-        m_container = container;
+    public static Command doNothing(){
+        return new InstantCommand().withName("Do Nothing");
     }
 
-    public Command doNothing(){
-        return new InstantCommand();
-    }
+    public static Command exampleRoutine(){
+        RobotContainer.getSwerve().resetPoseFromTraj(AutoTrajectories.getExampleTrajectory());
 
-    public Command exampleRoutine(){
-        Command command = new SequentialCommandGroup(
-            new InstantCommand(() -> m_container.getSwerve().resetPose(AutoTrajectories.getExampleTrajectory().getInitialHolonomicPose())),
-            m_container.getSwerve().followTrajectoryCommand(AutoTrajectories.getExampleTrajectory(), true)
+        Command routine = new SequentialCommandGroup(
+            RobotContainer.getSwerve().followTrajectoryCommand(AutoTrajectories.getExampleTrajectory(), true)
         );
-        command.setName("ExampleRoutine");
-        return command;
+        
+        return routine.withName("Example Routine");
     }
 }

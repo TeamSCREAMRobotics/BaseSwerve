@@ -39,17 +39,17 @@ public class Swerve extends SubsystemBase {
      * Initializes the gyro, swerve modules, and odometry.
      */
     public Swerve() {
-        m_gyro = new Pigeon2(Ports.pigeonID, Ports.canivoreBusName); //TODO delete canivoreBusName if the robot is not using a CANivore
+        m_gyro = new Pigeon2(Ports.PIGEON_ID, Ports.CANIVORE_BUS_NAME); //TODO delete CANIVORE_BUS_NAME if the robot is not using a CANivore
         configGyro();
         
         /**
          * Initializes an array of SwerveModule objects with their respective names, IDs, and constants.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule("FL", 0, SwerveConstants.Module0),
-                new SwerveModule("FR", 1, SwerveConstants.Module1),
-                new SwerveModule("BL", 2, SwerveConstants.Module2),
-                new SwerveModule("BR", 3, SwerveConstants.Module3)
+                new SwerveModule("FL", 0, SwerveConstants.FRONT_LEFT_MODULE),
+                new SwerveModule("FR", 1, SwerveConstants.FRONT_RIGHT_MODULE),
+                new SwerveModule("BL", 2, SwerveConstants.BACK_LEFT_MODULE),
+                new SwerveModule("BR", 3, SwerveConstants.BACK_RIGHT_MODULE)
         };
         
         /**
@@ -87,7 +87,7 @@ public class Swerve extends SubsystemBase {
                                 translation.getX(),
                                 translation.getY(),
                                 rotation));
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
@@ -102,7 +102,7 @@ public class Swerve extends SubsystemBase {
      */
     public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
         //SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], false);
@@ -116,6 +116,15 @@ public class Swerve extends SubsystemBase {
      */
     public void resetPose(Pose2d pose) {
         m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
+    }
+
+    /**
+     * Resets the pose reported by the odometry to the initial pose of the specified trajectory.
+     *
+     * @param trajectory The trajectory to get the inital pose from.
+     */
+    public void resetPoseFromTraj(PathPlannerTrajectory trajectory) {
+        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), trajectory.getInitialHolonomicPose());
     }
 
     /**
@@ -164,12 +173,12 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Returns the yaw rotation in degrees.
-     * If <STRONG>invertGyro</STRONG> is set to true, the yaw rotation is inverted.
+     * If {@code}invertGyro{@code} is set to true, the yaw rotation is inverted.
      *
      * @return The yaw rotation in degrees.
      */
     public Rotation2d getYaw() {
-        return (SwerveConstants.invertGyro) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw())
+        return (SwerveConstants.INVERT_GYRO) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw())
                 : Rotation2d.fromDegrees(m_gyro.getYaw());
     }
 
@@ -205,15 +214,15 @@ public class Swerve extends SubsystemBase {
                 trajectory, 
                 this::getPose, // Pose supplier
                 SwerveConstants.swerveKinematics, // SwerveDriveKinematics
-                SwerveConstants.pathTranslationController, // X controller
-                SwerveConstants.pathTranslationController, // Y controller 
-                SwerveConstants.pathRotationController, // Rotation controller
+                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // X controller
+                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // Y controller 
+                SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller
                 this::setModuleStates, // Module states consumer
                 mirrorWithAlliance, // If the path should be mirrored depending on alliance color
                 this // Requires this drive subsystem
             ), 
             trajectory.getMarkers(), 
-            autoEvents);
+            AutoEvents.getEvents());
             return path;
     }
 
@@ -225,22 +234,20 @@ public class Swerve extends SubsystemBase {
      * @return The full path, including the events triggered along it.
      */
     public Command followTrajectoryCommand(PathPlannerTrajectory trajectory) {
-        HashMap<String, Command> autoEvents = AutoEvents.getEvents();
-
         FollowPathWithEvents path = new FollowPathWithEvents(
             new PPSwerveControllerCommand(
                 trajectory, 
                 this::getPose, // Pose supplier
                 SwerveConstants.swerveKinematics, // SwerveDriveKinematics
-                SwerveConstants.pathTranslationController, // X controller
-                SwerveConstants.pathTranslationController, // Y controller 
-                SwerveConstants.pathRotationController, // Rotation controller
+                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // X controller
+                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // Y controller 
+                SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller
                 this::setModuleStates, // Module states consumer
                 true, // If the path should be mirrored depending on alliance color
                 this // Requires this drive subsystem
             ), 
             trajectory.getMarkers(), 
-            autoEvents);
+            AutoEvents.getEvents());
             return path;
     }
 }

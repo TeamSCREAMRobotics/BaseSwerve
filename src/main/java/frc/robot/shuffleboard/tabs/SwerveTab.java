@@ -19,8 +19,8 @@ public class SwerveTab extends ShuffleboardTabBase {
     }
     
     /**
-     * Represents a set of generic entries for the FL, FR, BL, and BR modules.
-     * Each position has three generic entries: Cancoder, Integrated, and Velocity.
+     * Represents a set of generic entries for the Swerve subsystem.
+     * Each module has three generic entries: Cancoder, Integrated, and Velocity.
      */
     private GenericEntry m_FLCancoder;
     private GenericEntry m_FLIntegrated;
@@ -42,7 +42,7 @@ public class SwerveTab extends ShuffleboardTabBase {
 
     private GenericEntry m_odometryX;
     private GenericEntry m_odometryY;
-    private GenericEntry m_odometryAngle;
+    private GenericEntry m_odometryYaw;
 
     /**
      * This method creates number entries for various sensors related to the Swerve subsystem.
@@ -69,13 +69,13 @@ public class SwerveTab extends ShuffleboardTabBase {
         m_BRIntegrated = createNumberEntry("BR Integrated", 0);
         m_BRVelocity = createNumberEntry("BR Velocity", 0);
 
-        m_gyroYaw = createNumberEntry("Gyro Yaw Reading", 0);
+        m_gyroYaw = createNumberEntry("Gyro Yaw", 0);
 
         m_odometryX = createNumberEntry("Odometry X", 0);
         m_odometryY = createNumberEntry("Odometry Y", 0);
-        m_odometryAngle = createNumberEntry("Odometry Angle", 0);
+        m_odometryYaw = createNumberEntry("Odometry Yaw", 0);
 
-        if (SwerveConstants.updateSwerveFromShuffleboard) {
+        if (SwerveConstants.UPDATE_SWERVE_FROM_SHUFFLEBOARD) {
             /* Add code here */
         }
     }
@@ -83,7 +83,7 @@ public class SwerveTab extends ShuffleboardTabBase {
     /**
      * Updates the values of various Shuffleboard widgets with the current state of the swerve drive.
      * The Cancoder, Integrated, and Velocity widgets for each module are updated periodically.
-     * Set <STRONG>SwerveConstants.updateSwerveFromShuffleboard</STRONG> to true to update values.
+     * Set {@code}updateSwerveFromShuffleboard{@code} to true to update values.
      */
     @Override
     public void periodic() {
@@ -107,9 +107,9 @@ public class SwerveTab extends ShuffleboardTabBase {
 
         m_odometryX.setDouble(m_swerve.getPose().getX());
         m_odometryY.setDouble(m_swerve.getPose().getY());
-        m_odometryAngle.setDouble(m_swerve.getPose().getRotation().getDegrees());
+        m_odometryYaw.setDouble(m_swerve.getPose().getRotation().getDegrees());
 
-        if (SwerveConstants.updateSwerveFromShuffleboard) {
+        if (SwerveConstants.UPDATE_SWERVE_FROM_SHUFFLEBOARD) {
             /* Add code here */
         }
     }

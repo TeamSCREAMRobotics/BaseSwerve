@@ -39,9 +39,9 @@ public abstract class ShuffleboardTabBase {
     /**
      * Creates a new string entry with the given name and default value.
      *
-     * @param name The name of the entry
+     * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
-     * @return The created string entry
+     * @return The created string entry.
      */
     protected GenericEntry createStringEntry(String name, String defaultValue) {
         return mTab.add(name, defaultValue).withSize(1, 1).getEntry();

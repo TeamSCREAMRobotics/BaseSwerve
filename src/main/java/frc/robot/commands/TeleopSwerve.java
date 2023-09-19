@@ -55,13 +55,13 @@ public class TeleopSwerve extends CommandBase {
     @Override
     public void execute() {
         
-        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
-        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
-        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
+        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
+        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
+        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
 
         m_swerve.drive(
-                new Translation2d(translationVal, strafeVal).times(SwerveConstants.maxSpeed),
-                rotationVal * SwerveConstants.maxAngularVelocity,
+                new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED),
+                rotationVal * SwerveConstants.MAX_ANGULAR_VELOCITY,
                 robotCentricSup.getAsBoolean(),
                 true);
     }

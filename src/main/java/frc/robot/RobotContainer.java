@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.auto.AutoEvents;
 import frc.robot.auto.AutoRoutines;
@@ -16,37 +17,26 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
 
     /* Controlboard */
-    private final Controlboard m_controlboard;
+    private static final Controlboard m_controlboard = new Controlboard();
 
     /* Subsystems */
-    private final Swerve m_swerve;
+    private static final Swerve m_swerve = new Swerve();
 
     /* Auto */
-    private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
-    private final AutoRoutines m_autoRoutines;
-    private final AutoEvents m_autoEvents;
+    private static final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
 
     /* Shuffleboard */
-    private final ShuffleboardTabManager m_shuffleboardTabManager;
-    private final ShuffleboardTab m_autoTab;
+    private static final ShuffleboardTabManager m_shuffleboardTabManager = new ShuffleboardTabManager();
 
     /**
      * Configures the subsystems, default commands, button bindings, and autonomous classes.
      */
     public RobotContainer() {
         /* Controlboard */
-        m_controlboard = new Controlboard();
-
-        /* Subsystems */
-        m_swerve = new Swerve();
+        configButtonBindings();
 
         /* Auto */
-        m_autoRoutines = new AutoRoutines(this);
-        m_autoEvents = new AutoEvents(this);
-
-        /* Shuffleboard */
-        m_shuffleboardTabManager = new ShuffleboardTabManager(this);
-        m_autoTab = Shuffleboard.getTab("Auto");
+        configAuto();
 
         m_swerve.setDefaultCommand(
                 new TeleopSwerve(
@@ -55,9 +45,6 @@ public class RobotContainer {
                         () -> m_controlboard.getTranslation().getX(),
                         () -> m_controlboard.getRotation(),
                         () -> m_controlboard.getFieldCentric()));
-
-        configButtonBindings();
-        configAutoChooser();
     }
 
     /**
@@ -70,13 +57,19 @@ public class RobotContainer {
     /**
      * Configures the autonomous chooser on the SmartDashboard.
      * <p>
-     * Add options with <STRONG>addOption</STRONG>.
+     * Add options with {@code}addOption{@code}
      */
-    private void configAutoChooser() {
-        m_autoTab.add(m_autoChooser);
+    private void configAuto() {
+        addAutoEvents();
+        ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+        autoTab.add(m_autoChooser);
 
-        m_autoChooser.setDefaultOption("Do Nothing", m_autoRoutines.doNothing());
-        m_autoChooser.addOption("Example Option", m_autoRoutines.exampleRoutine());
+        m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());
+        m_autoChooser.addOption("Example Routine", AutoRoutines.exampleRoutine());
+    }
+
+    private void addAutoEvents(){
+        AutoEvents.addEvent("ExampleEvent", new PrintCommand("This is an example event :)"));
     }
 
     /**
@@ -94,7 +87,7 @@ public class RobotContainer {
      *
      * @return The Swerve subsystem.
      */
-    public Swerve getSwerve() {
+    public static Swerve getSwerve() {
         return m_swerve;
     }
 }

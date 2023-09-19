@@ -16,9 +16,9 @@ public class ShuffleboardTabManager extends SubsystemBase {
 
     private final ArrayList<ShuffleboardTabBase> mTabs = new ArrayList<ShuffleboardTabBase>();
 
-    public ShuffleboardTabManager(RobotContainer container) {
+    public ShuffleboardTabManager() {
         if (m_debug) {
-            mTabs.add(new SwerveTab(container.getSwerve()));
+            mTabs.add(new SwerveTab(RobotContainer.getSwerve()));
         } else {
             /* Add code here */
         }
