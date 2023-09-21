@@ -3,7 +3,6 @@ package frc.robot.controlboard;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -11,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * <p>
  * Controlboard allows easy reference of custom button associations.
  */
-public class Controlboard extends SubsystemBase {
+public class Controlboard{
     private final XboxController m_driverController = new XboxController(0);
 
     /**

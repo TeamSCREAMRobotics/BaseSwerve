@@ -17,16 +17,16 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
 
     /* Controlboard */
-    private static final Controlboard m_controlboard = new Controlboard();
+    private final Controlboard m_controlboard = new Controlboard();
 
     /* Subsystems */
     private static final Swerve m_swerve = new Swerve();
 
     /* Auto */
-    private static final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
+    private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
 
     /* Shuffleboard */
-    private static final ShuffleboardTabManager m_shuffleboardTabManager = new ShuffleboardTabManager();
+    private final ShuffleboardTabManager m_shuffleboardTabManager = new ShuffleboardTabManager();
 
     /**
      * Configures the subsystems, default commands, button bindings, and autonomous classes.
@@ -60,14 +60,19 @@ public class RobotContainer {
      * Add options with {@code}addOption{@code}
      */
     private void configAuto() {
-        addAutoEvents();
         ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
         autoTab.add(m_autoChooser);
+        addAutoEvents();
 
         m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());
         m_autoChooser.addOption("Example Routine", AutoRoutines.exampleRoutine());
     }
 
+    /**
+     * Adds an event to the event map.
+     * The event map defines what command will be run with the corresponding event.
+     * Reference these events in PathPlanner to trigger the commands along a path.
+     */
     private void addAutoEvents(){
         AutoEvents.addEvent("ExampleEvent", new PrintCommand("This is an example event :)"));
     }

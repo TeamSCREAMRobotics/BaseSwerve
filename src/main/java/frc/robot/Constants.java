@@ -21,14 +21,14 @@ public final class Constants{
 
         public static final boolean UPDATE_SWERVE_FROM_SHUFFLEBOARD = false;
 
-        public static final boolean INVERT_GYRO = false; // Always ensure Gyro is CCW+ CW-
+        public static final boolean INVERT_GYRO = false; // TODO Always ensure Gyro is CCW+ CW-
 
         public static final COTSFalconSwerveConstants CHOSEN_MODULE = COTSFalconSwerveConstants
                             .SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); // TODO ROBOT SPECIFIC
 
-        /* Drivetrain Constants */
-        public static final double TRACK_WIDTH = 0.50165;
-        public static final double WHEEL_BASE = 0.57531; 
+        /* Drivetrain Constants */ // TODO ROBOT SPECIFIC
+        public static final double TRACK_WIDTH = 0.50165; // Distance from left wheels to right wheels/vice versa
+        public static final double WHEEL_BASE = 0.57531; // Distance from front wheels to back wheels/vice versa
         public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
 
         /*
@@ -47,8 +47,8 @@ public final class Constants{
         public static final double ANGLE_GEAR_RATIO = CHOSEN_MODULE.angleGearRatio;
 
         /* Motor Inverts */
-        public static final InvertType ANGLE_MOTOR_INVERT = InvertType.InvertMotorOutput;//chosenModule.angleMotorInvert;
-        public static final InvertType DRIVE_MOTOR_INVERT = InvertType.InvertMotorOutput;//chosenModule.driveMotorInvert;
+        public static final InvertType ANGLE_MOTOR_INVERT = CHOSEN_MODULE.angleMotorInvert;
+        public static final InvertType DRIVE_MOTOR_INVERT = CHOSEN_MODULE.driveMotorInvert;
 
         /* Angle Encoder Invert */
         public static final boolean CANCODER_INVERT = CHOSEN_MODULE.canCoderInvert;
@@ -134,6 +134,11 @@ public final class Constants{
             2, 
             Rotation2d.fromDegrees(-69.34570312500003)); // TODO ROBOT SPECIFIC
 
+        /** 
+         * Use this if you have multiple sets of modules.
+         * In our case, this is useful for hotswapping modules.
+         * Simply set each location's constants to their corresponding module.
+         */
         public static final SwerveModuleConstants FRONT_LEFT_MODULE = MODULE_0;
         public static final SwerveModuleConstants FRONT_RIGHT_MODULE = MODULE_1;
         public static final SwerveModuleConstants BACK_LEFT_MODULE = MODULE_2;

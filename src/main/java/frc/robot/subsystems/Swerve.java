@@ -118,10 +118,11 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Resets the pose reported by the odometry to the initial pose of the specified trajectory.
+     * For use in auto routines.
      *
      * @param trajectory The trajectory to get the inital pose from.
      */
-    public void resetPoseFromTraj(PathPlannerTrajectory trajectory) {
+    public void resetPose(PathPlannerTrajectory trajectory) {
         m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), trajectory.getInitialHolonomicPose());
     }
 
