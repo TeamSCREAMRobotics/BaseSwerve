@@ -213,7 +213,7 @@ public class SwerveModule {
      */
     private void configDriveMotor() {
         DeviceConfig.configSwerveDriveFX(
-            m_angleMotor, 
+            m_driveMotor, 
             SwerveConstants.DRIVE_MOTOR_INVERT, 
             SwerveConstants.DRIVE_NEUTRAL_MODE, 
             SwerveConstants.DRIVE_CONSTANTS);

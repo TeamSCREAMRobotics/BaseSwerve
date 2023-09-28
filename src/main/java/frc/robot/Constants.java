@@ -14,7 +14,7 @@ import frc.lib.util.SwerveModuleConstants;
  * A container class for constants used in various places in the project.
  */
 public final class Constants{
-    public static final double STICK_DEADBAND = 0.05;
+    public static final double STICK_DEADBAND = 0.025;
     public static final boolean INCLUDE_DEBUG_TABS = true;
 
     public static final class SwerveConstants {
@@ -91,8 +91,8 @@ public final class Constants{
         public static final double DRIVE_KA = (0.27 / 12);
 
         /* PathPlanner PIDConstants */
-        public static final PIDController PATH_TRANSLATION_CONTROLLER = new PIDController(0.5, 0.0, 0.0); // TODO ROBOT SPECIFIC
-        public static final PIDController PATH_ROTATION_CONTROLLER = new PIDController(0.5, 0.0, 0.0);
+        public static final PIDController PATH_TRANSLATION_CONTROLLER = new PIDController(3, 0.0, 0.0); // TODO ROBOT SPECIFIC
+        public static final PIDController PATH_ROTATION_CONTROLLER = new PIDController(4, 0.0, 0.0);
 
         /* Swerve Profiling Values */
 
@@ -108,31 +108,31 @@ public final class Constants{
 
         /* Front Left */
         public static final SwerveModuleConstants MODULE_0 = new SwerveModuleConstants(
-            23, 
+            23,           
             24, 
             8, 
-            Rotation2d.fromDegrees(3.33984375)); // TODO ROBOT SPECIFIC
+            Rotation2d.fromDegrees(-176.04492187500003)); // TODO ROBOT SPECIFIC
 
         /* Front Right */
         public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
             13, 
             14, 
             3, 
-            Rotation2d.fromDegrees(-52.9101562)); // TODO ROBOT SPECIFIC
+            Rotation2d.fromDegrees(127.17773437499999)); // TODO ROBOT SPECIFIC
 
         /* Back Left */
         public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
             19, 
             20, 
             6, 
-            Rotation2d.fromDegrees(-76.90429687500001)); // TODO ROBOT SPECIFIC
+            Rotation2d.fromDegrees(102.65625000000001)); // TODO ROBOT SPECIFIC
 
         /* Back Right */
         public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
-            11, 
-            12, 
-            2, 
-            Rotation2d.fromDegrees(-69.34570312500003)); // TODO ROBOT SPECIFIC
+            17, 
+            18, 
+            5, 
+            Rotation2d.fromDegrees(116.27929687500001)); // TODO ROBOT SPECIFIC
 
         /** 
          * Use this if you have multiple sets of modules.

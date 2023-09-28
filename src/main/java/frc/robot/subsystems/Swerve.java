@@ -90,11 +90,12 @@ public class Swerve extends SubsystemBase {
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
         }
+        //getModules()[3].set(swerveModuleStates[3], isOpenLoop);
     }
 
     /**
      * Drives the swerve drive system based on the given chassis speeds.
-     * Used as an input for SwerveAutoBuilder.
+     * Used as an input for followTrajectoryCommand.
      *
      * @param chassisSpeeds The desired chassis speeds to drive.
      */
@@ -123,7 +124,7 @@ public class Swerve extends SubsystemBase {
      * @param trajectory The trajectory to get the inital pose from.
      */
     public void resetPose(PathPlannerTrajectory trajectory) {
-        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), trajectory.getInitialHolonomicPose());
+        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), trajectory.getInitialHolonomicPose() );
     }
 
     /**

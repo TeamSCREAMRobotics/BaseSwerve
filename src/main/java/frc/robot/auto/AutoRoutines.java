@@ -16,9 +16,8 @@ public class AutoRoutines{
     }
 
     public static Command exampleRoutine(){
-        RobotContainer.getSwerve().resetPose(AutoTrajectories.getExampleTrajectory());
-
         Command routine = new SequentialCommandGroup(
+            new InstantCommand(() -> RobotContainer.getSwerve().resetPose(AutoTrajectories.getExampleTrajectory())),
             RobotContainer.getSwerve().followTrajectoryCommand(AutoTrajectories.getExampleTrajectory(), true)
         );
         
