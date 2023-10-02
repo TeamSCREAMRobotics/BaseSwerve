@@ -137,7 +137,7 @@ public final class Constants{
         /** 
          * Use this if you have multiple sets of modules.
          * In our case, this is useful for hotswapping modules.
-         * Simply set each location's constants to their corresponding module.
+         * Set each location's constants to their corresponding module.
          */
         public static final SwerveModuleConstants FRONT_LEFT_MODULE = MODULE_0;
         public static final SwerveModuleConstants FRONT_RIGHT_MODULE = MODULE_1;
@@ -147,6 +147,10 @@ public final class Constants{
     }
 
     public static final class Ports {
+
+        /* Controllers */
+        public static final int DRIVER_PORT = 0;
+
         /* CANivore */
         public static final String CANIVORE_BUS_NAME = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
 

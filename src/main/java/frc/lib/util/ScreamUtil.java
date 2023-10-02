@@ -91,12 +91,15 @@ public class ScreamUtil {
 	}
 
 	public static double getCircularBufferAverage(CircularBuffer buffer){
-		if(buffer.size() < 1) return 0; //TODO returning 0 is maybe not the best idea. If the array has a size of 0, we do this so that we don't divide by 0, but there may be a better way to do this.
         int num = 0;
         for(int i = 0; i < buffer.size(); i++){
             num += buffer.get(i);
         }
-		
-        return num / buffer.size();
+		try {
+            return num / buffer.size();
+        } catch(ArithmeticException exception){
+            System.out.println(exception + "... Returning 0");
+            return 0;
+        }
     }
 }

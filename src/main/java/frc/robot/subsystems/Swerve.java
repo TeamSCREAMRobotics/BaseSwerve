@@ -90,7 +90,6 @@ public class Swerve extends SubsystemBase {
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
         }
-        //getModules()[3].set(swerveModuleStates[3], isOpenLoop);
     }
 
     /**
@@ -100,7 +99,6 @@ public class Swerve extends SubsystemBase {
      * @param chassisSpeeds The desired chassis speeds to drive.
      */
     public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
-        //SwerveModuleState[] swerveModuleStates = SwerveConstants.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
         for (SwerveModule mod : m_swerveModules) {
@@ -217,31 +215,6 @@ public class Swerve extends SubsystemBase {
                 SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller
                 this::setModuleStates, // Module states consumer
                 mirrorWithAlliance, // If the path should be mirrored depending on alliance color
-                this // Requires this drive subsystem
-            ), 
-            trajectory.getMarkers(), 
-            AutoEvents.getEvents());
-            return path;
-    }
-
-    /**
-     * Generates a command that follows the given trajectory.
-     * Will automatically trigger events associated with that trajectory.
-     *
-     * @param trajectory The trajectory to follow.
-     * @return The full path, including the events triggered along it.
-     */
-    public Command followTrajectoryCommand(PathPlannerTrajectory trajectory) {
-        FollowPathWithEvents path = new FollowPathWithEvents(
-            new PPSwerveControllerCommand(
-                trajectory, 
-                this::getPose, // Pose supplier
-                SwerveConstants.SWERVE_KINEMATICS, // SwerveDriveKinematics
-                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // X controller
-                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // Y controller 
-                SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller
-                this::setModuleStates, // Module states consumer
-                true, // If the path should be mirrored depending on alliance color
                 this // Requires this drive subsystem
             ), 
             trajectory.getMarkers(), 

@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.Ports;
 
 /**
  * A utility class that contains button bindings.
@@ -11,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * Controlboard allows easy reference of custom button associations.
  */
 public class Controlboard{
-    private final XboxController m_driverController = new XboxController(0);
+    private final XboxController m_driverController = new XboxController(Ports.DRIVER_PORT);
 
     /**
      * Retrieves a Translation2d based on the input from the driver controller.
@@ -40,12 +41,12 @@ public class Controlboard{
         return m_driverController.getBackButtonPressed();
     }
 
-    boolean fieldCentric = true;
     /**
      * Retreives the current field-centric mode.
      *
      * @return True if field-centric; false if robot-centric
      */
+    boolean fieldCentric = true;
     public boolean getFieldCentric() {
         /* Toggles field-centric mode between true and false when the start button is pressed */
         new Trigger(m_driverController::getStartButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
