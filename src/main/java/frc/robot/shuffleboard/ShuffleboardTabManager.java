@@ -2,10 +2,6 @@ package frc.robot.shuffleboard;
 
 import java.util.ArrayList;
 
-import javax.print.attribute.standard.DialogTypeSelection;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-
-import edu.wpi.first.cscore.VideoProperty.Kind;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.shuffleboard.tabs.SwerveTab;

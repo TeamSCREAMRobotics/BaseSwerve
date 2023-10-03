@@ -12,14 +12,16 @@ import frc.robot.Constants.Ports;
  * Controlboard allows easy reference of custom button associations.
  */
 public class Controlboard{
-    private final XboxController m_driverController = new XboxController(Ports.DRIVER_PORT);
+    private static final XboxController m_driverController = new XboxController(Ports.DRIVER_PORT);
+
+    private static boolean fieldCentric = true;
 
     /**
      * Retrieves a Translation2d based on the input from the driver controller.
      *
      * @return A Translation2d representing the movement in the x and y directions.
      */
-    public Translation2d getTranslation() {
+    public static Translation2d getTranslation() {
         return new Translation2d(-m_driverController.getLeftX(), -m_driverController.getLeftY());
     }
 
@@ -28,7 +30,7 @@ public class Controlboard{
      *
      * @return The rotation value of the driver controller.
      */
-    public double getRotation() {
+    public static double getRotation() {
         return -m_driverController.getRightX();
     }
 
@@ -37,7 +39,7 @@ public class Controlboard{
      *
      * @return True once when to zero the gyro; false otherwise.
      */
-    public boolean getZeroGyro() {
+    public static boolean getZeroGyro() {
         return m_driverController.getBackButtonPressed();
     }
 
@@ -46,8 +48,7 @@ public class Controlboard{
      *
      * @return True if field-centric; false if robot-centric
      */
-    boolean fieldCentric = true;
-    public boolean getFieldCentric() {
+    public static boolean getFieldCentric() {
         /* Toggles field-centric mode between true and false when the start button is pressed */
         new Trigger(m_driverController::getStartButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
         return fieldCentric;

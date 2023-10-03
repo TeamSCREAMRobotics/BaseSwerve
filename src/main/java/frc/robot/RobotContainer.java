@@ -16,9 +16,6 @@ import frc.robot.subsystems.*;
 
 public class RobotContainer {
 
-    /* Controlboard */
-    private final Controlboard m_controlboard = new Controlboard();
-
     /* Subsystems */
     private static final Swerve m_swerve = new Swerve();
 
@@ -41,17 +38,17 @@ public class RobotContainer {
         m_swerve.setDefaultCommand(
                 new TeleopSwerve(
                         m_swerve,
-                        () -> m_controlboard.getTranslation().getY(),
-                        () -> m_controlboard.getTranslation().getX(),
-                        () -> m_controlboard.getRotation(),
-                        () -> m_controlboard.getFieldCentric()));
+                        () -> Controlboard.getTranslation().getY(),
+                        () -> Controlboard.getTranslation().getX(),
+                        () -> Controlboard.getRotation(),
+                        () -> Controlboard.getFieldCentric()));
     }
 
     /**
      * Configures button bindings using methods from Controlboard.
      */
     private void configButtonBindings() {
-        new Trigger(() -> m_controlboard.getZeroGyro()).onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
+        new Trigger(() -> Controlboard.getZeroGyro()).onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
     }
 
     /**
