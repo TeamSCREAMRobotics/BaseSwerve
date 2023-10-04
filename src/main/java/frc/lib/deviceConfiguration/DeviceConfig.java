@@ -24,7 +24,7 @@ public class DeviceConfig {
         return config;
     }
 
-    public static void configSwerveDriveFX(TalonFX motor, InvertType invert, NeutralMode neutralMode, ScreamPIDConstants constants){
+    public static void configSwerveDriveFX(TalonFX motor, String name, InvertType invert, NeutralMode neutralMode, ScreamPIDConstants constants){
         TalonFXConfiguration config = genericTalonFXConfig(motor, invert, neutralMode);
         config.slot0.kP = constants.kP();
         config.slot0.kI = constants.kI();
@@ -34,6 +34,8 @@ public class DeviceConfig {
         config.supplyCurrLimit.triggerThresholdCurrent = SwerveConstants.DRIVE_CONTINUOUS_CURRENT_LIMIT;
         config.supplyCurrLimit.triggerThresholdTime = SwerveConstants.DRIVE_PEAK_CURRENT_DURATION;
         config.statorCurrLimit.enable = SwerveConstants.DRIVE_ENABLE_CURRENT_LIMIT;
+        config.openloopRamp = SwerveConstants.OPEN_LOOP_RAMP;
+        config.closedloopRamp = SwerveConstants.CLOSED_LOOP_RAMP;
         DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
             public boolean configureSettings(){
@@ -42,10 +44,10 @@ public class DeviceConfig {
                 motor.setSelectedSensorPosition(0));
         }
         };
-        ErrorChecker.configureDevice(deviceConfig, motor.toString() + " with ID " + motor.getDeviceID(), true);
+        ErrorChecker.configureDevice(deviceConfig, name + " Drive Motor ID: " + motor.getDeviceID(), true);
     }
 
-    public static void configSwerveAngleFX(TalonFX motor, InvertType invert, NeutralMode neutralMode, ScreamPIDConstants constants){
+    public static void configSwerveAngleFX(TalonFX motor, String name, InvertType invert, NeutralMode neutralMode, ScreamPIDConstants constants){
         TalonFXConfiguration config = genericTalonFXConfig(motor, invert, neutralMode);
         config.slot0.kP = constants.kP();
         config.slot0.kI = constants.kI();
@@ -63,10 +65,10 @@ public class DeviceConfig {
                 motor.setSelectedSensorPosition(0));
         }
         };
-        ErrorChecker.configureDevice(deviceConfig, motor.toString() + " with ID " + motor.getDeviceID(), true);
+        ErrorChecker.configureDevice(deviceConfig, name + " Angle Motor ID: " + motor.getDeviceID(), true);
     }
 
-    public static void configSwerveCANCoder(CANCoder encoder, boolean invert){
+    public static void configSwerveCANCoder(CANCoder encoder, String name, boolean invert){
         CANCoderConfiguration config = new CANCoderConfiguration();
         config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
         config.sensorDirection = invert;
@@ -77,6 +79,6 @@ public class DeviceConfig {
                 encoder.configAllSettings(config));
         }
         };
-        ErrorChecker.configureDevice(deviceConfig, encoder.toString() + " with ID " + encoder.getDeviceID(), true);
+        ErrorChecker.configureDevice(deviceConfig, name + " CANCoder ID: " + encoder.getDeviceID(), true);
     }
 }

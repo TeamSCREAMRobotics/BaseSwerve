@@ -57,8 +57,7 @@ public class RobotContainer {
      * Add options with {@code}addOption{@code}
      */
     private void configAuto() {
-        ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
-        autoTab.add("Selected Auto", m_autoChooser);
+        Shuffleboard.getTab("Auto").add("Selected Auto", m_autoChooser).withSize(2, 1);
         addAutoEvents();
 
         m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());

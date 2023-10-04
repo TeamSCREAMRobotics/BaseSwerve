@@ -189,6 +189,7 @@ public class SwerveModule {
     private void configAngleEncoder() {
         DeviceConfig.configSwerveCANCoder(
             m_angleEncoder, 
+            m_location,
             SwerveConstants.CANCODER_INVERT);
     }
 
@@ -200,6 +201,7 @@ public class SwerveModule {
     private void configAngleMotor() {
         DeviceConfig.configSwerveAngleFX(
             m_angleMotor, 
+            m_location,
             SwerveConstants.ANGLE_MOTOR_INVERT, 
             SwerveConstants.ANGLE_NEUTRAL_MODE, 
             SwerveConstants.ANGLE_CONSTANTS);
@@ -214,6 +216,7 @@ public class SwerveModule {
     private void configDriveMotor() {
         DeviceConfig.configSwerveDriveFX(
             m_driveMotor, 
+            m_location,
             SwerveConstants.DRIVE_MOTOR_INVERT, 
             SwerveConstants.DRIVE_NEUTRAL_MODE, 
             SwerveConstants.DRIVE_CONSTANTS);

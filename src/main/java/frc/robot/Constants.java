@@ -90,12 +90,11 @@ public final class Constants{
         public static final double DRIVE_KV = (1.51 / 12);
         public static final double DRIVE_KA = (0.27 / 12);
 
-        /* PathPlanner PIDConstants */
+        /* PathPlanner Controllers */
         public static final PIDController PATH_TRANSLATION_CONTROLLER = new PIDController(3, 0.0, 0.0); // TODO ROBOT SPECIFIC
         public static final PIDController PATH_ROTATION_CONTROLLER = new PIDController(4, 0.0, 0.0);
 
         /* Swerve Profiling Values */
-
         /* Meters per Second */
         public static final double MAX_SPEED = 5.7349; // TODO ROBOT SPECIFIC
 

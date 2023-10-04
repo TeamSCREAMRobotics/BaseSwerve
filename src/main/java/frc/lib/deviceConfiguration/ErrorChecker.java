@@ -49,7 +49,7 @@ public class ErrorChecker {
 
         }
         if(printInfo && tries > kTriesToGenerateWarning)  DriverStation.reportWarning("Possible issue with " + name + ". Configuration took " + tries + " tries", false);
-        else if(printInfo) System.out.println( "   " + name + " configuration took " + tries + " tries. ");
+        else if(printInfo) System.out.println( "   " + name + " | configuration took " + tries + " tries. ");
     }
 
     /**
