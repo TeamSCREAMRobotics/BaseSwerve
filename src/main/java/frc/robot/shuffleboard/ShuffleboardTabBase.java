@@ -2,18 +2,20 @@ package frc.robot.shuffleboard;
 
 import java.util.Map;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import java.util.Objects;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
+
+import java.util.Set;
 
 /**
  * Base class for Shuffleboard tabs.
  */
 public abstract class ShuffleboardTabBase {
     protected ShuffleboardTab mTab;
+
+    private Set<String> validPropertyKeys = Set.of("min", "max", "block increment", "center", "show value", "visible time", "color when true", "color when false", "orientation", "number of tick marks", "show voltage and current values", "show text", "precision", "show tick marks", "range", "major tick spacing", "starting angle", "show tick mark ring", "number of wheels", "wheel diameter", "show velocity vectors", "show crosshair", "crosshair color", "show controls", "rotation");
 
     public abstract void createEntries();
 
@@ -33,12 +35,13 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
+     * @param entryInfo The EntryInfo to use for the entry.
      * @return The created number entry.
      */
-    protected GenericEntry createNumberEntry(String name, double defaultValue, CellInfo cellInfo) {
+    protected GenericEntry createNumberEntry(String name, double defaultValue, EntryInfo entryInfo) {
         return mTab.add(name, defaultValue)
-        .withPosition(cellInfo.getColumnIndex(), cellInfo.getRowIndex())
-        .withSize(cellInfo.getCellWidth(), cellInfo.getCellHeight())
+        .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
+        .withSize(entryInfo.getWidth(), entryInfo.getHeight())
         .getEntry();
     }
 
@@ -58,12 +61,13 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
+     * @param entryInfo The EntryInfo to use for the entry.
      * @return The created boolean entry.
      */
-    protected GenericEntry createBooleanEntry(String name, boolean defaultValue, CellInfo cellInfo) {
+    protected GenericEntry createBooleanEntry(String name, boolean defaultValue, EntryInfo entryInfo) {
         return mTab.add(name, defaultValue)
-        .withPosition(cellInfo.getColumnIndex(), cellInfo.getRowIndex())
-        .withSize(cellInfo.getCellWidth(), cellInfo.getCellHeight())
+        .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
+        .withSize(entryInfo.getWidth(), entryInfo.getHeight())
         .getEntry();
     }
 
@@ -83,12 +87,13 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
+     * @param entryInfo The EntryInfo to use for the entry.
      * @return The created string entry.
      */
-    protected GenericEntry createStringEntry(String name, String defaultValue, CellInfo cellInfo) {
+    protected GenericEntry createStringEntry(String name, String defaultValue, EntryInfo entryInfo) {
         return mTab.add(name, defaultValue)
-        .withPosition(cellInfo.getColumnIndex(), cellInfo.getRowIndex())
-        .withSize(cellInfo.getCellWidth(), cellInfo.getCellHeight())
+        .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
+        .withSize(entryInfo.getWidth(), entryInfo.getHeight())
         .getEntry();
     }
 
@@ -99,8 +104,32 @@ public abstract class ShuffleboardTabBase {
      * @param defaultValue The default value of the entry.
      * @return The created entry.
      */
-    protected GenericEntry createEntry(String name, Object defaultValue) {
-        return mTab.add(name, defaultValue).withSize(1, 1).getEntry();
+    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType, Map<String, Object> propertyMap, EntryInfo entryInfo) {
+        if (propertyMap != null) {
+            for (String key : propertyMap.keySet()) {
+                if (!validPropertyKeys.contains(key)) {
+                    throw new IllegalArgumentException("Invalid property key: " + key);
+                }
+            }
+        }
+        
+        SimpleWidget entry = mTab.add(name, defaultValue);
+        
+        if (entryInfo != null) {
+            entry = entry
+                .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
+                .withSize(entryInfo.getWidth(), entryInfo.getHeight());
+        }
+        
+        if (widgetType != null) {
+            entry = entry.withWidget(widgetType);
+        }
+        
+        if (propertyMap != null) {
+            entry = entry.withProperties(propertyMap);
+        }
+        
+        return entry.getEntry();
     }
 
     /**
@@ -108,76 +137,38 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
+     * @param widgetType 
+     * @param entryInfo The EntryInfo to use for the entry.
      * @return The created entry.
      */
-    protected GenericEntry createEntry(String name, Object defaultValue, CellInfo cellInfo) {
-        return mTab.add(name, defaultValue)
-        .withPosition(cellInfo.getColumnIndex(), cellInfo.getRowIndex())
-        .withSize(cellInfo.getCellWidth(), cellInfo.getCellHeight())
-        .getEntry();
+    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType) {
+        return createEntry(name, defaultValue, widgetType, null, null);
     }
 
     /**
-     * Creates a slider widget entry with the given name, default value, minimum value, and maximum value.
+     * Creates a new entry with the given name and default value.
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
-     * @param minValue The minimum value of the slider.
-     * @param maxValue The maximum value of the slider.
+     * @param widgetType The WidgetType to use for the entry.
+     * @param entryInfo The EntryInfo to use for the entry.
      * @return The created entry.
      */
-    protected GenericEntry createSlider(String name, double defaultValue, double minValue, double maxValue) {
-        return mTab.add(name, defaultValue)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", minValue, "max", maxValue))
-        .withSize(3, 1)
-        .getEntry();
+    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType, EntryInfo entryInfo) {
+        return createEntry(name, defaultValue, widgetType, null, entryInfo);
     }
 
     /**
-     * Creates a slider widget entry with the given name, default value, minimum value, and maximum value.
+     * Creates a new entry with the given name and default value.
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
-     * @param minValue The minimum value of the slider.
-     * @param maxValue The maximum value of the slider.
+     * @param widgetType The WidgetType to use for the entry.
+     * @param entryInfo The EntryInfo to use for the entry.
      * @return The created entry.
      */
-    protected GenericEntry createSlider(String name, double defaultValue, double minValue, double maxValue, CellInfo cellInfo) {
-        return mTab.add(name, defaultValue)
-        .withWidget(BuiltInWidgets.kNumberSlider)
-        .withProperties(Map.of("min", minValue, "max", maxValue))
-        .withPosition(cellInfo.getColumnIndex(), cellInfo.getRowIndex())
-        .withSize(cellInfo.getCellWidth(), cellInfo.getCellHeight())
-        .getEntry();
-    }
-
-    /**
-     * Creates a graph widget entry with the given name and default value
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @return The created entry.
-     */
-    protected GenericEntry createGraph(String name, double defaultValue) {
-        return mTab.add(name, defaultValue)
-        .withWidget(BuiltInWidgets.kGraph)
-        .getEntry();
-    }
-
-    /**
-     * Creates a graph widget entry with the given name and default value
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @return The created entry.
-     */
-    protected GenericEntry createGraph(String name, double defaultValue, CellInfo cellInfo) {
-        return mTab.add(name, defaultValue)
-        .withWidget(BuiltInWidgets.kGraph)
-        .withPosition(cellInfo.getColumnIndex(), cellInfo.getRowIndex())
-        .withSize(cellInfo.getCellWidth(), cellInfo.getCellHeight())
-        .getEntry();
+    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType, Map<String, Object> propertyMap) {
+        return createEntry(name, defaultValue, widgetType, propertyMap, null);
     }
 
     public abstract void periodic();
@@ -198,33 +189,40 @@ public abstract class ShuffleboardTabBase {
         return mTab;
     }
 
-    public class CellInfo {
-        private final int columnIndex;
-        private final int rowIndex;
-        private final int cellWidth;
-        private final int cellHeight;
+    public class EntryInfo {
+        private final int xPos;
+        private final int yPos;
+        private final int width;
+        private final int height;
     
-        public CellInfo(int columnIndex, int rowIndex, int cellWidth, int cellHeight) {
-            this.columnIndex = rowIndex;
-            this.rowIndex = columnIndex;
-            this.cellWidth = cellWidth;
-            this.cellHeight = cellHeight;
+        public EntryInfo(int xPos, int yPos, int width, int height) {
+            this.xPos = xPos;
+            this.yPos = yPos;
+            this.width = width;
+            this.height = height;
+        }
+
+        public EntryInfo(int xPos, int yPos) {
+            this.xPos = xPos;
+            this.yPos = yPos;
+            this.width = 1;
+            this.height = 1;
         }
     
-        public int getColumnIndex() {
-            return columnIndex;
+        public int getXPosition() {
+            return xPos;
+        }
+
+        public int getYPosition() {
+            return yPos;
         }
     
-        public int getRowIndex() {
-            return rowIndex;
+        public int getWidth() {
+            return width;
         }
     
-        public int getCellWidth() {
-            return cellWidth;
-        }
-    
-        public int getCellHeight() {
-            return cellHeight;
+        public int getHeight() {
+            return height;
         }
     }
     
