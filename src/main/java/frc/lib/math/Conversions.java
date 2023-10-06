@@ -120,9 +120,9 @@ public class Conversions {
      * @return The mapped value
      */
     public static double mapRange(double value, double oldBottom, double oldTop, double newBottom, double newTop) {
-        boolean tmp = ((oldTop - oldBottom) * (newTop - newBottom)) == 0.0;
-        if(tmp){
-            System.out.println("Division by zero detected... Returning NaN");
+        boolean divByZero = ((oldTop - oldBottom) * (newTop - newBottom)) == 0.0;
+        if(divByZero){
+            System.out.println("Division by zero... Returning NaN");
             return Double.NaN;
         }
     

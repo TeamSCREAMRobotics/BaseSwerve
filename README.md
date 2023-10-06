@@ -43,7 +43,7 @@ The following things must be adjusted to your robot and module's specific consta
 12. Setting Offsets
     * For finding the offsets you need to line up all modules straight. Use a piece of wood/metal to do this.
     * Point the bevel gears of all the wheels in the same direction (either facing left or right), where a postive input to the drive motor drives the robot forward (Use phoenix tuner to test this). If for some reason you set the offsets with the wheels backwards, you can change the [```driveMotorInvert```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/general-testing/src/main/java/frc/robot/Constants.java#L49) value to fix.
-    * Open Shuffleboard and go to the smartdashboard tab. You will see 4 printouts called "Mod 0 Cancoder", "Mod 1 Cancoder", etc. 
+    * Open Shuffleboard and go to the smartdashboard tab. You will see 4 printouts called "Mod 0 CANCoder", "Mod 1 CANCoder", etc. 
     <br>If you have already straightened the modules, copy those 4 numbers to their respective [```angleOffset```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/general-testing/src/main/java/frc/robot/Constants.java#L106-L132) parameter in the SwerveModuleConstants for each module.
     <br><b>Note: The CANcoder values printed to Shuffleboard are in degrees, when copying the values to [```angleOffset```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/general-testing/src/main/java/frc/robot/Constants.java#L106-L132) you must use ```Rotation2d.fromDegrees(value_here)```.</b>
 

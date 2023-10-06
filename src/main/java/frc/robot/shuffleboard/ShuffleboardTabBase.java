@@ -3,7 +3,7 @@ package frc.robot.shuffleboard;
 import java.util.Map;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
@@ -15,7 +15,7 @@ import java.util.Set;
 public abstract class ShuffleboardTabBase {
     protected ShuffleboardTab mTab;
 
-    private Set<String> validPropertyKeys = Set.of("min", "max", "block increment", "center", "show value", "visible time", "color when true", "color when false", "orientation", "number of tick marks", "show voltage and current values", "show text", "precision", "show tick marks", "range", "major tick spacing", "starting angle", "show tick mark ring", "number of wheels", "wheel diameter", "show velocity vectors", "show crosshair", "crosshair color", "show controls", "rotation");
+    private final Set<String> validPropertyKeys = Set.of("min", "max", "block increment", "center", "show value", "visible time", "color when true", "color when false", "orientation", "number of tick marks", "show voltage and current values", "show text", "precision", "show tick marks", "range", "major tick spacing", "starting angle", "show tick mark ring", "number of wheels", "wheel diameter", "show velocity vectors", "show crosshair", "crosshair color", "show controls", "rotation");
 
     public abstract void createEntries();
 
@@ -27,7 +27,7 @@ public abstract class ShuffleboardTabBase {
      * @return The created number entry.
      */
     protected GenericEntry createNumberEntry(String name, double defaultValue) {
-        return mTab.add(name, defaultValue).withSize(1, 1).getEntry();
+        return createEntry(name, defaultValue, null, null, null);
     }
 
     /**
@@ -35,14 +35,11 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
-     * @param entryInfo The EntryInfo to use for the entry.
+     * @param entryProps The EntryProperties to use for the entry.
      * @return The created number entry.
      */
-    protected GenericEntry createNumberEntry(String name, double defaultValue, EntryInfo entryInfo) {
-        return mTab.add(name, defaultValue)
-        .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
-        .withSize(entryInfo.getWidth(), entryInfo.getHeight())
-        .getEntry();
+    protected GenericEntry createNumberEntry(String name, double defaultValue, EntryProperties entryProps) {
+        return createEntry(name, defaultValue, null, null, entryProps);
     }
 
     /**
@@ -53,7 +50,7 @@ public abstract class ShuffleboardTabBase {
      * @return The created boolean entry.
      */
     protected GenericEntry createBooleanEntry(String name, boolean defaultValue) {
-        return mTab.add(name, defaultValue).withSize(1, 1).getEntry();
+        return createEntry(name, defaultValue, null, null, null);
     }
 
     /**
@@ -61,14 +58,11 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
-     * @param entryInfo The EntryInfo to use for the entry.
+     * @param entryProps The EntryProperties to use for the entry.
      * @return The created boolean entry.
      */
-    protected GenericEntry createBooleanEntry(String name, boolean defaultValue, EntryInfo entryInfo) {
-        return mTab.add(name, defaultValue)
-        .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
-        .withSize(entryInfo.getWidth(), entryInfo.getHeight())
-        .getEntry();
+    protected GenericEntry createBooleanEntry(String name, boolean defaultValue, EntryProperties entryProps) {
+        return createEntry(name, defaultValue, null, null, entryProps);
     }
 
     /**
@@ -79,7 +73,7 @@ public abstract class ShuffleboardTabBase {
      * @return The created string entry.
      */
     protected GenericEntry createStringEntry(String name, String defaultValue) {
-        return mTab.add(name, defaultValue).withSize(1, 1).getEntry();
+        return createEntry(name, defaultValue, null, null, null);
     }
 
     /**
@@ -87,14 +81,11 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
-     * @param entryInfo The EntryInfo to use for the entry.
+     * @param entryProps The EntryProperties to use for the entry.
      * @return The created string entry.
      */
-    protected GenericEntry createStringEntry(String name, String defaultValue, EntryInfo entryInfo) {
-        return mTab.add(name, defaultValue)
-        .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
-        .withSize(entryInfo.getWidth(), entryInfo.getHeight())
-        .getEntry();
+    protected GenericEntry createStringEntry(String name, String defaultValue, EntryProperties entryProps) {
+        return createEntry(name, defaultValue, null, null, entryProps);
     }
 
     /**
@@ -102,9 +93,12 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
+     * @param widgetType The WidgetType to use for the entry.
+     * @param propertyMap The properties to use for the specified widget.
+     * @param entryProps The EntryProperties to use for the entry.
      * @return The created entry.
      */
-    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType, Map<String, Object> propertyMap, EntryInfo entryInfo) {
+    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType, Map<String, Object> propertyMap, EntryProperties entryProps) {
         if (propertyMap != null) {
             for (String key : propertyMap.keySet()) {
                 if (!validPropertyKeys.contains(key)) {
@@ -115,10 +109,10 @@ public abstract class ShuffleboardTabBase {
         
         SimpleWidget entry = mTab.add(name, defaultValue);
         
-        if (entryInfo != null) {
+        if (entryProps != null) {
             entry = entry
-                .withPosition(entryInfo.getXPosition(), entryInfo.getYPosition())
-                .withSize(entryInfo.getWidth(), entryInfo.getHeight());
+                .withPosition(entryProps.getXPosition(), entryProps.getYPosition())
+                .withSize(entryProps.getWidth(), entryProps.getHeight());
         }
         
         if (widgetType != null) {
@@ -137,11 +131,10 @@ public abstract class ShuffleboardTabBase {
      *
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
-     * @param widgetType 
-     * @param entryInfo The EntryInfo to use for the entry.
+     * @param widgetType The WidgetType to use for the entry.
      * @return The created entry.
      */
-    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType) {
+    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType) {
         return createEntry(name, defaultValue, widgetType, null, null);
     }
 
@@ -151,11 +144,11 @@ public abstract class ShuffleboardTabBase {
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
      * @param widgetType The WidgetType to use for the entry.
-     * @param entryInfo The EntryInfo to use for the entry.
+     * @param entryProps The EntryProperties to use for the entry.
      * @return The created entry.
      */
-    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType, EntryInfo entryInfo) {
-        return createEntry(name, defaultValue, widgetType, null, entryInfo);
+    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType, EntryProperties entryProps) {
+        return createEntry(name, defaultValue, widgetType, null, entryProps);
     }
 
     /**
@@ -164,10 +157,10 @@ public abstract class ShuffleboardTabBase {
      * @param name The name of the entry.
      * @param defaultValue The default value of the entry.
      * @param widgetType The WidgetType to use for the entry.
-     * @param entryInfo The EntryInfo to use for the entry.
+     * @param propertyMap The properties to use for the specified widget.
      * @return The created entry.
      */
-    protected GenericEntry createEntry(String name, Object defaultValue, BuiltInWidgets widgetType, Map<String, Object> propertyMap) {
+    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType, Map<String, Object> propertyMap) {
         return createEntry(name, defaultValue, widgetType, propertyMap, null);
     }
 
@@ -189,20 +182,35 @@ public abstract class ShuffleboardTabBase {
         return mTab;
     }
 
-    public class EntryInfo {
+    public class EntryProperties {
         private final int xPos;
         private final int yPos;
         private final int width;
         private final int height;
     
-        public EntryInfo(int xPos, int yPos, int width, int height) {
+        /** 
+         * Specifies an x-position, y-position, width, and height for an entry.
+         *  
+         * @param xPos The x-position of the entry (column) 
+         * @param yPos The y-position of the entry (row)
+         * @param width The width of the entry 
+         * @param height The height of the entry 
+         */
+        public EntryProperties(int xPos, int yPos, int width, int height) {
             this.xPos = xPos;
             this.yPos = yPos;
             this.width = width;
             this.height = height;
         }
 
-        public EntryInfo(int xPos, int yPos) {
+        /** 
+         * Specifies an x-position and y-position for an entry.
+         * Size defaults to 1x1.
+         *  
+         * @param xPos The x-position of the entry (column)
+         * @param yPos The y-position of the entry (row)
+         */
+        public EntryProperties(int xPos, int yPos) {
             this.xPos = xPos;
             this.yPos = yPos;
             this.width = 1;

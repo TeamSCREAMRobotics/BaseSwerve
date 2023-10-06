@@ -23,7 +23,7 @@ public class RobotContainer {
 
     /* Shuffleboard */
     private final ShuffleboardTabManager m_shuffleboardTabManager = new ShuffleboardTabManager();
-
+    
     /**
      * Configures the subsystems, default commands, button bindings, and autonomous classes.
      */
@@ -52,8 +52,7 @@ public class RobotContainer {
 
     /**
      * Configures the autonomous chooser on the SmartDashboard.
-     * <p>
-     * Add options with {@code}addOption{@code}
+     * Add options with {@code}addOption(String name, Command object){@code}
      */
     private void configAuto() {
         Shuffleboard.getTab("Auto").add("Selected Auto", m_autoChooser).withSize(2, 1);

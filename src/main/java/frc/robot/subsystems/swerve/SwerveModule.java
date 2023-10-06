@@ -19,8 +19,8 @@ import com.ctre.phoenix.sensors.CANCoder;
 
 /**
  * A swerve module, which consists of an angle motor, a drive motor, and an angle encoder.
- * <p>
- * This class provides methods to get and set the angle and speed of the module.
+ * 
+ * This class provides methods to get and set all parts of the module, including the speed and angle.
  */
 public class SwerveModule {
     private int m_moduleNumber;
@@ -37,7 +37,7 @@ public class SwerveModule {
 
     /**
      * Constructs a SwerveModule object with the given location, module number, and module constants.
-     *<p>
+     *
      * @param location The location of the SwerveModule.
      * @param moduleNumber The module number of the SwerveModule.
      * @param moduleConstants The constants specific to this SwerveModule.
@@ -64,7 +64,7 @@ public class SwerveModule {
 
     /**
      * Returns the location associated with this module.
-     *<p>
+     *
      * @return The location.
      */
     public String getLocation() {
@@ -73,7 +73,7 @@ public class SwerveModule {
 
     /**
      * Returns the module number.
-     *<p>
+     *
      * @return The module number.
      */
     public int getModuleNumber() {
@@ -82,7 +82,7 @@ public class SwerveModule {
 
     /**
      * Sets the neutral mode for both the angle and the drive motor.
-     *<p>
+     *
      * @param mode The neutral mode to set.
      */
     public void setNeutralMode(NeutralMode mode) {
@@ -92,7 +92,7 @@ public class SwerveModule {
 
     /**
      * Sets the desired state of the Swerve module, including the angle and the speed
-     *<p>
+     *
      * @param desiredState The desired state of the Swerve module.
      * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
@@ -104,7 +104,7 @@ public class SwerveModule {
 
     /**
      * Sets the speed of the swerve module based on the desired state's speed and whether it is in open loop or closed loop control.
-     *<p>
+     *
      * @param desiredState The desired state of the swerve module.
      * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
@@ -122,7 +122,7 @@ public class SwerveModule {
 
     /**
      * Sets the angle of the swerve module based on the desired state's angle.
-     *<p>
+     *
      * @param desiredState The desired state of the swerve module.
      */
     private void setAngle(SwerveModuleState desiredState) {
@@ -136,7 +136,7 @@ public class SwerveModule {
 
     /**
      * Optimizes the movement of the module to travel the least distance to get to the desired angle.
-     *<p>
+     *
      * @param desiredState The desired state of the swerve module.
      * @param currentAngle The current angle of the swerve module as a Rotation2d.
      * @return The optimized swerve module state.
@@ -152,9 +152,9 @@ public class SwerveModule {
 	}
 
     /**
-     * Retrieves the current angle of the rotation motor.
-     *<p>
-     * @return The angle of the rotation motor in degrees.
+     * Retrieves the current agnle of the angle motor.
+     *
+     * @return The angle of the rotation motor as a Rotation2d.
      */
     private Rotation2d getAngle() {
         return Rotation2d.fromDegrees(
@@ -162,18 +162,18 @@ public class SwerveModule {
     }
 
     /**
-     * Retrieves the current absolute rotation of the Cancoder.
-     *<p>
-     * @return The current absolute rotation of the Cancoder sensor, adjusted by the angle offset, in degrees.
+     * Retrieves the current absolute rotation of the CANCoder.
+     *
+     * @return The current absolute rotation of the CANCoder sensor, adjusted by the angle offset, as a Rotation2d.
      */
     public Rotation2d getCanCoder() {
         return Rotation2d.fromDegrees(m_angleEncoder.getAbsolutePosition()).minus(m_angleOffset);
     }
 
     /**
-     * Resets the angle motor to the absolute position provided by the Cancoder.
-     * <p>
-     * Delays for 1 second to prevent problems with getting the Cancoder angle before it is initialized.
+     * Resets the angle motor to the absolute position provided by the CANCoder.
+     * 
+     * Delays for 1 second to prevent problems with getting the CANCoder angle before it is initialized.
      */
     public void resetToAbsolute() {
         Timer.delay(1.0);
@@ -183,8 +183,8 @@ public class SwerveModule {
 
     /**
      * Configures the angle encoder for the swerve module.
-     * <p>
-     * Sets the angle encoder to its factory default settings and applies the provided configuration settings.
+     * 
+     * Resets to factory default settings and configures the invert mode.
      */
     private void configAngleEncoder() {
         DeviceConfig.configSwerveCANCoder(
@@ -195,7 +195,7 @@ public class SwerveModule {
 
     /**
      * Configures the angle motor for swerve drive.
-     * <p>
+     * 
      * Configures basic settings, the inversion and neutral modes, and resets it to absolute.
      */
     private void configAngleMotor() {
@@ -210,7 +210,7 @@ public class SwerveModule {
 
     /**
      * Configures the drive motor with the specified settings.
-     * <p>
+     * 
      * Configures basic settings, the inversion and neutral modes, and resets the position to zero.
      */
     private void configDriveMotor() {

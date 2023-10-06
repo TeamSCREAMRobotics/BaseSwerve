@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * A swerve drive subsystem.
- * <p>
+ * 
  * This class provides methods for high-level control of the swerve drivetrain.
  */
 public class Swerve extends SubsystemBase {
@@ -33,7 +33,7 @@ public class Swerve extends SubsystemBase {
 
     /**
      * Constructs a new instance of the Swerve class.
-     * <p>
+     * 
      * Initializes the gyro, swerve modules, and odometry.
      */
     public Swerve() {
@@ -42,6 +42,7 @@ public class Swerve extends SubsystemBase {
         
         /**
          * Initializes an array of SwerveModule objects with their respective names, IDs, and constants.
+         * This array represents the robot's four swerve modules.
          */
         m_swerveModules = new SwerveModule[] {
                 new SwerveModule("FL", 0, SwerveConstants.FRONT_LEFT_MODULE),
@@ -51,7 +52,7 @@ public class Swerve extends SubsystemBase {
         };
         
         /**
-         * Configures the odometry, which uses the kinematics, gyro reading, and module positions.
+         * Configures the odometry, which requires the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
         m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.SWERVE_KINEMATICS, getYaw(),
@@ -70,21 +71,21 @@ public class Swerve extends SubsystemBase {
      * Uses inputs for field relative control and if the control is open-loop.
      *
      * @param translation A Translation2d representing the desired movement in x and y directions.
-     * @param rotation The rotation value representing the desired rotation speed.
+     * @param omega The desired angular velocity in rads/sec.
      * @param fieldRelative Whether the movement should be field-relative or robot-relative.
-     * @param isOpenLoop Whether the drive should be open loop (Tele-Op driving) or closed loop (Autonomous driving).
+     * @param isOpenLoop Whether the driving should be open loop (Tele-Op driving) or closed loop (Autonomous driving).
      */
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+    public void drive(Translation2d translation, double omega, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         translation.getX(),
                         translation.getY(),
-                        rotation,
+                        omega,
                         getYaw())
                         : new ChassisSpeeds(
                                 translation.getX(),
                                 translation.getY(),
-                                rotation));
+                                omega));
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
         for (SwerveModule mod : m_swerveModules) {
@@ -173,7 +174,7 @@ public class Swerve extends SubsystemBase {
      * Returns the yaw rotation in degrees.
      * If {@code}invertGyro{@code} is set to true, the yaw rotation is inverted.
      *
-     * @return The yaw rotation in degrees.
+     * @return The yaw rotation as a Rotation2d.
      */
     public Rotation2d getYaw() {
         return (SwerveConstants.INVERT_GYRO) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw())
@@ -181,7 +182,7 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Configures the gyro by resetting it to factory default settings and zeroing it.
+     * Configures the gyro. Resets it to factory default settings and zeroes it.
      */
     public void configGyro(){
         m_gyro.configFactoryDefault();

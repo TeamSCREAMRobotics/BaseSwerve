@@ -43,14 +43,8 @@ public class TeleopSwerve extends CommandBase {
 
     /**
      * Executes the swerve drive command.
-     * <p>
-     * This method applies a deadband to the translation, strafe, and rotation values
+     * <p>This method applies a deadband to the translation, strafe, and rotation values
      * and then passes them to the swerve drive subsystem to drive the robot.
-     * 
-     * @param translationSup A supplier that provides the translation value
-     * @param strafeSup A supplier that provides the strafe value
-     * @param rotationSup A supplier that provides the rotation value
-     * @param robotCentricSup A supplier that provides a boolean indicating whether the robot should be in robot-centric mode
      */
     @Override
     public void execute() {

@@ -90,6 +90,10 @@ public class ScreamPIDConstants implements Cloneable{
         return kD;
     }
 
+    public double kF(){
+        return kF;
+    }
+
     public double integralZone(){
         return integralZone;
     }
@@ -100,10 +104,6 @@ public class ScreamPIDConstants implements Cloneable{
 
     public double minIntegralAccumulator(){
         return minIntegralAccumulator;
-    }
-
-    public double kF(){
-        return kF;
     }
 
     public double maxOutput(){

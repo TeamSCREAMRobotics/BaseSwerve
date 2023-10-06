@@ -7,7 +7,7 @@ import frc.robot.RobotContainer;
 import frc.robot.shuffleboard.tabs.SwerveTab;
 
 /**
- * Manages the Shuffleboard tabs for the robot.
+ * Manages tabs for Shuffleboard.
  */
 public class ShuffleboardTabManager extends SubsystemBase {
 
