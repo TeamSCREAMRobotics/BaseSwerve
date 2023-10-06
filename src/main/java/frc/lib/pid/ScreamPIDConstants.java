@@ -3,7 +3,7 @@ package frc.lib.pid;
 /**
  * A container class for PID constants, along with additional methods.
  */
-public class PIDConstants implements Cloneable{
+public class ScreamPIDConstants implements Cloneable{
     private double kP, kI, kD, kF = 0;
     private double period = 0.02;
     private double minOutput = -1;
@@ -12,15 +12,15 @@ public class PIDConstants implements Cloneable{
     private double maxIntegralAccumulator = Double.POSITIVE_INFINITY;
     private double minIntegralAccumulator = Double.NEGATIVE_INFINITY;
 
-    public PIDConstants(){}
+    public ScreamPIDConstants(){}
 
-    public PIDConstants(double kP, double kI, double kD){
+    public ScreamPIDConstants(double kP, double kI, double kD){
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
     }
 
-    public PIDConstants(double kP, double kI, double kD, double kF){
+    public ScreamPIDConstants(double kP, double kI, double kD, double kF){
         this.kP = kP;
         this.kI = kI;
         this.kD = kD;
@@ -90,6 +90,10 @@ public class PIDConstants implements Cloneable{
         return kD;
     }
 
+    public double kF(){
+        return kF;
+    }
+
     public double integralZone(){
         return integralZone;
     }
@@ -102,10 +106,6 @@ public class PIDConstants implements Cloneable{
         return minIntegralAccumulator;
     }
 
-    public double kF(){
-        return kF;
-    }
-
     public double maxOutput(){
         return maxOutput;
     }
@@ -114,7 +114,7 @@ public class PIDConstants implements Cloneable{
         return minOutput;
     }
 
-    public boolean equals(PIDConstants other){
+    public boolean equals(ScreamPIDConstants other){
         return
             this.period == other.period &&
             this.kP == other.kP &&
@@ -128,8 +128,8 @@ public class PIDConstants implements Cloneable{
             this.minIntegralAccumulator == other.minIntegralAccumulator;
     }
 
-    public PIDConstants clone(){
-        PIDConstants copy = new PIDConstants();
+    public ScreamPIDConstants clone(){
+        ScreamPIDConstants copy = new ScreamPIDConstants();
         copy.period = this.period;
         copy.kP = this.kP;
         copy.kI = this.kI;

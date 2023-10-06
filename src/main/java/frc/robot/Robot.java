@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
    * diagnostics that you want ran during disabled, autonomous, teleoperated and
    * test.
    *
-   * <p>
+   * 
    * This runs after the mode specific periodic functions, but before LiveWindow
    * and
    * SmartDashboard integrated updating.
@@ -65,7 +65,6 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-
   }
 
     /** This function is called periodically when the robot is in Disabled mode. */

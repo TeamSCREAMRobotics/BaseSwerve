@@ -1,14 +1,26 @@
 package frc.robot.auto;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Swerve;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.RobotContainer;
 
 /**
- * A container class for auto routines for use during the autonomous period.
+ * A utility class that contains predefined auto routines for use during the autonomous period.
+ * Reference routines in RobotContainer.
  */
-public class AutoRoutines {
+public class AutoRoutines{
 
-    public static Command exampleRoutine(Swerve swerve) {
-        return swerve.followTrajectoryCommand(Paths.examplePath(), AutoEvents.exampleEvents(), true, true);
+    public static Command doNothing(){
+        return new InstantCommand().withName("Do Nothing");
+    }
+
+    public static Command exampleRoutine(){
+        Command routine = new SequentialCommandGroup(
+            new InstantCommand(() -> RobotContainer.getSwerve().resetPose(AutoTrajectories.getExampleTrajectory())),
+            RobotContainer.getSwerve().followTrajectoryCommand(AutoTrajectories.getExampleTrajectory(), true)
+        );
+        
+        return routine.withName("Example Routine");
     }
 }

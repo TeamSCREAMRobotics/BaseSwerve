@@ -1,28 +1,31 @@
 package frc.robot.auto;
 
 import java.util.HashMap;
-
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
- * A container class for PathPlanner events.
- * <p>
- * Auto events are used by PathPlanner to trigger events along a path.
+ * A utility class that holds all events for use during the autonomous period.
+ * Add events in RobotContainer.
  */
-public class AutoEvents extends SequentialCommandGroup {
-
-    public AutoEvents() {}
-
-    public static HashMap<String, Command> doNothing() {
-        return new HashMap<String, Command>();
+public class AutoEvents{
+    
+    private static final HashMap<String, Command> m_autoEventMap = new HashMap<String, Command>();
+    
+    public static void addEvent(String key, Command command){
+        m_autoEventMap.put(key, command);
     }
 
-    public static HashMap<String, Command> exampleEvents() {
-        HashMap<String, Command> exampleEvents = new HashMap<String, Command>();
+    public static void addEventMap(HashMap<String, Command> eventMap){
+        m_autoEventMap.putAll(eventMap);
+    }
 
-        exampleEvents.put("Example", new InstantCommand());
-        return exampleEvents;
+    public static void removeEvents(String... keys){
+        for(String key : keys){
+            m_autoEventMap.remove(key);
+        }
+    }
+
+    public static HashMap<String, Command> getEvents(){
+        return m_autoEventMap;
     }
 }

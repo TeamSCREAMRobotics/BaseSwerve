@@ -1,8 +1,6 @@
 package frc.lib.deviceConfiguration;
 
 import com.ctre.phoenix.ErrorCode;
-import com.revrobotics.REVLibError;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -12,29 +10,16 @@ public class ErrorChecker {
     public static final int kTriesToGenerateWarning = 5;
     
     /**
-     * This method takes a list of ErrorCodes and returns true if they are all ErrorCode.OK. When we configure our devices, we wrap all our our calls to the devices in this method
+     * This method takes a list of StatusCodes and returns true if they are all OK. When we configure our devices, we wrap all our our calls to the devices in this method
      * to tell us if the device has configured correctly, or if there are errors.
      */
-    public static boolean hasConfiguredWithoutErrors(ErrorCode... errors){
+    public static boolean hasConfiguredWithoutErrors(ErrorCode... statusCodes){
         boolean okay = true;
-        for(ErrorCode error : errors){
-            okay = okay && ErrorCode.OK == error;
+        for(ErrorCode statusCode : statusCodes){
+            okay = okay && ErrorCode.OK == statusCode;
         }
         return okay;
     }
-
-    /**
-     * This method takes a list of RevLibErrors and returns true if they are all REVLibError.kOk. When we configure our devices, we wrap all our our calls to the devices in this method
-     * to tell us if the device has configured correctly, or if there are errors.
-     */
-    public static boolean hasConfiguredWithoutErrors(REVLibError... errors){
-        boolean okay = true;
-        for(REVLibError error : errors){
-            okay = okay && REVLibError.kOk == error;
-        }
-        return okay;
-    }
-
     
     /**
      * This method does the actual configuration for the device. It repeatedly calls config.configureSettings() until there is a successful configuration or until it times out.
@@ -64,7 +49,7 @@ public class ErrorChecker {
 
         }
         if(printInfo && tries > kTriesToGenerateWarning)  DriverStation.reportWarning("Possible issue with " + name + ". Configuration took " + tries + " tries", false);
-        else if(printInfo) System.out.println( "   " + name + " configuration took " + tries + " tries. ");
+        else if(printInfo) System.out.println( "   " + name + " | configuration took " + tries + " tries. ");
     }
 
     /**

@@ -43,25 +43,19 @@ public class TeleopSwerve extends CommandBase {
 
     /**
      * Executes the swerve drive command.
-     * <p>
-     * This method applies a deadband to the translation, strafe, and rotation values
+     * <p>This method applies a deadband to the translation, strafe, and rotation values
      * and then passes them to the swerve drive subsystem to drive the robot.
-     * 
-     * @param translationSup A supplier that provides the translation value
-     * @param strafeSup A supplier that provides the strafe value
-     * @param rotationSup A supplier that provides the rotation value
-     * @param robotCentricSup A supplier that provides a boolean indicating whether the robot should be in robot-centric mode
      */
     @Override
     public void execute() {
         
-        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.stickDeadband);
-        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.stickDeadband);
-        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.stickDeadband);
+        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
+        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
+        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
 
         m_swerve.drive(
-                new Translation2d(translationVal, strafeVal).times(SwerveConstants.maxSpeed),
-                rotationVal * SwerveConstants.maxAngularVelocity,
+                new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED),
+                rotationVal * SwerveConstants.MAX_ANGULAR_VELOCITY,
                 robotCentricSup.getAsBoolean(),
                 true);
     }
