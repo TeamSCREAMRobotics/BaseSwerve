@@ -20,8 +20,8 @@ public class SwerveTab extends ShuffleboardTabBase {
     }
     
     /**
-     * Represents a set of generic entries for the Swerve subsystem.
-     * Each module has three generic entries: CANCoder, Integrated, and Velocity.
+     * Represents a set of entries for the Swerve subsystem.
+     * Each module has three entries: CANCoder, Integrated, and Velocity readings.
      */
     private GenericEntry m_FLCANCoder;
     private GenericEntry m_FLIntegrated;
@@ -44,11 +44,11 @@ public class SwerveTab extends ShuffleboardTabBase {
     private GenericEntry m_odometryYaw;
 
     private GenericEntry m_gyroYaw;
-    
+
     /**
      * This method creates number entries for various sensors related to the Swerve subsystem.
      * These entries are used to display and update values on the Shuffleboard.
-     * Set {@code SwerveConstants.updateSwerveFromShuffleboard} equal to true to add and/or update values
+     * Set {@code SwerveConstants.updateSwerveFromShuffleboard} for entries that get values.
      */
     @Override
     public void createEntries() {
@@ -85,8 +85,7 @@ public class SwerveTab extends ShuffleboardTabBase {
 
     /**
      * Updates the values of various Shuffleboard widgets with the current state of the swerve drive.
-     * The CANCoder, Integrated, and Velocity widgets for each module are updated periodically.
-     * Set {@code}updateSwerveFromShuffleboard{@code} to true to update values.
+     * Set {@code}updateSwerveFromShuffleboard{@code} for getting values.
      */
     @Override
     public void periodic() {
