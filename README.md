@@ -3,6 +3,7 @@
 <br>This template includes everything we require for a basic Swerve Drive robot.
 <br>
 <br><b>Includes:</b>
+   * Phoenix 6 Implementation
    * Basic Swerve Code
    * PathPlanner functionality
    * Basic examples for autonomous routines
