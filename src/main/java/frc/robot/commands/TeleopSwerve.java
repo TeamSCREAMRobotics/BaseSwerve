@@ -9,6 +9,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 /**
@@ -20,6 +21,9 @@ public class TeleopSwerve extends CommandBase {
     private DoubleSupplier strafeSup;
     private DoubleSupplier rotationSup;
     private BooleanSupplier robotCentricSup;
+    private double lastAngle;
+    private Timer holdTimer = new Timer();
+
 
     /**
      * Constructs a TeleopSwerve command with the given parameters.
@@ -53,10 +57,27 @@ public class TeleopSwerve extends CommandBase {
         double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
         double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
 
+        double angularVel = getAngularVelocity(rotationVal);
+
         m_swerve.drive(
                 new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED),
-                rotationVal * SwerveConstants.MAX_ANGULAR_VELOCITY,
+                angularVel,
                 robotCentricSup.getAsBoolean(),
                 true);
+    }
+
+    private double getAngularVelocity(double currentVelocity){
+        boolean isRotating = Math.abs(currentVelocity) > 0; 
+        if(isRotating){
+            holdTimer.reset();
+            lastAngle = m_swerve.getYaw().getDegrees();
+            return currentVelocity;
+        } else { 
+            holdTimer.start();
+            if(holdTimer.hasElapsed(0.1)){
+                return m_swerve.calculateHold(m_swerve.getYaw().getDegrees(), lastAngle);
+            }
+            return currentVelocity;
+        }
     }
 }

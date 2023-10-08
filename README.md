@@ -27,7 +27,7 @@ The following things must be adjusted to your robot and module's specific consta
     * Wheel Circumference
     * Angle Motor Invert
     * Drive Motor Invert
-    * CANCoder Sensor Invert
+    * CANcoder Sensor Invert
     * Angle Motor Gear Ratio
     * Drive Motor Gear Ratio
     * Angle Falcon Motor PID Values
@@ -37,14 +37,14 @@ The following things must be adjusted to your robot and module's specific consta
 6. [```wheelCircumference```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): Cirumference of the wheel (including tread) in meters. <br><b>This value will be automatically set by the selected module.</b>
 7. [```driveGearRatio```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): Total gear ratio for the drive motor. <br><b>This value will be automatically set by the selected module.</b>
 8. [```angleGearRatio```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): Total gear ratio for the angle motor. <br><b>This value will be automatically set by the selected module.</b>
-9. [```canCoderInvert```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java) and [```angleMotorInvert```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): Both must be set such that they are CCW+. <br><b>This value will be automatically set by the selected module, but checking is recommended.</b>
+9. [```CANcoderInvert```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java) and [```angleMotorInvert```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): Both must be set such that they are CCW+. <br><b>This value will be automatically set by the selected module, but checking is recommended.</b>
 10. [```driveMotorInvert```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): This can always remain false, since you set your offsets in step #11 such that a positive input to the drive motor will cause the robot to drive forwards. <br><b>This value will be automatically set by the selected module.</b>
 
-11. [```Module Specific Constants```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): set the Can Id's of the motors and CANCoders for the respective modules, see the next step for setting offsets.
+11. [```Module Specific Constants```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java): set the Can Id's of the motors and CANcoders for the respective modules, see the next step for setting offsets.
 12. Setting Offsets
     * For finding the offsets you need to line up all modules straight. Use a piece of wood/metal to do this.
     * Point the bevel gears of all the wheels in the same direction (either facing left or right), where a postive input to the drive motor drives the robot forward (Use phoenix tuner to test this). If for some reason you set the offsets with the wheels backwards, you can change the [```driveMotorInvert```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java) value to fix.
-    * Open Shuffleboard and go to the smartdashboard tab. You will see 4 printouts called "Mod 0 CANCoder", "Mod 1 CANCoder", etc. 
+    * Open Shuffleboard and go to the smartdashboard tab. You will see 4 printouts called "Mod 0 CANcoder", "Mod 1 CANcoder", etc. 
     <br>If you have already straightened the modules, copy those 4 numbers to their respective [```angleOffset```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java) parameter in the SwerveModuleConstants for each module.
     <br><b>Note: The CANcoder values printed to Shuffleboard are in degrees, when copying the values to [```angleOffset```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/Constants.java) you must use ```Rotation2d.fromDegrees(value_here)```.</b>
 

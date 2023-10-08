@@ -21,21 +21,21 @@ public class SwerveTab extends ShuffleboardTabBase {
     
     /**
      * Represents a set of entries for the Swerve subsystem.
-     * Each module has three entries: CANCoder, Integrated, and Velocity readings.
+     * Each module has three entries: CANcoder, Integrated, and Velocity readings.
      */
-    private GenericEntry m_FLCANCoder;
+    private GenericEntry m_FLCANcoder;
     private GenericEntry m_FLIntegrated;
     private GenericEntry m_FLVelocity;
 
-    private GenericEntry m_FRCANCoder;
+    private GenericEntry m_FRCANcoder;
     private GenericEntry m_FRIntegrated;
     private GenericEntry m_FRVelocity;
 
-    private GenericEntry m_BLCANCoder;
+    private GenericEntry m_BLCANcoder;
     private GenericEntry m_BLIntegrated;
     private GenericEntry m_BLVelocity;
 
-    private GenericEntry m_BRCANCoder;
+    private GenericEntry m_BRCANcoder;
     private GenericEntry m_BRIntegrated;
     private GenericEntry m_BRVelocity;
 
@@ -54,19 +54,19 @@ public class SwerveTab extends ShuffleboardTabBase {
     public void createEntries() {
         mTab = Shuffleboard.getTab("Swerve");
 
-        m_FLCANCoder = createNumberEntry("FL CANCoder", 0, new EntryProperties(0, 0));
+        m_FLCANcoder = createNumberEntry("FL CANcoder", 0, new EntryProperties(0, 0));
         m_FLIntegrated = createNumberEntry("FL Integrated", 0, new EntryProperties(1, 0));
         m_FLVelocity = createNumberEntry("FL Velocity", 0, new EntryProperties(2,0));
 
-        m_FRCANCoder = createNumberEntry("FR CANCoder", 0, new EntryProperties(0, 1));
+        m_FRCANcoder = createNumberEntry("FR CANcoder", 0, new EntryProperties(0, 1));
         m_FRIntegrated = createNumberEntry("FR Integrated", 0, new EntryProperties(1, 1));
         m_FRVelocity = createNumberEntry("FR Velocity", 0, new EntryProperties(2, 1));
 
-        m_BLCANCoder = createNumberEntry("BL CANCoder", 0, new EntryProperties(0, 2));
+        m_BLCANcoder = createNumberEntry("BL CANcoder", 0, new EntryProperties(0, 2));
         m_BLIntegrated = createNumberEntry("BL Integrated", 0, new EntryProperties(1, 2));
         m_BLVelocity = createNumberEntry("BL Velocity", 0, new EntryProperties(2, 2));
 
-        m_BRCANCoder = createNumberEntry("BR CANCoder", 0, new EntryProperties(0, 3));
+        m_BRCANcoder = createNumberEntry("BR CANcoder", 0, new EntryProperties(0, 3));
         m_BRIntegrated = createNumberEntry("BR Integrated", 0, new EntryProperties(1, 3));
         m_BRVelocity = createNumberEntry("BR Velocity", 0, new EntryProperties(2, 3));
 
@@ -89,19 +89,19 @@ public class SwerveTab extends ShuffleboardTabBase {
      */
     @Override
     public void periodic() {
-        m_FLCANCoder.setDouble(round(m_swerve.getModules()[0].getCanCoder().getDegrees(), 3));
+        m_FLCANcoder.setDouble(round(m_swerve.getModules()[0].getCANcoder().getDegrees(), 3));
         m_FLIntegrated.setDouble(round(m_swerve.getModules()[0].getPosition().angle.getDegrees(), 3));
         m_FLVelocity.setDouble(round(m_swerve.getModules()[0].getState().speedMetersPerSecond, 3));
 
-        m_FRCANCoder.setDouble(round(m_swerve.getModules()[1].getCanCoder().getDegrees(), 3));
+        m_FRCANcoder.setDouble(round(m_swerve.getModules()[1].getCANcoder().getDegrees(), 3));
         m_FRIntegrated.setDouble(round(m_swerve.getModules()[1].getPosition().angle.getDegrees(), 3));
         m_FRVelocity.setDouble(round(m_swerve.getModules()[1].getState().speedMetersPerSecond, 3));
 
-        m_BLCANCoder.setDouble(round(m_swerve.getModules()[2].getCanCoder().getDegrees(), 3));
+        m_BLCANcoder.setDouble(round(m_swerve.getModules()[2].getCANcoder().getDegrees(), 3));
         m_BLIntegrated.setDouble(round(m_swerve.getModules()[2].getPosition().angle.getDegrees(), 3));
         m_BLVelocity.setDouble(round(m_swerve.getModules()[2].getState().speedMetersPerSecond, 3));
 
-        m_BRCANCoder.setDouble(round(m_swerve.getModules()[3].getCanCoder().getDegrees(), 3));
+        m_BRCANcoder.setDouble(round(m_swerve.getModules()[3].getCANcoder().getDegrees(), 3));
         m_BRIntegrated.setDouble(round(m_swerve.getModules()[3].getPosition().angle.getDegrees(), 3));
         m_BRVelocity.setDouble(round(m_swerve.getModules()[3].getState().speedMetersPerSecond, 3));
 

@@ -1,21 +1,22 @@
 package frc.robot.subsystems.swerve;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import frc.lib.deviceConfiguration.DeviceConfig;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
 
 /**
  * A swerve module, which consists of an angle motor, a drive motor, and an angle encoder.
@@ -30,7 +31,11 @@ public class SwerveModule {
 
     private TalonFX m_angleMotor;
     private TalonFX m_driveMotor;
-    private CANCoder m_angleEncoder;
+    private CANcoder m_angleEncoder;
+
+    private DutyCycleOut driveCycle = new DutyCycleOut(0);
+    private VelocityVoltage driveVelVoltage = new VelocityVoltage(0);
+    private PositionVoltage anglePosVoltage = new PositionVoltage(0);
 
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(SwerveConstants.DRIVE_KS, SwerveConstants.DRIVE_KV,
             SwerveConstants.DRIVE_KA);
@@ -48,7 +53,7 @@ public class SwerveModule {
         this.m_angleOffset = moduleConstants.angleOffset;
 
         /* Angle Encoder Config */
-        m_angleEncoder = new CANCoder(moduleConstants.cancoderID, Ports.CANIVORE_BUS_NAME); //TODO delete CANIVORE_BUS_NAME if the robot is not using a CANivore
+        m_angleEncoder = new CANcoder(moduleConstants.CANcoderID, Ports.CANIVORE_BUS_NAME); //TODO delete CANIVORE_BUS_NAME if the robot is not using a CANivore
         configAngleEncoder();
 
         /* Angle Motor Config */
@@ -80,14 +85,16 @@ public class SwerveModule {
         return m_moduleNumber;
     }
 
-    /**
-     * Sets the neutral mode for both the angle and the drive motor.
-     *
-     * @param mode The neutral mode to set.
-     */
-    public void setNeutralMode(NeutralMode mode) {
-        m_angleMotor.setNeutralMode(mode);
-        m_driveMotor.setNeutralMode(mode);
+    public void setAngleNeutralMode(NeutralModeValue mode){
+        MotorOutputConfigs configs = new MotorOutputConfigs();
+        configs.NeutralMode = mode;
+        m_angleMotor.getConfigurator().refresh(configs);
+    }
+
+    public void setDriveNeutralMode(NeutralModeValue mode){
+        MotorOutputConfigs configs = new MotorOutputConfigs();
+        configs.NeutralMode = mode;
+        m_driveMotor.getConfigurator().refresh(configs);
     }
 
     /**
@@ -110,13 +117,13 @@ public class SwerveModule {
      */
     private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            double percentOutput = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
-            m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
+            driveCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
+            m_driveMotor.setControl(driveCycle);
         } else {
-            double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
+            driveVelVoltage.Velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
                     SwerveConstants.WHEEL_CIRCUMFERENCE, SwerveConstants.DRIVE_GEAR_RATIO);
-            m_driveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward,
-                    feedforward.calculate(desiredState.speedMetersPerSecond));
+            driveVelVoltage.FeedForward = feedforward.calculate(desiredState.speedMetersPerSecond);
+            m_driveMotor.setControl(driveVelVoltage);
         }
     }
 
@@ -129,8 +136,8 @@ public class SwerveModule {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01))
                 ? m_lastAngle
                 : desiredState.angle; /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
-        m_angleMotor.set(ControlMode.Position,
-                Conversions.degreesToFalcon(angle.getDegrees(), SwerveConstants.ANGLE_GEAR_RATIO));
+        anglePosVoltage.Position = Conversions.degreesToFalcon(angle.getDegrees(), SwerveConstants.ANGLE_GEAR_RATIO);
+        m_angleMotor.setControl(anglePosVoltage);
         m_lastAngle = angle;
     }
 
@@ -158,27 +165,26 @@ public class SwerveModule {
      */
     private Rotation2d getAngle() {
         return Rotation2d.fromDegrees(
-                Conversions.falconToDegrees(m_angleMotor.getSelectedSensorPosition(), SwerveConstants.ANGLE_GEAR_RATIO));
+                Conversions.falconToDegrees(m_angleMotor.getPosition().getValue(), SwerveConstants.ANGLE_GEAR_RATIO));
     }
 
     /**
-     * Retrieves the current absolute rotation of the CANCoder.
+     * Retrieves the current absolute rotation of the CANcoder.
      *
-     * @return The current absolute rotation of the CANCoder sensor, adjusted by the angle offset, as a Rotation2d.
+     * @return The current absolute rotation of the CANcoder sensor, adjusted by the angle offset, as a Rotation2d.
      */
-    public Rotation2d getCanCoder() {
-        return Rotation2d.fromDegrees(m_angleEncoder.getAbsolutePosition()).minus(m_angleOffset);
+    public Rotation2d getCANcoder() {
+        return Rotation2d.fromDegrees(m_angleEncoder.getAbsolutePosition().getValue()).minus(m_angleOffset);
     }
 
     /**
-     * Resets the angle motor to the absolute position provided by the CANCoder.
+     * Resets the angle motor to the absolute position provided by the CANcoder.
      * 
-     * Delays for 1 second to prevent problems with getting the CANCoder angle before it is initialized.
+     * Delays for 1 second to prevent problems with getting the CANcoder angle before it is initialized.
      */
     public void resetToAbsolute() {
-        Timer.delay(1.0);
-        m_angleMotor.setSelectedSensorPosition(
-                Conversions.degreesToFalcon(getCanCoder().getDegrees(), SwerveConstants.ANGLE_GEAR_RATIO));
+        double position = Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(0.5).getValue()).getDegrees();
+        m_angleMotor.setRotorPosition(Conversions.degreesToFalcon(position - m_angleOffset.getDegrees(), SwerveConstants.ANGLE_GEAR_RATIO));
     }
 
     /**
@@ -187,7 +193,7 @@ public class SwerveModule {
      * Resets to factory default settings and configures the invert mode.
      */
     private void configAngleEncoder() {
-        DeviceConfig.configSwerveCANCoder(
+        DeviceConfig.configSwerveCANcoder(
             m_angleEncoder, 
             m_location,
             SwerveConstants.CANCODER_INVERT);
@@ -229,7 +235,7 @@ public class SwerveModule {
      */
     public SwerveModuleState getState() {
         return new SwerveModuleState(
-                Conversions.falconToMPS(m_driveMotor.getSelectedSensorVelocity(), SwerveConstants.WHEEL_CIRCUMFERENCE,
+                Conversions.falconToMPS(m_driveMotor.getVelocity().getValue(), SwerveConstants.WHEEL_CIRCUMFERENCE,
                         SwerveConstants.DRIVE_GEAR_RATIO),
                 getAngle());
     }
@@ -241,18 +247,8 @@ public class SwerveModule {
      */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
-                Conversions.falconToMeters(m_driveMotor.getSelectedSensorPosition(), SwerveConstants.WHEEL_CIRCUMFERENCE,
+                Conversions.falconToMeters(m_driveMotor.getPosition().getValue(), SwerveConstants.WHEEL_CIRCUMFERENCE,
                         SwerveConstants.DRIVE_GEAR_RATIO),
                 getAngle());
-    }
-
-    /**
-     * Calculates and returns the distance traveled by the drive motor in meters.
-     *
-     * @return The distance traveled in meters.
-     */
-    public double getDistanceMeters() {
-        return Conversions.falconToMeters(m_driveMotor.getSelectedSensorPosition(), SwerveConstants.WHEEL_CIRCUMFERENCE,
-                SwerveConstants.DRIVE_GEAR_RATIO);
     }
 }

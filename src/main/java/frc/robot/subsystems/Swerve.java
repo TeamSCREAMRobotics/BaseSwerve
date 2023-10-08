@@ -9,7 +9,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
-import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.commands.FollowPathWithEvents;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
@@ -71,21 +72,21 @@ public class Swerve extends SubsystemBase {
      * Uses inputs for field relative control and if the control is open-loop.
      *
      * @param translation A Translation2d representing the desired movement in x and y directions.
-     * @param omega The desired angular velocity in rads/sec.
+     * @param angularVel The desired angular velocity in rads/sec.
      * @param fieldRelative Whether the movement should be field-relative or robot-relative.
      * @param isOpenLoop Whether the driving should be open loop (Tele-Op driving) or closed loop (Autonomous driving).
      */
-    public void drive(Translation2d translation, double omega, boolean fieldRelative, boolean isOpenLoop) {
+    public void drive(Translation2d translation, double angularVel, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                         translation.getX(),
                         translation.getY(),
-                        omega,
+                        angularVel,
                         getYaw())
                         : new ChassisSpeeds(
                                 translation.getX(),
                                 translation.getY(),
-                                omega));
+                                angularVel));
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
         for (SwerveModule mod : m_swerveModules) {
@@ -105,6 +106,17 @@ public class Swerve extends SubsystemBase {
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], false);
         }
+    }
+
+    /** 
+     * Calculates the hold value based on the provided measurement and setpoint. 
+     *  
+     * @param measurement The current measurement value. 
+     * @param setpoint The desired setpoint value. 
+     * @return The calculated value from the hold controller.
+    */
+    public double calculateHold(double measurement, double setpoint){
+        return SwerveConstants.SWERVE_HOLD_CONTROLLER.calculate(measurement, setpoint);
     }
 
     /**
@@ -177,15 +189,15 @@ public class Swerve extends SubsystemBase {
      * @return The yaw rotation as a Rotation2d.
      */
     public Rotation2d getYaw() {
-        return (SwerveConstants.INVERT_GYRO) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw())
-                : Rotation2d.fromDegrees(m_gyro.getYaw());
+        return (SwerveConstants.INVERT_GYRO) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw().getValue())
+                : Rotation2d.fromDegrees(m_gyro.getYaw().getValue());
     }
 
     /**
      * Configures the gyro. Resets it to factory default settings and zeroes it.
      */
     public void configGyro(){
-        m_gyro.configFactoryDefault();
+        m_gyro.getConfigurator().apply(new Pigeon2Configuration());
         zeroGyro();
     }
 

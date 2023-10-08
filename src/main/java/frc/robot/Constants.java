@@ -1,7 +1,9 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.InvertType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,14 +16,14 @@ import frc.lib.util.SwerveModuleConstants;
  * A container class for constants used in various places in the project.
  */
 public final class Constants{
-    public static final double STICK_DEADBAND = 0.05;
+    public static final double STICK_DEADBAND = 0.1;
     public static final boolean INCLUDE_DEBUG_TABS = true;
 
     public static final class SwerveConstants {
 
         public static final boolean UPDATE_SWERVE_FROM_SHUFFLEBOARD = false;
 
-        public static final boolean INVERT_GYRO = false; // TODO Always ensure Gyro is CCW+ CW-
+        public static final boolean INVERT_GYRO = false; // TODO ALWAYS ENSURE GYRO READS CCW+ CW-
 
         public static final COTSFalconSwerveConstants CHOSEN_MODULE = COTSFalconSwerveConstants
                             .SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); // TODO ROBOT SPECIFIC
@@ -33,8 +35,7 @@ public final class Constants{
 
         /*
          * Swerve Kinematics
-         * No need to ever change this unless you are not doing a traditional
-         * rectangular/square 4 module swerve
+         * No need to ever change this unless there is more than four modules.
          */
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
@@ -47,11 +48,11 @@ public final class Constants{
         public static final double ANGLE_GEAR_RATIO = CHOSEN_MODULE.angleGearRatio;
 
         /* Motor Inverts */
-        public static final InvertType ANGLE_MOTOR_INVERT = CHOSEN_MODULE.angleMotorInvert;
-        public static final InvertType DRIVE_MOTOR_INVERT = CHOSEN_MODULE.driveMotorInvert;
+        public static final InvertedValue ANGLE_MOTOR_INVERT = CHOSEN_MODULE.angleMotorInvert;
+        public static final InvertedValue DRIVE_MOTOR_INVERT = CHOSEN_MODULE.driveMotorInvert;
 
         /* Angle Encoder Invert */
-        public static final boolean CANCODER_INVERT = CHOSEN_MODULE.canCoderInvert;
+        public static final SensorDirectionValue CANCODER_INVERT = CHOSEN_MODULE.CANcoderInvert;
 
         /* Swerve Current Limiting */
         public static final int ANGLE_CONTINUOUS_CURRENT_LIMIT = 25;
@@ -90,9 +91,11 @@ public final class Constants{
         public static final double DRIVE_KV = (1.51 / 12);
         public static final double DRIVE_KA = (0.27 / 12);
 
-        /* PathPlanner Controllers */
+        /* Controllers */
         public static final PIDController PATH_TRANSLATION_CONTROLLER = new PIDController(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
         public static final PIDController PATH_ROTATION_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+
+        public static final PIDController SWERVE_HOLD_CONTROLLER = new PIDController(0.0, 0.0, 0.2);
 
         /* Swerve Profiling Values */
         /* Meters per Second */
@@ -102,47 +105,50 @@ public final class Constants{
         public static final double MAX_ANGULAR_VELOCITY = 0.0; // TODO ROBOT SPECIFIC
 
         /* Neutral Modes */
-        public static final NeutralMode ANGLE_NEUTRAL_MODE = NeutralMode.Coast; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
-        public static final NeutralMode DRIVE_NEUTRAL_MODE = NeutralMode.Brake;
-
-        /* Front Left */
-        public static final SwerveModuleConstants MODULE_0 = new SwerveModuleConstants(
-            0,           
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
-
-        /* Front Right */
-        public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
-            0, 
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
-
-        /* Back Left */
-        public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
-            0, 
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
-
-        /* Back Right */
-        public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
-            0, 
-            0, 
-            0, 
-            Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+        public static final NeutralModeValue ANGLE_NEUTRAL_MODE = NeutralModeValue.Coast; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
+        public static final NeutralModeValue DRIVE_NEUTRAL_MODE = NeutralModeValue.Brake;
 
         /** 
          * Use this if you have multiple sets of modules.
          * In our case, this is useful for hotswapping modules.
          * Set each location's constants to their corresponding module.
          */
-        public static final SwerveModuleConstants FRONT_LEFT_MODULE = MODULE_0;
-        public static final SwerveModuleConstants FRONT_RIGHT_MODULE = MODULE_1;
-        public static final SwerveModuleConstants BACK_LEFT_MODULE = MODULE_2;
-        public static final SwerveModuleConstants BACK_RIGHT_MODULE = MODULE_3;
+        public static final SwerveModuleConstants FRONT_LEFT_MODULE = ModuleConstants.MODULE_0;
+        public static final SwerveModuleConstants FRONT_RIGHT_MODULE = ModuleConstants.MODULE_1;
+        public static final SwerveModuleConstants BACK_LEFT_MODULE = ModuleConstants.MODULE_2;
+        public static final SwerveModuleConstants BACK_RIGHT_MODULE = ModuleConstants.MODULE_3;
 
+
+        public static class ModuleConstants{
+            
+            /* Front Left */
+            public static final SwerveModuleConstants MODULE_0 = new SwerveModuleConstants(
+                0,           
+                1, 
+                1, 
+                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+
+            /* Front Right */
+            public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
+                2, 
+                3, 
+                2, 
+                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+
+            /* Back Left */
+            public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
+                4, 
+                5, 
+                3, 
+                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+
+            /* Back Right */
+            public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
+                6, 
+                7, 
+                4, 
+                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+        }
     }
 
     public static final class Ports {
