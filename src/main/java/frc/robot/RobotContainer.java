@@ -61,11 +61,6 @@ public class RobotContainer {
 
         m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());
         m_autoChooser.addOption("Example Routine", AutoRoutines.exampleRoutine());
-        m_autoChooser.addOption("Example Routine1", AutoRoutines.exampleRoutine());
-        m_autoChooser.addOption("Example Routine2", AutoRoutines.exampleRoutine());
-        m_autoChooser.addOption("Example Routine3", AutoRoutines.exampleRoutine());
-        m_autoChooser.addOption("Example Routine4", AutoRoutines.exampleRoutine());
-        m_autoChooser.addOption("Example Routine5", AutoRoutines.exampleRoutine());
     }
 
     /**
