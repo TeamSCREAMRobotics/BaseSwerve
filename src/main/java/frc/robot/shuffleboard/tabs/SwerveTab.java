@@ -82,7 +82,7 @@ public class SwerveTab extends ShuffleboardTabBase {
         m_odometryY = createNumberEntry("Odometry Y", 0, new EntryProperties(4, 1));
         m_odometryYaw = createNumberEntry("Odometry Yaw", 0, new EntryProperties(4, 2));
 
-        m_gyroYaw = createEntry("Gyro Yaw", 0, new EntryProperties(6, 0, 3, 3, BuiltInWidgets.kGyro));
+        //m_gyroYaw = createEntry("Gyro Yaw", 0, new EntryProperties(6, 0, 3, 3, BuiltInWidgets.kGyro));
 
         if (ShuffleboardConstants.UPDATE_SWERVE) {
             

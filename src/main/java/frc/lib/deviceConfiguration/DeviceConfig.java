@@ -75,7 +75,7 @@ public class DeviceConfig {
                 motor.getConfigurator().setPosition(0));
         }
         };
-        ErrorChecker.configureDevice(deviceConfig, name + " Angle Motor ID: " + motor.getDeviceID(), true);
+        ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID(), true);
     }
 
     public static void configureSwerveEncoder(String name, CANcoder encoder, CANcoderConfiguration config){

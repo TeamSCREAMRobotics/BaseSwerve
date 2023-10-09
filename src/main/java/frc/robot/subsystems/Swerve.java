@@ -208,6 +208,7 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         m_swerveOdometry.update(getYaw(), getModulePositions()); /* Updates the pose estimator with the current angle and module positions */
+        getModules()[0].setSpeed(new SwerveModuleState(0, getYaw()), false);
     }
 
     /**

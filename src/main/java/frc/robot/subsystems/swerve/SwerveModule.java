@@ -118,15 +118,16 @@ public class SwerveModule {
      * @param desiredState The desired state of the swerve module.
      * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
-    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
+    public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
             m_driveCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
             m_driveMotor.setControl(m_driveCycle);
         } else {
+            // TODO NOT CALCULATING CORRECTLY
             m_driveVelVoltage.Velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
                     SwerveConstants.WHEEL_CIRCUMFERENCE, DriveConstants.GEAR_RATIO);
             m_driveVelVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
-            m_driveMotor.setControl(m_driveVelVoltage);
+            m_driveMotor.setControl(m_driveVelVoltage.withVelocity(25)); // THIS WORKS
         }
     }
 
@@ -182,7 +183,7 @@ public class SwerveModule {
     /**
      * Resets the angle motor to the absolute position provided by the CANcoder.
      * 
-     * Delays for 500 ms to prevent problems with getting the CANcoder angle before it is initialized.
+     * Waits for 500 ms to prevent problems with getting the CANcoder angle before it is initialized.
      */
     public void resetToAbsolute() {
         Rotation2d position = Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(0.5).getValue());
@@ -195,7 +196,7 @@ public class SwerveModule {
      * Configures the encoder with the specified configuration.
      */
     private void configAngleEncoder() {
-        DeviceConfig.configureSwerveEncoder(m_modLocation, m_angleEncoder, DeviceConfig.swerveEncoderConfig());
+        DeviceConfig.configureSwerveEncoder(m_modLocation + " Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig());
     }
 
     /**
@@ -204,7 +205,7 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configAngleMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation, m_angleMotor, DeviceConfig.angleFXConfig());
+        DeviceConfig.configureTalonFX(m_modLocation + " Angle Motor", m_angleMotor, DeviceConfig.angleFXConfig());
         resetToAbsolute();
     }
 
@@ -218,7 +219,7 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configDriveMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation, m_driveMotor, DeviceConfig.driveFXConfig());
+        DeviceConfig.configureTalonFX(m_modLocation + " Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig());
     }
 
     /**

@@ -20,7 +20,7 @@ public final class Constants{
 
     public static final class Ports {
         /* CANivore */
-        public static final String CANIVORE_BUS_NAME = ""; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
+        public static final String CANIVORE_BUS_NAME = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
 
         /* Pigeon2 */
         public static final int PIGEON_ID = 0;
@@ -159,30 +159,30 @@ public final class Constants{
             
             /* Front Left */
             public static final SwerveModuleConstants MODULE_0 = new SwerveModuleConstants(
-                0,           
-                0, 
-                0, 
+                23,           
+                24, 
+                8, 
                 Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
 
             /* Front Right */
             public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
-                0, 
-                0, 
-                0, 
+                13, 
+                14, 
+                3, 
                 Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
 
             /* Back Left */
             public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
-                0, 
-                0, 
-                0, 
+                19, 
+                20, 
+                6, 
                 Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
 
             /* Back Right */
             public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
-                0, 
-                0, 
-                0, 
+                17, 
+                18, 
+                5, 
                 Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
         }
     }
