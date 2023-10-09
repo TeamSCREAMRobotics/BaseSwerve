@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.ShuffleboardConstants;
 import frc.robot.shuffleboard.tabs.SwerveTab;
 
 /**
@@ -11,19 +12,16 @@ import frc.robot.shuffleboard.tabs.SwerveTab;
  */
 public class ShuffleboardTabManager extends SubsystemBase {
 
-    // Adds more tabs to use when debugging
-    public final boolean m_debug = true;
-
-    private final ArrayList<ShuffleboardTabBase> mTabs = new ArrayList<ShuffleboardTabBase>();
+    private final ArrayList<ShuffleboardTabBase> m_tabs = new ArrayList<ShuffleboardTabBase>();
 
     public ShuffleboardTabManager() {
-        if (m_debug) {
-            mTabs.add(new SwerveTab(RobotContainer.getSwerve()));
+        if (ShuffleboardConstants.INCLUDE_DEBUG_TABS) {
+            m_tabs.add(new SwerveTab(RobotContainer.getSwerve()));
         } else {
             /* Add code here */
         }
 
-        for (ShuffleboardTabBase tab : mTabs) {
+        for (ShuffleboardTabBase tab : m_tabs) {
             tab.createEntries();
         }
     }
@@ -32,7 +30,7 @@ public class ShuffleboardTabManager extends SubsystemBase {
      * Calls the periodic method for each Shuffleboard tab in the list of tabs.
      */
     public void periodic() {
-        for (ShuffleboardTabBase tab : mTabs) {
+        for (ShuffleboardTabBase tab : m_tabs) {
             tab.periodic();
     
     }

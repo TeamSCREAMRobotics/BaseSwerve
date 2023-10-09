@@ -1,13 +1,11 @@
 package frc.robot.commands;
 
-import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -16,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  * A command that controls the swerve drive system.
  */
 public class TeleopSwerve extends CommandBase {
-    private Swerve m_swerve;
+    private Swerve swerve;
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
     private DoubleSupplier rotationSup;
@@ -36,13 +34,14 @@ public class TeleopSwerve extends CommandBase {
      */
     public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup,
             DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
-        this.m_swerve = swerve;
+        this.swerve = swerve;
         addRequirements(swerve);
 
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
         this.robotCentricSup = robotCentricSup;
+        lastAngle = swerve.getYaw().getDegrees();
     }
 
     /**
@@ -53,29 +52,27 @@ public class TeleopSwerve extends CommandBase {
     @Override
     public void execute() {
         
-        double translationVal = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.STICK_DEADBAND);
-        double strafeVal = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.STICK_DEADBAND);
-        double rotationVal = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.STICK_DEADBAND);
+        double translationVal = translationSup.getAsDouble();
+        double strafeVal = strafeSup.getAsDouble();
+        double rotationVal = getRotation(rotationSup.getAsDouble());
 
-        double angularVel = getAngularVelocity(rotationVal);
-
-        m_swerve.drive(
+        swerve.drive(
                 new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED),
-                angularVel,
+                rotationVal,
                 robotCentricSup.getAsBoolean(),
                 true);
     }
 
-    private double getAngularVelocity(double currentVelocity){
-        boolean isRotating = Math.abs(currentVelocity) > 0; 
+    private double getRotation(double currentVelocity){
+        boolean isRotating = Math.abs(currentVelocity) > 0;
         if(isRotating){
             holdTimer.reset();
-            lastAngle = m_swerve.getYaw().getDegrees();
+            lastAngle = swerve.getYaw().getDegrees();
             return currentVelocity;
         } else { 
             holdTimer.start();
             if(holdTimer.hasElapsed(0.1)){
-                return m_swerve.calculateHold(m_swerve.getYaw().getDegrees(), lastAngle);
+                return swerve.calculateHold(swerve.getYaw().getDegrees(), lastAngle);
             }
             return currentVelocity;
         }

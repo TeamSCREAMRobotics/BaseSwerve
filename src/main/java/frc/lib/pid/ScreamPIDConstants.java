@@ -1,5 +1,9 @@
 package frc.lib.pid;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.Slot2Configs;
+
 /**
  * A container class for PID constants, along with additional methods.
  */
@@ -112,6 +116,33 @@ public class ScreamPIDConstants implements Cloneable{
 
     public double minOutput(){
         return minOutput;
+    }
+
+    public Slot0Configs slot0Configs(){
+        Slot0Configs config = new Slot0Configs();
+        config.kP = kP;
+        config.kI = kI;
+        config.kD = kD;
+        config.kV = kF;
+        return config;
+    }
+
+    public Slot1Configs slot1Configs(){
+        Slot1Configs config = new Slot1Configs();
+        config.kP = kP;
+        config.kI = kI;
+        config.kD = kD;
+        config.kV = kF;
+        return config;
+    }
+
+    public Slot2Configs slot2Configs(){
+        Slot2Configs config = new Slot2Configs();
+        config.kP = kP;
+        config.kI = kI;
+        config.kD = kD;
+        config.kV = kF;
+        return config;
     }
 
     public boolean equals(ScreamPIDConstants other){

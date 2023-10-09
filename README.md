@@ -113,7 +113,7 @@ See [```configButtonBindings```](https://github.com/TeamSCREAM4522/BaseSwerve/bl
  
 <br><b>Putting tabs on Shuffleboard</b>
 * Add tabs to the list in [```ShuffleboardTabManager.java```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/shuffleboard/ShuffleboardTabManager.java), either as a debug tab or regular tab.
-   * Debug tabs will only be shown if [```m_debug```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/shuffleboard/ShuffleboardTabManager.java) is true
+   * Debug tabs will only be shown if [```debug```](https://github.com/TeamSCREAM4522/BaseSwerve/blob/main/src/main/java/frc/robot/shuffleboard/ShuffleboardTabManager.java) is true
       * Displaying to Shuffleboard is resource-intensive, so make sure it is true only when you are debugging.
 
 <br><b>Using the Shuffleboard application</b>

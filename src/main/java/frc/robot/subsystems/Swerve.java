@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.Modules;
 import frc.robot.auto.AutoEvents;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -28,9 +29,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * This class provides methods for high-level control of the swerve drivetrain.
  */
 public class Swerve extends SubsystemBase {
-    private SwerveDriveOdometry m_swerveOdometry;
-    private SwerveModule[] m_swerveModules;
     private Pigeon2 m_gyro;
+    private SwerveModule[] m_swerveModules;
+    private SwerveDriveOdometry m_swerveOdometry;
 
     /**
      * Constructs a new instance of the Swerve class.
@@ -46,10 +47,10 @@ public class Swerve extends SubsystemBase {
          * This array represents the robot's four swerve modules.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule("FL", 0, SwerveConstants.FRONT_LEFT_MODULE),
-                new SwerveModule("FR", 1, SwerveConstants.FRONT_RIGHT_MODULE),
-                new SwerveModule("BL", 2, SwerveConstants.BACK_LEFT_MODULE),
-                new SwerveModule("BR", 3, SwerveConstants.BACK_RIGHT_MODULE)
+                new SwerveModule("FL", 0, Modules.FRONT_LEFT.getAssociated()),
+                new SwerveModule("FR", 1, Modules.FRONT_RIGHT.getAssociated()),
+                new SwerveModule("BL", 2, Modules.BACK_LEFT.getAssociated()),
+                new SwerveModule("BR", 3, Modules.BACK_RIGHT.getAssociated())
         };
         
         /**
@@ -189,7 +190,7 @@ public class Swerve extends SubsystemBase {
      * @return The yaw rotation as a Rotation2d.
      */
     public Rotation2d getYaw() {
-        return (SwerveConstants.INVERT_GYRO) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw().getValue())
+        return (SwerveConstants.GYRO_INVERT) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw().getValue())
                 : Rotation2d.fromDegrees(m_gyro.getYaw().getValue());
     }
 
@@ -215,7 +216,7 @@ public class Swerve extends SubsystemBase {
      *
      * @param trajectory The trajectory to follow.
      * @param mirrorWithAlliance If the trajectory should be flipped according to alliance color.
-     * @return The full path, including the events triggered along it.
+     * @return The command that follows the trajectory and triggers associated events along it.
      */
     public Command followTrajectoryCommand(PathPlannerTrajectory trajectory, boolean mirrorWithAlliance) {
         FollowPathWithEvents path = new FollowPathWithEvents(

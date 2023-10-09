@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,6 +61,11 @@ public class RobotContainer {
 
         m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());
         m_autoChooser.addOption("Example Routine", AutoRoutines.exampleRoutine());
+        m_autoChooser.addOption("Example Routine1", AutoRoutines.exampleRoutine());
+        m_autoChooser.addOption("Example Routine2", AutoRoutines.exampleRoutine());
+        m_autoChooser.addOption("Example Routine3", AutoRoutines.exampleRoutine());
+        m_autoChooser.addOption("Example Routine4", AutoRoutines.exampleRoutine());
+        m_autoChooser.addOption("Example Routine5", AutoRoutines.exampleRoutine());
     }
 
     /**

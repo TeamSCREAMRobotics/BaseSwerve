@@ -1,10 +1,10 @@
 package frc.robot.controlboard;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.Ports;
 
 /**
  * A utility class that contains button bindings.
@@ -12,7 +12,10 @@ import frc.robot.Constants.Ports;
  * Controlboard allows easy reference of custom button associations.
  */
 public class Controlboard{
-    private static final XboxController m_driverController = new XboxController(Ports.DRIVER_PORT);
+
+    public static final double STICK_DEADBAND = 0.1;
+
+    private static final XboxController driverController = new XboxController(0);
 
     private static boolean fieldCentric = true;
 
@@ -22,7 +25,7 @@ public class Controlboard{
      * @return A Translation2d representing the movement in the x and y directions.
      */
     public static Translation2d getTranslation() {
-        return new Translation2d(-m_driverController.getLeftX(), -m_driverController.getLeftY());
+        return new Translation2d(-MathUtil.applyDeadband(driverController.getLeftX(), STICK_DEADBAND), -MathUtil.applyDeadband(driverController.getLeftY(), STICK_DEADBAND));
     }
 
     /**
@@ -31,7 +34,7 @@ public class Controlboard{
      * @return The rotation value of the driver controller.
      */
     public static double getRotation() {
-        return -m_driverController.getRightX();
+        return -MathUtil.applyDeadband(driverController.getRightX(), STICK_DEADBAND);
     }
 
     /**
@@ -40,7 +43,7 @@ public class Controlboard{
      * @return True once when to zero the gyro; false otherwise.
      */
     public static boolean getZeroGyro() {
-        return m_driverController.getBackButtonPressed();
+        return driverController.getBackButtonPressed();
     }
 
     /**
@@ -50,7 +53,7 @@ public class Controlboard{
      */
     public static boolean getFieldCentric() {
         /* Toggles field-centric mode between true and false when the start button is pressed */
-        new Trigger(m_driverController::getStartButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
+        new Trigger(driverController::getStartButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
         return fieldCentric;
     }
 

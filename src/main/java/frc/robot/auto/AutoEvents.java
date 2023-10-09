@@ -9,23 +9,23 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class AutoEvents{
     
-    private static final HashMap<String, Command> m_autoEventMap = new HashMap<String, Command>();
+    private static final HashMap<String, Command> autoEventMap = new HashMap<String, Command>();
     
     public static void addEvent(String key, Command command){
-        m_autoEventMap.put(key, command);
+        autoEventMap.put(key, command);
     }
 
     public static void addEventMap(HashMap<String, Command> eventMap){
-        m_autoEventMap.putAll(eventMap);
+        autoEventMap.putAll(eventMap);
     }
 
     public static void removeEvents(String... keys){
         for(String key : keys){
-            m_autoEventMap.remove(key);
+            autoEventMap.remove(key);
         }
     }
 
     public static HashMap<String, Command> getEvents(){
-        return m_autoEventMap;
+        return autoEventMap;
     }
 }
