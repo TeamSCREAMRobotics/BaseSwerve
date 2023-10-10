@@ -121,12 +121,11 @@ public class SwerveModule {
         if (isOpenLoop) {
             m_driveCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
             m_driveMotor.setControl(m_driveCycle);
-            System.out.println(m_driveCycle.Output);
         } else {
             m_driveVelVoltage.Velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
                     SwerveConstants.WHEEL_CIRCUMFERENCE, DriveConstants.GEAR_RATIO);
             m_driveVelVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
-            m_driveMotor.setControl(m_driveVelVoltage);
+            m_angleMotor.setControl(m_driveVelVoltage);
         }
     }
 
@@ -136,11 +135,10 @@ public class SwerveModule {
      * @param desiredState The desired state of the swerve module.
      */
     private void setAngle(SwerveModuleState desiredState) {
-        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01))
-                ? m_lastAngle
-                : desiredState.angle; /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01)) ? m_lastAngle : desiredState.angle; /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
         m_anglePosVoltage.Position = Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
-        m_angleMotor.setControl(m_anglePosVoltage);
+        System.out.println(m_angleMotor.getPosition().getValue());
+        //m_angleMotor.setControl(m_anglePosVoltage);
         m_lastAngle = angle;
     }
 

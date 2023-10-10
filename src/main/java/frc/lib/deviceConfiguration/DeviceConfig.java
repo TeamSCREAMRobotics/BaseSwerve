@@ -51,7 +51,7 @@ public class DeviceConfig {
             AngleConstants.SUPPLY_CURRENT_LIMIT, 
             AngleConstants.SUPPLY_CURRENT_THRESHOLD, 
             AngleConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = (Slot0Configs) DeviceConfig.FXPIDConfig(0, AngleConstants.ANGLE_PID_CONSTANTS);
+        config.Slot0 = (Slot0Configs) DeviceConfig.FXPIDConfig(0, AngleConstants.PID_CONSTANTS);
         return config;
     }
 
@@ -103,8 +103,8 @@ public class DeviceConfig {
         return config;
     }
 
-    public static ParentConfiguration FXPIDConfig(int slot, ScreamPIDConstants constants){
-        if(slot == 0){
+    public static Slot0Configs FXPIDConfig(int slot, ScreamPIDConstants constants){
+        /* if(slot == 0){
             return constants.slot0Configs();
         } else if(slot == 1){
             return constants.slot1Configs();
@@ -112,7 +112,8 @@ public class DeviceConfig {
             return constants.slot2Configs();
         } else{
             throw new IllegalArgumentException("Invalid slot: " + slot);
-        }
+        } */
+        return constants.slot0Configs();
     }
 
     public static OpenLoopRampsConfigs FXOpenLoopRampConfig(double ramp){

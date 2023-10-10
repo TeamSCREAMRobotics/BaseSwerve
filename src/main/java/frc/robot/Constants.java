@@ -32,7 +32,7 @@ public final class Constants{
         public static final boolean INCLUDE_DEBUG_TABS = true;
 
         /* For live updating values like PID from Shuffleboard */
-        public static final boolean UPDATE_SWERVE = true;
+        public static final boolean UPDATE_SWERVE = false;
         
     }
 
@@ -127,7 +127,7 @@ public final class Constants{
             public static final double KI = CHOSEN_MODULE.angleKI;
             public static final double KD = CHOSEN_MODULE.angleKD;
             public static final double KF = CHOSEN_MODULE.angleKF;
-            public static final ScreamPIDConstants ANGLE_PID_CONSTANTS = new ScreamPIDConstants(KP, KI, KD, KF);
+            public static final ScreamPIDConstants PID_CONSTANTS = new ScreamPIDConstants(KP, KI, KD, KF);
         }
 
 
@@ -161,28 +161,28 @@ public final class Constants{
                 23,           
                 24, 
                 8, 
-                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromDegrees(294.961)); // TODO ROBOT SPECIFIC
 
             /* Front Right */
             public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
                 13, 
                 14, 
                 3, 
-                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromDegrees(310.166)); // TODO ROBOT SPECIFIC
 
             /* Back Left */
             public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
                 19, 
                 20, 
                 6, 
-                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromDegrees(163.037)); // TODO ROBOT SPECIFIC
 
             /* Back Right */
             public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
                 17, 
                 18, 
                 5, 
-                Rotation2d.fromDegrees(0.0)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromDegrees(45.176)); // TODO ROBOT SPECIFIC
         }
     }
 }
