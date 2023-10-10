@@ -32,15 +32,15 @@ public final class Constants{
         public static final boolean INCLUDE_DEBUG_TABS = true;
 
         /* For live updating values like PID from Shuffleboard */
-        public static final boolean UPDATE_SWERVE = false;
+        public static final boolean UPDATE_SWERVE = true;
         
     }
 
 
     public static final class SwerveConstants {
 
-        public static final double TRACK_WIDTH = 0.0; // Distance from left wheels to right wheels/vice versa
-        public static final double WHEEL_BASE = 0.0; // Distance from front wheels to back wheels/vice versa
+        public static final double TRACK_WIDTH = 0.50165; // Distance from left wheels to right wheels/vice versa
+        public static final double WHEEL_BASE = 0.57531; // Distance from front wheels to back wheels/vice versa
 
         /* Selected Module Constants */ // TODO ROBOT SPECIFIC
         public static final COTSFalconSwerveConstants CHOSEN_MODULE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
@@ -51,8 +51,8 @@ public final class Constants{
         public static final boolean GYRO_INVERT = false; // TODO ALWAYS ENSURE GYRO READS CCW+ CW-
 
         /* Swerve Profiling Constants */ // TODO ROBOT SPECIFIC
-        public static final double MAX_SPEED = 0.0; // m/s
-        public static final double MAX_ANGULAR_VELOCITY = 0.0; // rad/s
+        public static final double MAX_SPEED = 5.7349; // m/s
+        public static final double MAX_ANGULAR_VELOCITY = 8.0; // rad/s
 
         /* PID Controllers */
         /* PathPlanner */
@@ -136,8 +136,7 @@ public final class Constants{
             public record SwerveModuleConstants(int driveMotorID, int angleMotorID, int encoderID, Rotation2d angleOffset){}
 
             /** 
-             * Use this if you have multiple sets of modules.
-             * In our case, this is useful for hotswapping modules.
+             * Use this if there is multiple sets of modules.
              * Set each location's constants to their corresponding module.
              */
             public static enum Modules{

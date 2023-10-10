@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class Controlboard{
 
-    public static final double STICK_DEADBAND = 0.1;
+    public static final double STICK_DEADBAND = 0.15;
 
     private static final XboxController driverController = new XboxController(0);
 

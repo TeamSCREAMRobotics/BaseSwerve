@@ -1,7 +1,6 @@
 package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -116,18 +115,18 @@ public class SwerveModule {
      * Sets the speed of the swerve module based on the desired state's speed and whether it is in open loop or closed loop control.
      *
      * @param desiredState The desired state of the swerve module.
-     * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
+     * @param isOpenLoop Indicates whether to drive in an open loop (Tele-Op) or closed loop (Autonomous driving) state.
      */
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
             m_driveCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
             m_driveMotor.setControl(m_driveCycle);
+            System.out.println(m_driveCycle.Output);
         } else {
-            // TODO NOT CALCULATING CORRECTLY
             m_driveVelVoltage.Velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
                     SwerveConstants.WHEEL_CIRCUMFERENCE, DriveConstants.GEAR_RATIO);
             m_driveVelVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
-            m_driveMotor.setControl(m_driveVelVoltage.withVelocity(25)); // THIS WORKS
+            m_driveMotor.setControl(m_driveVelVoltage);
         }
     }
 
@@ -209,10 +208,6 @@ public class SwerveModule {
         resetToAbsolute();
     }
 
-    private void configAngleMotorPID(ScreamPIDConstants constants) {
-        m_angleMotor.getConfigurator().apply(constants.slot0Configs());
-    }
-
     /**
      * Configures the drive motor.
      * 
@@ -220,6 +215,10 @@ public class SwerveModule {
      */
     private void configDriveMotor() {
         DeviceConfig.configureTalonFX(m_modLocation + " Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig());
+    }
+
+    public void configDriveMotorPID(ScreamPIDConstants constants) {
+        m_driveMotor.getConfigurator().apply(constants.slot0Configs());
     }
 
     /**

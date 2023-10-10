@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.subsystems.swerve.SwerveModule;
+import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Modules;
@@ -79,15 +80,8 @@ public class Swerve extends SubsystemBase {
      */
     public void drive(Translation2d translation, double angularVel, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        translation.getX(),
-                        translation.getY(),
-                        angularVel,
-                        getYaw())
-                        : new ChassisSpeeds(
-                                translation.getX(),
-                                translation.getY(),
-                                angularVel));
+                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, Rotation2d.fromDegrees(0))
+                              : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel));
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
         for (SwerveModule mod : m_swerveModules) {
@@ -96,7 +90,7 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Drives the swerve drive system based on the given chassis speeds.
+     * Drives the swerve drive system bjased on the given chassis speeds.
      * Used as an input for followTrajectoryCommand.
      *
      * @param chassisSpeeds The desired chassis speeds to drive.
@@ -194,12 +188,22 @@ public class Swerve extends SubsystemBase {
                 : Rotation2d.fromDegrees(m_gyro.getYaw().getValue());
     }
 
+    public Pigeon2 getGyro() {
+        return m_gyro;
+    }
+
     /**
      * Configures the gyro. Resets it to factory default settings and zeroes it.
      */
-    public void configGyro(){
+    public void configGyro() {
         m_gyro.getConfigurator().apply(new Pigeon2Configuration());
         zeroGyro();
+    }
+
+    public void configDrivePID(ScreamPIDConstants constants){
+        for (SwerveModule mod : m_swerveModules) {
+            mod.configDriveMotorPID(constants);
+        }
     }
 
     /**
@@ -208,7 +212,6 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         m_swerveOdometry.update(getYaw(), getModulePositions()); /* Updates the pose estimator with the current angle and module positions */
-        getModules()[0].setSpeed(new SwerveModuleState(0, getYaw()), false);
     }
 
     /**

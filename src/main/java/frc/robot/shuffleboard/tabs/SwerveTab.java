@@ -2,9 +2,11 @@
 package frc.robot.shuffleboard.tabs;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants.ShuffleboardConstants;
+import frc.robot.Constants.SwerveConstants.DriveConstants;
 import frc.robot.shuffleboard.ShuffleboardTabBase;
 import frc.robot.subsystems.Swerve;
 
@@ -43,15 +45,12 @@ public class SwerveTab extends ShuffleboardTabBase {
     private GenericEntry m_odometryY;
     private GenericEntry m_odometryYaw;
 
-    private GenericEntry m_gyroYaw;
+    private ComplexWidget m_gyro;
 
     private GenericEntry m_driveP;
     private GenericEntry m_driveI;
     private GenericEntry m_driveD;
-    
-    private GenericEntry m_angleP;
-    private GenericEntry m_angleI;
-    private GenericEntry m_angleD;
+
 
     /**
      * This method creates number entries for various sensors related to the Swerve subsystem.
@@ -82,14 +81,14 @@ public class SwerveTab extends ShuffleboardTabBase {
         m_odometryY = createNumberEntry("Odometry Y", 0, new EntryProperties(4, 1));
         m_odometryYaw = createNumberEntry("Odometry Yaw", 0, new EntryProperties(4, 2));
 
-        //m_gyroYaw = createEntry("Gyro Yaw", 0, new EntryProperties(6, 0, 3, 3, BuiltInWidgets.kGyro));
+        m_gyro = createSendableEntry("Gyro", m_swerve.getGyro(), new EntryProperties(6, 0));
 
         if (ShuffleboardConstants.UPDATE_SWERVE) {
-            
+            m_driveP = createNumberEntry("Drive P", DriveConstants.PID_CONSTANTS.kP(), new EntryProperties(9, 0));
+            m_driveI = createNumberEntry("Drive I", DriveConstants.PID_CONSTANTS.kI(), new EntryProperties(9, 1));
+            m_driveD = createNumberEntry("Drive D", DriveConstants.PID_CONSTANTS.kD(), new EntryProperties(9, 2));
         }
     }
-
-    
 
     /**
      * Updates the values of various Shuffleboard widgets with the current state of the swerve drive.
@@ -118,7 +117,10 @@ public class SwerveTab extends ShuffleboardTabBase {
         m_odometryYaw.setDouble(m_swerve.getPose().getRotation().getDegrees());
 
         if (ShuffleboardConstants.UPDATE_SWERVE) {
-            /* Add code here */
+            m_swerve.configDrivePID(new ScreamPIDConstants(
+                m_driveP.getDouble(DriveConstants.PID_CONSTANTS.kP()), 
+                m_driveI.getDouble(DriveConstants.PID_CONSTANTS.kI()), 
+                m_driveD.getDouble(DriveConstants.PID_CONSTANTS.kD())));
         }
     }
 }
