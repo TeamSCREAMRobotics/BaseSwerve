@@ -80,7 +80,7 @@ public class Swerve extends SubsystemBase {
      */
     public void drive(Translation2d translation, double angularVel, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, Rotation2d.fromDegrees(0))
+                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
                               : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel));
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
@@ -90,8 +90,8 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Drives the swerve drive system bjased on the given chassis speeds.
-     * Used as an input for followTrajectoryCommand.
+     * Drives the swerve drive system based on the given chassis speeds.
+     * Used as an input for FollowTrajectoryCommand.
      *
      * @param chassisSpeeds The desired chassis speeds to drive.
      */
@@ -184,8 +184,8 @@ public class Swerve extends SubsystemBase {
      * @return The yaw rotation as a Rotation2d.
      */
     public Rotation2d getYaw() {
-        return (SwerveConstants.GYRO_INVERT) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw().getValue())
-                : Rotation2d.fromDegrees(m_gyro.getYaw().getValue());
+        return (SwerveConstants.GYRO_INVERT) ? m_gyro.getRotation2d().minus(Rotation2d.fromDegrees(360))
+                : m_gyro.getRotation2d();
     }
 
     public Pigeon2 getGyro() {
@@ -212,31 +212,5 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         m_swerveOdometry.update(getYaw(), getModulePositions()); /* Updates the pose estimator with the current angle and module positions */
-    }
-
-    /**
-     * Generates a command that follows the given trajectory.
-     * Will automatically trigger events associated with that trajectory.
-     *
-     * @param trajectory The trajectory to follow.
-     * @param mirrorWithAlliance If the trajectory should be flipped according to alliance color.
-     * @return The command that follows the trajectory and triggers associated events along it.
-     */
-    public Command followTrajectoryCommand(PathPlannerTrajectory trajectory, boolean mirrorWithAlliance) {
-        FollowPathWithEvents path = new FollowPathWithEvents(
-            new PPSwerveControllerCommand(
-                trajectory, 
-                this::getPose, // Pose supplier
-                SwerveConstants.SWERVE_KINEMATICS, // SwerveDriveKinematics
-                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // X controller
-                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // Y controller 
-                SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller
-                this::setModuleStates, // Module states consumer
-                mirrorWithAlliance, // If the path should be mirrored depending on alliance color
-                this // Requires this drive subsystem
-            ), 
-            trajectory.getMarkers(), 
-            AutoEvents.getEvents());
-            return path;
     }
 }

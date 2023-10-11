@@ -69,9 +69,9 @@ public class Conversions {
      *                       Falcon MPS)
      * @return Falcon Velocity Counts
      */
-    public static double falconToMPS(double velocitycounts, double circumference, double gearRatio) {
-        double wheelRPM = falconToRPM(velocitycounts, gearRatio);
-        double wheelMPS = (wheelRPM * circumference) / 60;
+    public static double falconToMPS(double falconRPM, double circumference, double gearRatio) {
+        //double wheelRPM = falconToRPM(velocitycounts, gearRatio);
+        double wheelMPS = (falconRPM * circumference);
         return wheelMPS;
     }
 

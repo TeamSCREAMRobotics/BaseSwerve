@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.deviceConfiguration.DeviceConfig;
 import frc.lib.math.Conversions;
 import frc.lib.pid.ScreamPIDConstants;
+import frc.lib.util.CTREModuleState;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.AngleConstants;
@@ -106,7 +108,7 @@ public class SwerveModule {
      * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
     public void set(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = optimize(desiredState, getState().angle);
+        desiredState = CTREModuleState.optimize(desiredState, getState().angle);//optimize(desiredState, getState().angle);
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
@@ -125,7 +127,7 @@ public class SwerveModule {
             m_driveVelVoltage.Velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
                     SwerveConstants.WHEEL_CIRCUMFERENCE, DriveConstants.GEAR_RATIO);
             m_driveVelVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
-            m_angleMotor.setControl(m_driveVelVoltage);
+            m_driveMotor.setControl(m_driveVelVoltage);
         }
     }
 
@@ -174,7 +176,7 @@ public class SwerveModule {
      * @return The current absolute rotation of the CANcoder sensor as a Rotation2d.
      */
     public Rotation2d getEncoder() {
-        return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().getValue());
+        return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().refresh().getValue());
     }
 
     /**
