@@ -52,7 +52,7 @@ public class DeviceConfig {
             AngleConstants.SUPPLY_CURRENT_LIMIT, 
             AngleConstants.SUPPLY_CURRENT_THRESHOLD, 
             AngleConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = (Slot0Configs) DeviceConfig.FXPIDConfig(0, AngleConstants.PID_CONSTANTS);
+        config.Slot0 = DeviceConfig.FXPIDConfig(0, AngleConstants.PID_CONSTANTS);
         return config;
     }
 
@@ -73,8 +73,7 @@ public class DeviceConfig {
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 motor.getConfigurator().apply(config),
-                motor.getConfigurator().setPosition(0),
-                motor.optimizeBusUtilization());
+                motor.getConfigurator().setRotorPosition(0));
         }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID(), true);
@@ -86,8 +85,7 @@ public class DeviceConfig {
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 encoder.getConfigurator().apply(config),
-                encoder.getConfigurator().setPosition(0),
-                encoder.optimizeBusUtilization());
+                encoder.getConfigurator().setPosition(0));
         }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + encoder.getDeviceID(), true);

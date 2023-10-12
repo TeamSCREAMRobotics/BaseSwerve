@@ -2,6 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -108,7 +109,7 @@ public class SwerveModule {
      * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
     public void set(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = CTREModuleState.optimize(desiredState, getState().angle);//optimize(desiredState, getState().angle);
+        desiredState = SwerveModuleState.optimize(desiredState, getState().angle);//desiredState = optimize(desiredState, getState().angle);
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
@@ -122,13 +123,13 @@ public class SwerveModule {
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
             m_driveCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
-            m_driveMotor.setControl(m_driveCycle);
+            //m_driveMotor.setControl(m_driveCycle);
         } else {
             m_driveVelVoltage.Velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond,
                     SwerveConstants.WHEEL_CIRCUMFERENCE, DriveConstants.GEAR_RATIO);
             m_driveVelVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
             m_driveMotor.setControl(m_driveVelVoltage);
-        }
+        }  
     }
 
     /**
@@ -138,9 +139,10 @@ public class SwerveModule {
      */
     private void setAngle(SwerveModuleState desiredState) {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01)) ? m_lastAngle : desiredState.angle; /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
-        m_anglePosVoltage.Position = Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
-        System.out.println(m_angleMotor.getPosition().getValue());
-        //m_angleMotor.setControl(m_anglePosVoltage);
+        m_anglePosVoltage.Slot = 0;
+        m_anglePosVoltage.Position = angle.getRotations()*AngleConstants.GEAR_RATIO;//Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
+        if (m_modLocation == "BL") System.out.println(m_angleMotor.getPosition().refresh().getValue());
+        m_angleMotor.setControl(m_anglePosVoltage);
         m_lastAngle = angle;
     }
 
@@ -167,7 +169,7 @@ public class SwerveModule {
      * @return The angle of the rotation motor as a Rotation2d.
      */
     private Rotation2d getAngle() {
-        return Rotation2d.fromDegrees(Conversions.falconToDegrees(m_angleMotor.getPosition().refresh().getValue(), AngleConstants.GEAR_RATIO));
+        return Rotation2d.fromRotations(m_angleMotor.getPosition().refresh().getValue());//Rotation2d.fromDegrees(Conversions.falconToDegrees(m_angleMotor.getPosition().refresh().getValue(), AngleConstants.GEAR_RATIO));
     }
 
     /**
@@ -185,8 +187,9 @@ public class SwerveModule {
      * Waits for 500 ms to prevent problems with getting the CANcoder angle before it is initialized.
      */
     public void resetToAbsolute() {
+        // TARGET DEGREES
         Rotation2d position = Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(0.5).getValue());
-        m_angleMotor.setPosition(Conversions.degreesToFalcon(position.minus(m_angleOffset).getDegrees(), AngleConstants.GEAR_RATIO));
+        m_angleMotor.setRotorPosition(position.getRotations()*AngleConstants.GEAR_RATIO);//Conversions.degreesToFalcon(position.minus(m_angleOffset).getDegrees(), AngleConstants.GEAR_RATIO));
     }
 
     /**

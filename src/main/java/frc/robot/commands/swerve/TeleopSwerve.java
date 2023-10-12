@@ -54,7 +54,7 @@ public class TeleopSwerve extends CommandBase {
         
         double translationVal = translationSup.getAsDouble();
         double strafeVal = strafeSup.getAsDouble();
-        double rotationVal = getRotation(rotationSup.getAsDouble());
+        double rotationVal = rotationSup.getAsDouble();//getRotation(rotationSup.getAsDouble());
 
         swerve.drive(
                 new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED),
