@@ -1,4 +1,4 @@
-package frc.lib.deviceConfiguration;
+package frc.lib.config;
 
 import com.ctre.phoenix6.StatusCode;
 

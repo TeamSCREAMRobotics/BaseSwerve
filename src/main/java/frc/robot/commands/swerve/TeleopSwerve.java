@@ -63,18 +63,18 @@ public class TeleopSwerve extends CommandBase {
                 true);
     }
 
-    private double getRotation(double currentVelocity){
-        boolean isRotating = Math.abs(currentVelocity) > 0;
+    private double getRotation(double current){
+        boolean isRotating = Math.abs(current) > 0;
         if(isRotating){
             holdTimer.reset();
             lastAngle = swerve.getYaw().getDegrees();
-            return currentVelocity;
+            return current;
         } else { 
             holdTimer.start();
             if(holdTimer.hasElapsed(0.1)){
                 return swerve.calculateHold(swerve.getYaw().getDegrees(), lastAngle);
             }
-            return currentVelocity;
+            return current;
         }
     }
 }

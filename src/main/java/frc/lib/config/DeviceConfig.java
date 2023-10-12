@@ -1,4 +1,4 @@
-package frc.lib.deviceConfiguration;
+package frc.lib.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -15,7 +15,8 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import frc.lib.deviceConfiguration.ErrorChecker.DeviceConfiguration;
+
+import frc.lib.config.ErrorChecker.DeviceConfiguration;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.AngleConstants;

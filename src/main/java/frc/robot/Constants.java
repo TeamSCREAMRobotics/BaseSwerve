@@ -140,10 +140,10 @@ public final class Constants{
              * Set each location's constants to their corresponding module.
              */
             public static enum Modules{
-                FRONT_LEFT(MODULE_0), 
+                FRONT_LEFT (MODULE_0), 
                 FRONT_RIGHT(MODULE_1), 
-                BACK_LEFT(MODULE_2), 
-                BACK_RIGHT(MODULE_3);
+                BACK_LEFT  (MODULE_2), 
+                BACK_RIGHT (MODULE_3);
 
                 private SwerveModuleConstants constants;
 

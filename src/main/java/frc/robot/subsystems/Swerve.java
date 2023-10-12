@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.lib.pid.ScreamPIDConstants;
+import frc.lib.util.ScreamUtil;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Modules;
@@ -19,7 +20,9 @@ import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -79,10 +82,21 @@ public class Swerve extends SubsystemBase {
      * @param isOpenLoop Whether the driving should be open loop (Tele-Op driving) or closed loop (Autonomous driving).
      */
     public void drive(Translation2d translation, double angularVel, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
-                              : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel));
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
+        ChassisSpeeds velocity = fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
+            translation.getX(), translation.getY(), angularVel, getYaw())
+        : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
+
+        // Skew compensation
+        double dtConstant = 0.009;
+        Pose2d robotPoseVel = new Pose2d(velocity.vxMetersPerSecond * dtConstant,
+                                       velocity.vyMetersPerSecond * dtConstant,
+                                       Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * dtConstant));
+        Twist2d twistVel = ScreamUtil.getPoseLog(robotPoseVel);
+
+        velocity = new ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
+                                   twistVel.dtheta / dtConstant);
+
+        SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(velocity);
 
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
