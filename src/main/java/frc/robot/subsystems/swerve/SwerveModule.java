@@ -41,12 +41,11 @@ public class SwerveModule {
     private TalonFX m_driveMotor;
     private CANcoder m_angleEncoder;
 
-    private StatusSignal<Double> drivePosition;
-    private StatusSignal<Double> driveVelocity;
-    private StatusSignal<Double> anglePosition;
-    private StatusSignal<Double> angleVelocity;
-    private BaseStatusSignal[] signals;
-    private SwerveModulePosition internalState = new SwerveModulePosition();
+    private StatusSignal<Double> m_drivePosition;
+    private StatusSignal<Double> m_driveVelocity;
+    private StatusSignal<Double> m_anglePosition;
+    private StatusSignal<Double> m_angleVelocity;
+    private SwerveModulePosition m_internalState = new SwerveModulePosition();
 
     private DutyCycleOut m_driveCycle = new DutyCycleOut(0);
     private VelocityVoltage m_driveVelVoltage = new VelocityVoltage(0);
@@ -80,10 +79,10 @@ public class SwerveModule {
 
         m_lastAngle = getState(true).angle;
 
-        drivePosition = m_driveMotor.getPosition();
-        driveVelocity = m_driveMotor.getVelocity();
-        anglePosition = m_angleMotor.getPosition();
-        angleVelocity = m_angleMotor.getVelocity();
+        m_drivePosition = m_driveMotor.getPosition();
+        m_driveVelocity = m_driveMotor.getVelocity();
+        m_anglePosition = m_angleMotor.getPosition();
+        m_angleVelocity = m_angleMotor.getVelocity();
     }
 
     /**
@@ -192,7 +191,7 @@ public class SwerveModule {
      *
      * @return The current absolute rotation of the CANcoder sensor as a Rotation2d.
      */
-    public Rotation2d getEncoder() {
+    public Rotation2d getEncoderAngle() {
         return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().refresh().getValue());
     }
 
@@ -202,7 +201,7 @@ public class SwerveModule {
      * Waits for 500 ms to prevent problems with getting the CANcoder angle before it is initialized.
      */
     public void resetToAbsolute() {
-        double position = getEncoder().minus(m_angleOffset).getRotations();
+        double position = Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(0.5).getValue()).minus(m_angleOffset).getRotations();
         m_angleMotor.setPosition(position);//Conversions.degreesToFalcon(position.minus(m_angleOffset).getDegrees(), AngleConstants.GEAR_RATIO));
     }
 
@@ -258,20 +257,20 @@ public class SwerveModule {
      */
     public SwerveModulePosition getPosition(boolean refresh) {
         if(refresh) {
-            drivePosition.refresh();
+            m_drivePosition.refresh();
             //driveVelocity.refresh();
-            anglePosition.refresh();
-            angleVelocity.refresh();
+            m_anglePosition.refresh();
+            m_angleVelocity.refresh();
         }
         
-        double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(drivePosition, driveVelocity);
-        double angleRotations = BaseStatusSignal.getLatencyCompensatedValue(anglePosition, angleVelocity);
+        double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveVelocity);
+        double angleRotations = BaseStatusSignal.getLatencyCompensatedValue(m_anglePosition, m_angleVelocity);
 
         double distance = driveRotations;
-        internalState.distanceMeters = distance;
+        m_internalState.distanceMeters = distance;
         Rotation2d angle = Rotation2d.fromRotations(angleRotations);
-        internalState.angle = angle;
+        m_internalState.angle = angle;
         
-        return internalState;
+        return m_internalState;
     }
 }
