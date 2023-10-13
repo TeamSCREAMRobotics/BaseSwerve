@@ -97,20 +97,20 @@ public class SwerveTab extends ShuffleboardTabBase {
     @Override
     public void periodic() {
         m_FLEncoder.setDouble(round(m_swerve.getModules()[0].getEncoder().getDegrees(), 3));
-        m_FLIntegrated.setDouble(round(m_swerve.getModules()[0].getPosition().angle.getDegrees(), 3));
-        m_FLVelocity.setDouble(round(m_swerve.getModules()[0].getState().speedMetersPerSecond, 3));
+        m_FLIntegrated.setDouble(round(m_swerve.getModules()[0].getPosition(true).angle.getDegrees(), 3));
+        m_FLVelocity.setDouble(round(m_swerve.getModules()[0].getState(true).speedMetersPerSecond, 3));
 
         m_FREncoder.setDouble(round(m_swerve.getModules()[1].getEncoder().getDegrees(), 3));
-        m_FRIntegrated.setDouble(round(m_swerve.getModules()[1].getPosition().angle.getDegrees(), 3));
-        m_FRVelocity.setDouble(round(m_swerve.getModules()[1].getState().speedMetersPerSecond, 3));
+        m_FRIntegrated.setDouble(round(m_swerve.getModules()[1].getPosition(true).angle.getDegrees(), 3));
+        m_FRVelocity.setDouble(round(m_swerve.getModules()[1].getState(true).speedMetersPerSecond, 3));
 
         m_BLEncoder.setDouble(round(m_swerve.getModules()[2].getEncoder().getDegrees(), 3));
-        m_BLIntegrated.setDouble(round(m_swerve.getModules()[2].getPosition().angle.getDegrees(), 3));
-        m_BLVelocity.setDouble(round(m_swerve.getModules()[2].getState().speedMetersPerSecond, 3));
+        m_BLIntegrated.setDouble(round(m_swerve.getModules()[2].getPosition(true).angle.getDegrees(), 3));
+        m_BLVelocity.setDouble(round(m_swerve.getModules()[2].getState(true).speedMetersPerSecond, 3));
 
         m_BREncoder.setDouble(round(m_swerve.getModules()[3].getEncoder().getDegrees(), 3));
-        m_BRIntegrated.setDouble(round(m_swerve.getModules()[3].getPosition().angle.getDegrees(), 3));
-        m_BRVelocity.setDouble(round(m_swerve.getModules()[3].getState().speedMetersPerSecond, 3));
+        m_BRIntegrated.setDouble(round(m_swerve.getModules()[3].getPosition(true).angle.getDegrees(), 3));
+        m_BRVelocity.setDouble(round(m_swerve.getModules()[3].getState(true).speedMetersPerSecond, 3));
 
         m_odometryX.setDouble(m_swerve.getPose().getX());
         m_odometryY.setDouble(m_swerve.getPose().getY());

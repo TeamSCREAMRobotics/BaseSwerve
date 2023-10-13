@@ -31,13 +31,13 @@ public class DeviceConfig {
     public static TalonFXConfiguration driveFXConfig(){
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput = DeviceConfig.FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, DriveConstants.NEUTRAL_MODE);
-        config.Feedback = DeviceConfig.FXFeedbackConfig();
+        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor);
         config.CurrentLimits = DeviceConfig.FXCurrentLimitsConfig(
             DriveConstants.CURRENT_LIMIT_ENABLE, 
             DriveConstants.SUPPLY_CURRENT_LIMIT, 
             DriveConstants.SUPPLY_CURRENT_THRESHOLD, 
             DriveConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = (Slot0Configs) DeviceConfig.FXPIDConfig(0, DriveConstants.PID_CONSTANTS);
+        config.Slot0 = (Slot0Configs) DeviceConfig.FXPIDConfig(DriveConstants.PID_CONSTANTS);
         config.OpenLoopRamps = DeviceConfig.FXOpenLoopRampConfig(DriveConstants.OPEN_LOOP_RAMP);
         config.ClosedLoopRamps = DeviceConfig.FXClosedLoopRampConfig(DriveConstants.CLOSED_LOOP_RAMP);
         return config;
@@ -46,13 +46,13 @@ public class DeviceConfig {
     public static TalonFXConfiguration angleFXConfig(){
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput = DeviceConfig.FXMotorOutputConfig(AngleConstants.MOTOR_INVERT, AngleConstants.NEUTRAL_MODE);
-        config.Feedback = DeviceConfig.FXFeedbackConfig();
+        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, AngleConstants.GEAR_RATIO);
         config.CurrentLimits = DeviceConfig.FXCurrentLimitsConfig(
             AngleConstants.CURRENT_LIMIT_ENABLE, 
             AngleConstants.SUPPLY_CURRENT_LIMIT, 
             AngleConstants.SUPPLY_CURRENT_THRESHOLD, 
             AngleConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = DeviceConfig.FXPIDConfig(0, AngleConstants.PID_CONSTANTS);
+        config.Slot0 = DeviceConfig.FXPIDConfig(AngleConstants.PID_CONSTANTS);
         return config;
     }
 
@@ -73,7 +73,7 @@ public class DeviceConfig {
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 motor.getConfigurator().apply(config),
-                motor.getConfigurator().setRotorPosition(0));
+                motor.getConfigurator().setPosition(0));
         }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID(), true);
@@ -85,7 +85,7 @@ public class DeviceConfig {
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 encoder.getConfigurator().apply(config),
-                encoder.getConfigurator().setPosition(0));
+                encoder.getConfigurator().setPosition(50));
         }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + encoder.getDeviceID(), true);
@@ -98,22 +98,21 @@ public class DeviceConfig {
         return config;
     }
 
-    public static FeedbackConfigs FXFeedbackConfig(){
+    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor){
         FeedbackConfigs config = new FeedbackConfigs();
-        config.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        config.FeedbackSensorSource = sensor;
         return config;
     }
 
-    public static Slot0Configs FXPIDConfig(int slot, ScreamPIDConstants constants){
-        /* if(slot == 0){
-            return constants.slot0Configs();
-        } else if(slot == 1){
-            return constants.slot1Configs();
-        } else if(slot == 2){
-            return constants.slot2Configs();
-        } else{
-            throw new IllegalArgumentException("Invalid slot: " + slot);
-        } */
+    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double gearRatio){
+        FeedbackConfigs config = new FeedbackConfigs();
+        config.FeedbackSensorSource = sensor;
+        config.FeedbackRemoteSensorID = remoteSensorID;
+        config.SensorToMechanismRatio = gearRatio;
+        return config;
+    }
+
+    public static Slot0Configs FXPIDConfig(ScreamPIDConstants constants){
         return constants.slot0Configs();
     }
 
