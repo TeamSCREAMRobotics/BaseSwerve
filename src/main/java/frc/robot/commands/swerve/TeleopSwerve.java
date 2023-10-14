@@ -8,12 +8,12 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * A command that controls the swerve drive system.
  */
-public class TeleopSwerve extends CommandBase {
+public class TeleopSwerve extends Command {
     private Swerve swerve;
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
