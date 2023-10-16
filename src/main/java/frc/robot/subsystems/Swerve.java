@@ -226,6 +226,7 @@ public class Swerve extends SubsystemBase {
      */
     public void configGyro() {
         m_gyro.getConfigurator().apply(new Pigeon2Configuration());
+        m_gyro.optimizeBusUtilization();
         zeroGyro();
     }
 

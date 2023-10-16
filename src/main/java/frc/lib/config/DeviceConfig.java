@@ -72,7 +72,8 @@ public class DeviceConfig {
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 motor.getConfigurator().apply(config),
-                motor.getConfigurator().setPosition(0));
+                motor.getConfigurator().setPosition(0),
+                motor.optimizeBusUtilization());
         }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID(), true);
@@ -84,7 +85,8 @@ public class DeviceConfig {
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 encoder.getConfigurator().apply(config),
-                encoder.getConfigurator().setPosition(50));
+                encoder.getConfigurator().setPosition(0), 
+                encoder.optimizeBusUtilization());
         }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + encoder.getDeviceID(), true);
