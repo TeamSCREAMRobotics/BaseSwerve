@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.ShuffleboardConstants;
 import frc.robot.shuffleboard.tabs.SwerveTab;
 
 /**
@@ -12,10 +11,14 @@ import frc.robot.shuffleboard.tabs.SwerveTab;
  */
 public class ShuffleboardTabManager extends SubsystemBase {
 
-    private final ArrayList<ShuffleboardTabBase> m_tabs = new ArrayList<ShuffleboardTabBase>();
+    private static final ArrayList<ShuffleboardTabBase> m_tabs = new ArrayList<ShuffleboardTabBase>();
 
-    public ShuffleboardTabManager() {
-        if (ShuffleboardConstants.INCLUDE_DEBUG_TABS) {
+    /**
+     * Adds predefined tabs to Shuffleboard.<p>
+     * @param includeDebug Whether to include additional debug tabs.
+     */
+    public static void addTabs(boolean includeDebug){
+        if (includeDebug) {
             m_tabs.add(new SwerveTab(RobotContainer.getSwerve()));
         } else {
             /* Add code here */

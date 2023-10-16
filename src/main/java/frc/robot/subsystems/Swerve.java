@@ -5,8 +5,6 @@ import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.ScreamUtil;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Constants.SwerveConstants.ModuleConstants.Modules;
-import frc.robot.auto.AutoEvents;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -14,17 +12,12 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -36,6 +29,7 @@ public class Swerve extends SubsystemBase {
     private Pigeon2 m_gyro;
     private SwerveModule[] m_swerveModules;
     private SwerveDriveOdometry m_swerveOdometry;
+    private ChassisSpeeds m_currentSpeeds;
 
     /**
      * Constructs a new instance of the Swerve class.
@@ -43,7 +37,7 @@ public class Swerve extends SubsystemBase {
      * Initializes the gyro, swerve modules, and odometry.
      */
     public Swerve() {
-        m_gyro = new Pigeon2(Ports.PIGEON_ID, Ports.CANIVORE_BUS_NAME); //TODO delete CANIVORE_BUS_NAME if the robot is not using a CANivore
+        m_gyro = new Pigeon2(Ports.PIGEON_ID, Ports.CAN_BUS_NAME);
         configGyro();
         
         /**
@@ -51,18 +45,26 @@ public class Swerve extends SubsystemBase {
          * This array represents the robot's four swerve modules.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule("FL", 0, Modules.FRONT_LEFT.getAssociated()),
-                new SwerveModule("FR", 1, Modules.FRONT_RIGHT.getAssociated()),
-                new SwerveModule("BL", 2, Modules.BACK_LEFT.getAssociated()),
-                new SwerveModule("BR", 3, Modules.BACK_RIGHT.getAssociated())
+                new SwerveModule(SwerveConstants.FRONT_LEFT),
+                new SwerveModule(SwerveConstants.FRONT_RIGHT),
+                new SwerveModule(SwerveConstants.BACK_LEFT),
+                new SwerveModule(SwerveConstants.BACK_RIGHT)
         };
         
         /**
          * Configures the odometry, which requires the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
-        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.SWERVE_KINEMATICS, getYaw(),
-                getModulePositions(), new Pose2d());
+        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+
+        AutoBuilder.configureHolonomic(
+            this::getPose,
+            this::resetPose,
+            this::getRobotCentricSpeeds,
+            this::setChassisSpeeds,
+            SwerveConstants.PATH_FOLLOWER_CONFIG,
+            this
+        );
     }
 
     /**
@@ -73,34 +75,32 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Drives the swerve drive system based on the given translation and rotation inputs.
-     * Uses inputs for field relative control and if the control is open-loop.
+     * Returns a new ChassisSpeeds based on the given inputs.
      *
      * @param translation A Translation2d representing the desired movement in x and y directions.
      * @param angularVel The desired angular velocity in rads/sec.
-     * @param fieldRelative Whether the movement should be field-relative or robot-relative.
-     * @param isOpenLoop Whether the driving should be open loop (Tele-Op driving) or closed loop (Autonomous driving).
+     * @param fieldRelative Whether the speeds should be field-relative or robot-relative.
+     * @return The calculated ChassisSpeeds.
      */
-    public void drive(Translation2d translation, double angularVel, boolean fieldRelative, boolean isOpenLoop) {
-        ChassisSpeeds velocity = fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-            translation.getX(), translation.getY(), angularVel, getYaw())
-        : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
+    public ChassisSpeeds robotSpeeds(Translation2d translation, double angularVel, boolean fieldCentric){
+        m_currentSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
+        ChassisSpeeds speeds = fieldCentric 
+                      ? ScreamUtil.compensateForSkew(ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw()))
+                      : ScreamUtil.compensateForSkew(new ChassisSpeeds(translation.getX(), translation.getY(), angularVel));
+        return speeds;
+    }
 
-        // Skew compensation
-        double dtConstant = 0.009;
-        Pose2d robotPoseVel = new Pose2d(velocity.vxMetersPerSecond * dtConstant,
-                                       velocity.vyMetersPerSecond * dtConstant,
-                                       Rotation2d.fromRadians(velocity.omegaRadiansPerSecond * dtConstant));
-        Twist2d twistVel = ScreamUtil.getPoseLog(robotPoseVel);
-
-        velocity = new ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
-                                   twistVel.dtheta / dtConstant);
-
-        SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(velocity);
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop){
+        m_currentSpeeds = chassisSpeeds;
+        SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
         }
+    }
+
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds){
+        setChassisSpeeds(chassisSpeeds, false);
     }
 
     /**
@@ -124,8 +124,8 @@ public class Swerve extends SubsystemBase {
      * @param setpoint The desired setpoint value. 
      * @return The calculated value from the hold controller.
     */
-    public double calculateHold(double measurement, double setpoint){
-        return SwerveConstants.SWERVE_HOLD_CONTROLLER.calculate(measurement, setpoint);
+    public double calculateHeadingCorrection(double measurement, double setpoint){
+        return SwerveConstants.HEADING_CORRECT_CONTROLLER.calculate(measurement, setpoint);
     }
 
     /**
@@ -143,8 +143,10 @@ public class Swerve extends SubsystemBase {
      *
      * @param trajectory The trajectory to get the inital pose from.
      */
-    public void resetPose(PathPlannerTrajectory trajectory) {
-        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), trajectory.getInitialHolonomicPose() );
+    public void resetPose(PathPlannerPath trajectory) {
+        Translation2d location = trajectory.getAllPathPoints().get(0).position;
+        Rotation2d angle = trajectory.getAllPathPoints().get(0).holonomicRotation;
+        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), new Pose2d(location, angle));
     }
 
     /**
@@ -189,6 +191,19 @@ public class Swerve extends SubsystemBase {
             positions[mod.getModuleNumber()] = mod.getPosition(true);
         }
         return positions;
+    }
+
+    public ChassisSpeeds getRobotCentricSpeeds(){
+        double vxFieldCentric = m_currentSpeeds.vxMetersPerSecond;
+        double vyFieldCentric = m_currentSpeeds.vyMetersPerSecond;
+        double vxRobotCentric = m_currentSpeeds.vxMetersPerSecond * Math.cos(-getYaw().getDegrees()) - m_currentSpeeds.vyMetersPerSecond * Math.sin(-getYaw().getDegrees());
+        double vyRobotCentric = m_currentSpeeds.vxMetersPerSecond * Math.sin(-getYaw().getDegrees()) + m_currentSpeeds.vyMetersPerSecond * Math.cos(-getYaw().getDegrees());
+
+        if (Math.abs(vxFieldCentric - vxRobotCentric) > ScreamUtil.EPSILON || Math.abs(vyFieldCentric - vyRobotCentric) > ScreamUtil.EPSILON) {
+            return new ChassisSpeeds(vxRobotCentric, vyRobotCentric, m_currentSpeeds.omegaRadiansPerSecond);
+        }
+
+        return m_currentSpeeds;
     }
 
     /**

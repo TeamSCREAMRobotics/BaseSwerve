@@ -7,7 +7,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
-import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,7 +18,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.lib.config.ErrorChecker.DeviceConfiguration;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Constants.SwerveConstants.AngleConstants;
+import frc.robot.Constants.SwerveConstants.SteerConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
 
 public class DeviceConfig {
@@ -31,28 +30,28 @@ public class DeviceConfig {
     public static TalonFXConfiguration driveFXConfig(){
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput = DeviceConfig.FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, DriveConstants.NEUTRAL_MODE);
-        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor);
+        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, DriveConstants.GEAR_RATIO);
         config.CurrentLimits = DeviceConfig.FXCurrentLimitsConfig(
             DriveConstants.CURRENT_LIMIT_ENABLE, 
             DriveConstants.SUPPLY_CURRENT_LIMIT, 
             DriveConstants.SUPPLY_CURRENT_THRESHOLD, 
             DriveConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = (Slot0Configs) DeviceConfig.FXPIDConfig(DriveConstants.PID_CONSTANTS);
+        config.Slot0 = DeviceConfig.FXPIDConfig(DriveConstants.PID_CONSTANTS);
         config.OpenLoopRamps = DeviceConfig.FXOpenLoopRampConfig(DriveConstants.OPEN_LOOP_RAMP);
         config.ClosedLoopRamps = DeviceConfig.FXClosedLoopRampConfig(DriveConstants.CLOSED_LOOP_RAMP);
         return config;
     }
 
-    public static TalonFXConfiguration angleFXConfig(){
+    public static TalonFXConfiguration steerFXConfig(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput = DeviceConfig.FXMotorOutputConfig(AngleConstants.MOTOR_INVERT, AngleConstants.NEUTRAL_MODE);
-        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, AngleConstants.GEAR_RATIO);
+        config.MotorOutput = DeviceConfig.FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, SteerConstants.NEUTRAL_MODE);
+        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, SteerConstants.GEAR_RATIO);
         config.CurrentLimits = DeviceConfig.FXCurrentLimitsConfig(
-            AngleConstants.CURRENT_LIMIT_ENABLE, 
-            AngleConstants.SUPPLY_CURRENT_LIMIT, 
-            AngleConstants.SUPPLY_CURRENT_THRESHOLD, 
-            AngleConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = DeviceConfig.FXPIDConfig(AngleConstants.PID_CONSTANTS);
+            SteerConstants.CURRENT_LIMIT_ENABLE, 
+            SteerConstants.SUPPLY_CURRENT_LIMIT, 
+            SteerConstants.SUPPLY_CURRENT_THRESHOLD, 
+            SteerConstants.SUPPLY_TIME_THRESHOLD);
+        config.Slot0 = DeviceConfig.FXPIDConfig(SteerConstants.PID_CONSTANTS);
         return config;
     }
 

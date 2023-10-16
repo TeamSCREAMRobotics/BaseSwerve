@@ -1,7 +1,8 @@
 package frc.robot.controlboard;
 
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -20,30 +21,39 @@ public class Controlboard{
     private static boolean fieldCentric = true;
 
     /**
-     * Retrieves a Translation2d based on the input from the driver controller.
+     * Returns a DoubleSupplier of the x direction movement of the driver controller.
      *
-     * @return A Translation2d representing the movement in the x and y directions.
+     * @return A DoubleSupplier representing the movement in the x direction.
      */
-    public static Translation2d getTranslation() {
-        return new Translation2d(-MathUtil.applyDeadband(driverController.getLeftX(), STICK_DEADBAND), -MathUtil.applyDeadband(driverController.getLeftY(), STICK_DEADBAND));
+    public static DoubleSupplier getTranslationX() {
+        return () -> -MathUtil.applyDeadband(driverController.getLeftX(), STICK_DEADBAND);
+    }
+
+    /**
+     * Returns a DoubleSupplier of the x direction movement of the driver controller.
+     *
+     * @return A DoubleSupplier representing the movement in the y direction.
+     */
+    public static DoubleSupplier getTranslationY() {
+        return () -> -MathUtil.applyDeadband(driverController.getLeftY(), STICK_DEADBAND);
     }
 
     /**
      * Retrieves the rotation value from the driver controller.
      *
-     * @return The rotation value of the driver controller.
+     * @return A DoubleSupplier representing the rotation.
      */
-    public static double getRotation() {
-        return -MathUtil.applyDeadband(driverController.getRightX(), STICK_DEADBAND);
+    public static DoubleSupplier getRotation() {
+        return () -> -MathUtil.applyDeadband(driverController.getRightX(), STICK_DEADBAND);
     }
 
     /**
      * Retrieves whether to zero the gyro from the driver controller.
      *
-     * @return True once when to zero the gyro; false otherwise.
+     * @return A BooleanSupplier that is true once when to zero the gyro; false otherwise.
      */
-    public static boolean getZeroGyro() {
-        return driverController.getBackButtonPressed();
+    public static BooleanSupplier getZeroGyro() {
+        return () -> driverController.getBackButtonPressed();
     }
 
     /**
@@ -51,10 +61,10 @@ public class Controlboard{
      *
      * @return True if field-centric; false if robot-centric
      */
-    public static boolean getFieldCentric() {
+    public static BooleanSupplier getFieldCentric() {
         /* Toggles field-centric mode between true and false when the start button is pressed */
         new Trigger(driverController::getStartButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
-        return fieldCentric;
+        return () -> fieldCentric;
     }
 
 }

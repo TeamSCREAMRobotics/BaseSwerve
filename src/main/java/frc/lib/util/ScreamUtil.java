@@ -79,6 +79,16 @@ public class ScreamUtil {
         return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
 	}
 
+    public static ChassisSpeeds compensateForSkew(ChassisSpeeds chassisSpeeds){
+        double dtConstant = 0.009;
+        Pose2d robotPoseVel = new Pose2d(chassisSpeeds.vxMetersPerSecond * dtConstant,
+                                       chassisSpeeds.vyMetersPerSecond * dtConstant,
+                                       Rotation2d.fromRadians(chassisSpeeds.omegaRadiansPerSecond * dtConstant));
+        Twist2d twistVel = getPoseLog(robotPoseVel);
+        return new ChassisSpeeds(twistVel.dx / dtConstant, twistVel.dy / dtConstant,
+        twistVel.dtheta / dtConstant);
+    }
+
 
 	public static ProfiledPIDController createProfiledPIDController(ScreamPIDConstants pidConstants, Constraints motionConstraints, double updatePeriod){
 		return new ProfiledPIDController(pidConstants.kP(), pidConstants.kI(), pidConstants.kD(), motionConstraints, updatePeriod);

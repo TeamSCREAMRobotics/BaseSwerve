@@ -1,6 +1,5 @@
 package frc.robot.commands.swerve;
 
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import java.util.function.BooleanSupplier;
@@ -18,7 +17,7 @@ public class TeleopSwerve extends Command {
     private DoubleSupplier translationSup;
     private DoubleSupplier strafeSup;
     private DoubleSupplier rotationSup;
-    private BooleanSupplier robotCentricSup;
+    private BooleanSupplier fieldCentricSup;
     private double lastAngle;
     private Timer holdTimer = new Timer();
 
@@ -30,17 +29,17 @@ public class TeleopSwerve extends Command {
      * @param translationSup A supplier for the translation value.
      * @param strafeSup A supplier for the strafe value.
      * @param rotationSup A supplier for the rotation value.
-     * @param robotCentricSup A supplier for the robot-centric mode value.
+     * @param fieldCentricSup A supplier for the drive mode. Robot centric = false; Field centric = true
      */
     public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup,
-            DoubleSupplier rotationSup, BooleanSupplier robotCentricSup) {
+            DoubleSupplier rotationSup, BooleanSupplier fieldCentricSup) {
         this.swerve = swerve;
         addRequirements(swerve);
 
         this.translationSup = translationSup;
         this.strafeSup = strafeSup;
         this.rotationSup = rotationSup;
-        this.robotCentricSup = robotCentricSup;
+        this.fieldCentricSup = fieldCentricSup;
         lastAngle = swerve.getYaw().getDegrees();
     }
 
@@ -55,12 +54,17 @@ public class TeleopSwerve extends Command {
         double translationVal = translationSup.getAsDouble();
         double strafeVal = strafeSup.getAsDouble();
         double rotationVal = rotationSup.getAsDouble();//getRotation(rotationSup.getAsDouble());
+        boolean fieldCentric = fieldCentricSup.getAsBoolean();
 
-        swerve.drive(
-                new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED),
-                rotationVal,
-                robotCentricSup.getAsBoolean(),
-                true);
+
+        swerve.setChassisSpeeds(
+            swerve.robotSpeeds(
+                new Translation2d(translationVal, strafeVal), 
+                rotationVal, 
+                fieldCentric
+            ),
+            true
+        );
     }
 
     private double getRotation(double current){
@@ -72,7 +76,7 @@ public class TeleopSwerve extends Command {
         } else { 
             holdTimer.start();
             if(holdTimer.hasElapsed(0.1)){
-                return swerve.calculateHold(swerve.getYaw().getDegrees(), lastAngle);
+                return swerve.calculateHeadingCorrection(swerve.getYaw().getDegrees(), lastAngle);
             }
             return current;
         }

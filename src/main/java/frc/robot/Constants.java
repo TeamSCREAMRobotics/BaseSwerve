@@ -3,6 +3,9 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.COTSFalconSwerveConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
 
 /**
  * A class for constants used in various places in the project.
@@ -19,59 +23,79 @@ public final class Constants{
     public record MotionMagicConstants(double cruiseVelocity, double acceleration, int sCurveStrength){}
 
     public static final class Ports {
-        /* CANivore */
-        public static final String CANIVORE_BUS_NAME = "canivore"; // TODO DELETE IF ROBOT DOES NOT USE A CANivore
+        /** Possible CAN bus strings are:
+         *   • "rio" for the native roboRIO CAN bus 
+         *   • CANivore name or serial number 
+         *   • "*" for any CANivore seen by the program
+         */
+        public static final String CAN_BUS_NAME = "canivore"; // TODO ROBOT SPECIFIC
 
         /* Pigeon2 */
-        public static final int PIGEON_ID = 0;
+        public static final int PIGEON_ID = 0; // TODO ROBOT SPECIFIC
     }
 
     
     public static final class ShuffleboardConstants {
-        /* Adds additional tabs for debugging */
-        public static final boolean INCLUDE_DEBUG_TABS = true;
 
         /* For live updating values like PID from Shuffleboard */
         public static final boolean UPDATE_SWERVE = false;
-        
     }
 
 
     public static final class SwerveConstants {
 
+        /* Drivebase Constants */
+        // TODO ROBOT SPECIFIC
         public static final double TRACK_WIDTH = 0.50165; // Distance from left wheels to right wheels/vice versa
         public static final double WHEEL_BASE = 0.57531; // Distance from front wheels to back wheels/vice versa
-
-        /* Selected Module Constants */ // TODO ROBOT SPECIFIC
-        public static final COTSFalconSwerveConstants CHOSEN_MODULE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
-        public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
-        public static final SensorDirectionValue CANCODER_INVERT = CHOSEN_MODULE.CANcoderInvert;
 
         /* Gyro Constants */
         public static final boolean GYRO_INVERT = false; // TODO ALWAYS ENSURE GYRO READS CCW+ CW-
 
-        /* Swerve Profiling Constants */ // TODO ROBOT SPECIFIC
+        /* Swerve Kinematics */
         public static final double MAX_SPEED = 5.7349; // m/s
         public static final double MAX_ANGULAR_VELOCITY = 8.0; // rad/s
 
-        /* PID Controllers */
-        /* PathPlanner */
-        public static final PIDController PATH_TRANSLATION_CONTROLLER = new PIDController(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
-        public static final PIDController PATH_ROTATION_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
-        
-        /* Swerve angle holding */
-        public static final PIDController SWERVE_HOLD_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+        /* Selected Module Constants */
+        // TODO ROBOT SPECIFIC
+        public static final COTSFalconSwerveConstants CHOSEN_MODULE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
+        public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
+        public static final SensorDirectionValue CANCODER_INVERT = CHOSEN_MODULE.CANcoderInvert;
 
-        /* Swerve Kinematics
-         * No need to ever change this unless there is more than four modules.
-         */
+        /* Swerve Kinematics */
+        // No need to ever change this unless there are more than four modules.
         public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
                 new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
                 new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-                new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0));
+                new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0)
+        );
 
+        /** Selected Modules */
+        // Use this if there are multiple sets of modules.
+        // Set each location's constants to their corresponding module constants.
+        public static final Module FRONT_LEFT =  new Module(0, ModuleConstants.MODULE_0);
+        public static final Module FRONT_RIGHT = new Module(1, ModuleConstants.MODULE_1);
+        public static final Module BACK_LEFT =   new Module(2, ModuleConstants.MODULE_2);
+        public static final Module BACK_RIGHT =  new Module(3, ModuleConstants.MODULE_3);
 
+        /* PID Controllers */
+        /* Swerve Heading Correction */
+        public static final PIDController HEADING_CORRECT_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+
+        /* PathPlanner Constants */
+        public static final PIDConstants PATH_TRANSLATION_CONSTANTS = new PIDConstants(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
+        public static final PIDConstants PATH_ROTATION_CONSTANTS = new PIDConstants(0.0, 0.0, 0.0);
+
+        public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
+                PATH_TRANSLATION_CONSTANTS, 
+                PATH_ROTATION_CONSTANTS, 
+                MAX_SPEED, 
+                new Translation2d(SwerveConstants.WHEEL_BASE/2, SwerveConstants.TRACK_WIDTH/2).getDistance(new Translation2d()), 
+                new ReplanningConfig()
+        );
+
+        
         public static final class DriveConstants {
             /* Gear Ratio */
             public static final double GEAR_RATIO = CHOSEN_MODULE.driveGearRatio;
@@ -106,12 +130,12 @@ public final class Constants{
         }
 
 
-        public static final class AngleConstants {
+        public static final class SteerConstants {
             /* Gear Ratio */
-            public static final double GEAR_RATIO = CHOSEN_MODULE.angleGearRatio;
+            public static final double GEAR_RATIO = CHOSEN_MODULE.steerGearRatio;
 
             /* Motor Invert */
-            public static final InvertedValue MOTOR_INVERT = CHOSEN_MODULE.angleMotorInvert;
+            public static final InvertedValue MOTOR_INVERT = CHOSEN_MODULE.steerMotorInvert;
 
             /* Neutral Modes */
             public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Coast; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
@@ -123,36 +147,30 @@ public final class Constants{
             public static final boolean CURRENT_LIMIT_ENABLE = true;        
 
             /* PID */
-            public static final double KP = CHOSEN_MODULE.angleKP; 
-            public static final double KI = CHOSEN_MODULE.angleKI;
-            public static final double KD = CHOSEN_MODULE.angleKD;
-            public static final double KF = CHOSEN_MODULE.angleKF;
+            public static final double KP = CHOSEN_MODULE.steerKP; 
+            public static final double KI = CHOSEN_MODULE.steerKI;
+            public static final double KD = CHOSEN_MODULE.steerKD;
+            public static final double KF = CHOSEN_MODULE.steerKF;
             public static final ScreamPIDConstants PID_CONSTANTS = new ScreamPIDConstants(KP, KI, KD, KF);
         }
 
 
         public static class ModuleConstants{
 
-            public record SwerveModuleConstants(int driveMotorID, int angleMotorID, int encoderID, Rotation2d angleOffset){}
-
-            /** 
-             * Use this if there is multiple sets of modules.
-             * Set each location's constants to their corresponding module.
-             */
-            public static enum Modules{
-                FRONT_LEFT (MODULE_0), 
-                FRONT_RIGHT(MODULE_1), 
-                BACK_LEFT  (MODULE_2), 
-                BACK_RIGHT (MODULE_3);
-
-                private SwerveModuleConstants constants;
-
-                private Modules(SwerveModuleConstants constants){
-                    this.constants = constants;
-                }
-
-                public SwerveModuleConstants getAssociated(){
-                    return constants;
+            public record SwerveModuleConstants(int driveMotorID, int steerMotorID, int encoderID, Rotation2d angleOffset){}
+            public record Module(int number, SwerveModuleConstants constants){
+                public String toString(){
+                    switch(number){
+                        case 0:
+                        return "FRONT_LEFT";
+                        case 1:
+                        return "FRONT_RIGHT";
+                        case 2:
+                        return "BACK_LEFT";
+                        case 3:
+                        return "BACK_RIGHT";
+                    }
+                    return null;
                 }
             }
             

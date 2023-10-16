@@ -9,14 +9,14 @@ import edu.wpi.first.math.util.Units;
 public class COTSFalconSwerveConstants {
     public final double wheelDiameter;
     public final double wheelCircumference;
-    public final double angleGearRatio;
+    public final double steerGearRatio;
     public final double driveGearRatio;
-    public final double angleKP;
-    public final double angleKI;
-    public final double angleKD;
-    public final double angleKF;
+    public final double steerKP;
+    public final double steerKI;
+    public final double steerKD;
+    public final double steerKF;
     public final InvertedValue driveMotorInvert;
-    public final InvertedValue angleMotorInvert;
+    public final InvertedValue steerMotorInvert;
     public final SensorDirectionValue CANcoderInvert;
 
     public COTSFalconSwerveConstants(double wheelDiameter, double angleGearRatio, double driveGearRatio, double angleKP,
@@ -24,14 +24,14 @@ public class COTSFalconSwerveConstants {
             SensorDirectionValue CANcoderInvert) {
         this.wheelDiameter = wheelDiameter;
         this.wheelCircumference = wheelDiameter * Math.PI;
-        this.angleGearRatio = angleGearRatio;
+        this.steerGearRatio = angleGearRatio;
         this.driveGearRatio = driveGearRatio;
-        this.angleKP = angleKP;
-        this.angleKI = angleKI;
-        this.angleKD = angleKD;
-        this.angleKF = angleKF;
+        this.steerKP = angleKP;
+        this.steerKI = angleKI;
+        this.steerKD = angleKD;
+        this.steerKF = angleKF;
         this.driveMotorInvert = driveMotorInvert;
-        this.angleMotorInvert = angleMotorInvert;
+        this.steerMotorInvert = angleMotorInvert;
         this.CANcoderInvert = CANcoderInvert;
     }
 
