@@ -85,9 +85,9 @@ public class Swerve extends SubsystemBase {
     public ChassisSpeeds robotSpeeds(Translation2d translation, double angularVel, boolean fieldCentric){
         m_currentSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
         ChassisSpeeds speeds = fieldCentric 
-                      ? ScreamUtil.compensateForSkew(ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw()))
-                      : ScreamUtil.compensateForSkew(new ChassisSpeeds(translation.getX(), translation.getY(), angularVel));
-        return speeds;
+                      ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
+                      : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
+        return ChassisSpeeds.discretize(speeds, 0.009);
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop){
