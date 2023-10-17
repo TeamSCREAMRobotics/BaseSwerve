@@ -4,7 +4,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
@@ -16,7 +18,7 @@ public class Controlboard{
 
     public static final double STICK_DEADBAND = 0.15;
 
-    private static final XboxController driverController = new XboxController(0);
+    private static final CommandXboxController driverController = new CommandXboxController(0);
 
     private static boolean fieldCentric = true;
 
@@ -50,10 +52,10 @@ public class Controlboard{
     /**
      * Retrieves whether to zero the gyro from the driver controller.
      *
-     * @return A BooleanSupplier that is true once when to zero the gyro; false otherwise.
+     * @return A Trigger representing the state of the start button.
      */
-    public static BooleanSupplier getZeroGyro() {
-        return () -> driverController.getBackButtonPressed();
+    public static Trigger getZeroGyro() {
+        return driverController.back();
     }
 
     /**
@@ -63,7 +65,7 @@ public class Controlboard{
      */
     public static BooleanSupplier getFieldCentric() {
         /* Toggles field-centric mode between true and false when the start button is pressed */
-        new Trigger(driverController::getStartButtonPressed).onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
+        driverController.start().onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
         return () -> fieldCentric;
     }
 

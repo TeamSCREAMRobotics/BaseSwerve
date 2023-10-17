@@ -9,6 +9,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -38,13 +39,13 @@ public class SwerveModule {
 
     private StatusSignal<Double> m_drivePosition;
     private StatusSignal<Double> m_driveVelocity;
-    private StatusSignal<Double> m_anglePosition;
-    private StatusSignal<Double> m_angleVelocity;
+    private StatusSignal<Double> m_steerPosition;
+    private StatusSignal<Double> m_steerVelocity;
     private SwerveModulePosition m_internalState = new SwerveModulePosition();
 
     private DutyCycleOut m_driveCycle = new DutyCycleOut(0);
-    private VelocityVoltage m_driveVelVoltage = new VelocityVoltage(0);
-    private PositionVoltage m_anglePosVoltage = new PositionVoltage(0);
+    private VelocityVoltage m_driveVoltage = new VelocityVoltage(0);
+    private PositionVoltage m_steerVoltage = new PositionVoltage(0);
 
     private SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.KS, DriveConstants.KV, DriveConstants.KA);
 
@@ -75,8 +76,8 @@ public class SwerveModule {
 
         m_drivePosition = m_driveMotor.getPosition();
         m_driveVelocity = m_driveMotor.getVelocity();
-        m_anglePosition = m_steerMotor.getPosition();
-        m_angleVelocity = m_steerMotor.getVelocity();
+        m_steerPosition = m_steerMotor.getPosition();
+        m_steerVelocity = m_steerMotor.getVelocity();
     }
 
     /**
@@ -132,10 +133,10 @@ public class SwerveModule {
             m_driveCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
             m_driveMotor.setControl(m_driveCycle);
         } else {
-            m_driveVelVoltage.Velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond,
+            m_driveVoltage.Velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond,
                     SwerveConstants.WHEEL_CIRCUMFERENCE, 1);
-            m_driveVelVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
-            m_driveMotor.setControl(m_driveVelVoltage);
+            m_driveVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
+            m_driveMotor.setControl(m_driveVoltage);
         }  
     }
 
@@ -148,8 +149,8 @@ public class SwerveModule {
         /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01)) ? m_lastAngle : desiredState.angle;
 
-        m_anglePosVoltage.Position = angle.getRotations();//Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
-        m_steerMotor.setControl(m_anglePosVoltage);
+        m_steerVoltage.Position = angle.getRotations();//Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
+        m_steerMotor.setControl(m_steerVoltage);
         m_lastAngle = angle;
     }
 
@@ -252,12 +253,12 @@ public class SwerveModule {
         if(refresh) {
             m_drivePosition.refresh();
             //m_driveVelocity.refresh();
-            m_anglePosition.refresh();
-            m_angleVelocity.refresh();
+            m_steerPosition.refresh();
+            m_steerVelocity.refresh();
         }
         
         double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveVelocity);
-        double angleRotations = BaseStatusSignal.getLatencyCompensatedValue(m_anglePosition, m_angleVelocity);
+        double angleRotations = BaseStatusSignal.getLatencyCompensatedValue(m_steerPosition, m_steerVelocity);
 
         double distance = driveRotations;
         m_internalState.distanceMeters = distance;

@@ -43,7 +43,7 @@ public class RobotContainer {
      * Configures button bindings using methods from Controlboard.
      */
     private void configButtonBindings() {
-        new Trigger(Controlboard.getZeroGyro()).onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
+        Controlboard.getZeroGyro().onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
     }
 
     /**
