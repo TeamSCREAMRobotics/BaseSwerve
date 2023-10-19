@@ -59,8 +59,8 @@ public class RobotContainer {
         );
 
         Auto.addRoutines(
-            Routines.exampleSequence(),
-            Routines.exampleAuto()
+            //Routines.exampleSequence(),
+            //Routines.exampleAuto()
         );
     }
 

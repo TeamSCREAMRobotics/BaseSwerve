@@ -7,7 +7,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
  */
 public class Paths {
 
-    public static PathPlannerPath getExamplePath() {
+    /* public static PathPlannerPath getExamplePath() {
         return PathPlannerPath.fromPathFile("ExamplePath");
-    }
+    } */
 }

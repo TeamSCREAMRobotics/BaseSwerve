@@ -38,7 +38,7 @@ public class SwerveModule {
     private CANcoder m_angleEncoder;
 
     private StatusSignal<Double> m_drivePosition;
-    private StatusSignal<Double> m_driveVelocity;
+    //private StatusSignal<Double> m_driveVelocity;
     private StatusSignal<Double> m_steerPosition;
     private StatusSignal<Double> m_steerVelocity;
     private SwerveModulePosition m_internalState = new SwerveModulePosition();
@@ -75,7 +75,7 @@ public class SwerveModule {
         m_lastAngle = getState(true).angle;
 
         m_drivePosition = m_driveMotor.getPosition();
-        m_driveVelocity = m_driveMotor.getVelocity();
+        //m_driveVelocity = m_driveMotor.getVelocity();
         m_steerPosition = m_steerMotor.getPosition();
         m_steerVelocity = m_steerMotor.getVelocity();
     }
@@ -146,6 +146,7 @@ public class SwerveModule {
      * @param desiredState The desired state of the swerve module.
      */
     private void setAngle(SwerveModuleState desiredState) {
+        System.out.println(getAngle());
         /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01)) ? m_lastAngle : desiredState.angle;
 
@@ -225,6 +226,7 @@ public class SwerveModule {
      */
     private void configDriveMotor() {
         DeviceConfig.configureTalonFX(m_modLocation + " Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig());
+        m_driveMotor.setControl(new VelocityVoltage(0));
     }
 
     public void configDriveMotorPID(ScreamPIDConstants constants) {
@@ -239,9 +241,10 @@ public class SwerveModule {
     public SwerveModuleState getState(boolean refresh) {
         if(refresh) {
             //m_driveVelocity.refresh();
+            m_driveMotor.getVelocity().refresh();
         }
 
-        return new SwerveModuleState(m_driveMotor.getVelocity().getValueAsDouble(), getAngle());
+        return new SwerveModuleState(m_driveMotor.getVelocity().getValue(), getAngle());
     }
 
     /**
@@ -253,11 +256,12 @@ public class SwerveModule {
         if(refresh) {
             m_drivePosition.refresh();
             //m_driveVelocity.refresh();
+            m_driveMotor.getVelocity().refresh();
             m_steerPosition.refresh();
             m_steerVelocity.refresh();
         }
         
-        double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveVelocity);
+        double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveMotor.getVelocity());
         double angleRotations = BaseStatusSignal.getLatencyCompensatedValue(m_steerPosition, m_steerVelocity);
 
         double distance = driveRotations;

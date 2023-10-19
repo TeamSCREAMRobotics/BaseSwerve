@@ -22,20 +22,20 @@ public class Routines {
      * Uses Named Commands to trigger events along the path.
      * @return A custom sequence of commands.
      */
-    public static Command exampleSequence(){
+    /* public static Command exampleSequence(){
         Command routine = new SequentialCommandGroup(
             AutoBuilder.followPathWithEvents(Paths.getExamplePath())
         );
         
         return routine.withName("Example Sequence");
-    }
+    } */
 
     /** 
      * Returns a full auto created in the PathPlanner application.
      * Uses Named Commands to trigger events along the path.
      * @return A full autonomous command.
      */
-    public static Command exampleAuto(){
+    /* public static Command exampleAuto(){
         return new PathPlannerAuto("ExampleAuto").withName("Example Auto");
-    }
+    } */
 }
