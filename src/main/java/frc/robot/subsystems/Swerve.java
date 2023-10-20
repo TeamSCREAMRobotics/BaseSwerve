@@ -83,7 +83,6 @@ public class Swerve extends SubsystemBase {
      * @return The calculated ChassisSpeeds.
      */
     public ChassisSpeeds robotSpeeds(Translation2d translation, double angularVel, boolean fieldCentric){
-        m_currentSpeeds = new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
         ChassisSpeeds speeds = fieldCentric 
                       ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
                       : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
@@ -194,15 +193,6 @@ public class Swerve extends SubsystemBase {
     }
 
     public ChassisSpeeds getRobotCentricSpeeds(){
-        double vxFieldCentric = m_currentSpeeds.vxMetersPerSecond;
-        double vyFieldCentric = m_currentSpeeds.vyMetersPerSecond;
-        double vxRobotCentric = m_currentSpeeds.vxMetersPerSecond * Math.cos(-getYaw().getDegrees()) - m_currentSpeeds.vyMetersPerSecond * Math.sin(-getYaw().getDegrees());
-        double vyRobotCentric = m_currentSpeeds.vxMetersPerSecond * Math.sin(-getYaw().getDegrees()) + m_currentSpeeds.vyMetersPerSecond * Math.cos(-getYaw().getDegrees());
-
-        if (Math.abs(vxFieldCentric - vxRobotCentric) > ScreamUtil.EPSILON || Math.abs(vyFieldCentric - vyRobotCentric) > ScreamUtil.EPSILON) {
-            return new ChassisSpeeds(vxRobotCentric, vyRobotCentric, m_currentSpeeds.omegaRadiansPerSecond);
-        }
-
         return m_currentSpeeds;
     }
 
