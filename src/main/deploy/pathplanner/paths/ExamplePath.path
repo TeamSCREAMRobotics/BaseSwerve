@@ -69,8 +69,8 @@
   "constraintZones": [
     {
       "name": "New Constraints Zone",
-      "minWaypointRelativePos": 0.85,
-      "maxWaypointRelativePos": 0.95,
+      "minWaypointRelativePos": 1.0,
+      "maxWaypointRelativePos": 1.0,
       "constraints": {
         "maxVelocity": 0.1,
         "maxAcceleration": 3,
@@ -80,8 +80,8 @@
     },
     {
       "name": "New Constraints Zone",
-      "minWaypointRelativePos": 1.75,
-      "maxWaypointRelativePos": 1.85,
+      "minWaypointRelativePos": 1.85,
+      "maxWaypointRelativePos": 1.9500000000000002,
       "constraints": {
         "maxVelocity": 0.1,
         "maxAcceleration": 3,
@@ -95,7 +95,7 @@
       "name": "ExampleEvent",
       "waypointRelativePos": 3.0,
       "command": {
-        "type": "parallel",
+        "type": "sequential",
         "data": {
           "commands": [
             {

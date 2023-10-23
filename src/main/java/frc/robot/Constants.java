@@ -58,9 +58,7 @@ public final class Constants{
 
         /* Selected Module Constants */
         // TODO ROBOT SPECIFIC
-        public static final COTSFalconSwerveConstants CHOSEN_MODULE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
-        public static final double WHEEL_CIRCUMFERENCE = CHOSEN_MODULE.wheelCircumference;
-        public static final SensorDirectionValue CANCODER_INVERT = CHOSEN_MODULE.CANcoderInvert;
+        public static final COTSFalconSwerveConstants MODULE_TYPE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
 
         /* Swerve Kinematics */
         // No need to ever change this unless there are more than four modules.
@@ -98,13 +96,13 @@ public final class Constants{
         
         public static final class DriveConstants {
             /* Gear Ratio */
-            public static final double GEAR_RATIO = CHOSEN_MODULE.driveGearRatio;
+            public static final double GEAR_RATIO = MODULE_TYPE.driveGearRatio;
 
             /* Neutral Mode */
             public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake;
 
             /* Motor Invert */
-            public static final InvertedValue MOTOR_INVERT = CHOSEN_MODULE.driveMotorInvert;
+            public static final InvertedValue MOTOR_INVERT = MODULE_TYPE.driveMotorInvert;
 
             /* Current Limit Constants */
             public static final int SUPPLY_CURRENT_LIMIT = 35;
@@ -132,10 +130,10 @@ public final class Constants{
 
         public static final class SteerConstants {
             /* Gear Ratio */
-            public static final double GEAR_RATIO = CHOSEN_MODULE.steerGearRatio;
+            public static final double GEAR_RATIO = MODULE_TYPE.steerGearRatio;
 
             /* Motor Invert */
-            public static final InvertedValue MOTOR_INVERT = CHOSEN_MODULE.steerMotorInvert;
+            public static final InvertedValue MOTOR_INVERT = MODULE_TYPE.steerMotorInvert;
 
             /* Neutral Modes */
             public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Coast; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
@@ -147,10 +145,10 @@ public final class Constants{
             public static final boolean CURRENT_LIMIT_ENABLE = true;        
 
             /* PID */
-            public static final double KP = CHOSEN_MODULE.steerKP; 
-            public static final double KI = CHOSEN_MODULE.steerKI;
-            public static final double KD = CHOSEN_MODULE.steerKD;
-            public static final double KF = CHOSEN_MODULE.steerKF;
+            public static final double KP = MODULE_TYPE.steerKP; 
+            public static final double KI = MODULE_TYPE.steerKI;
+            public static final double KD = MODULE_TYPE.steerKD;
+            public static final double KF = MODULE_TYPE.steerKF;
             public static final ScreamPIDConstants PID_CONSTANTS = new ScreamPIDConstants(KP, KI, KD, KF);
         }
 

@@ -1,7 +1,5 @@
 package frc.robot.auto;
 
-import java.util.List;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -15,11 +13,11 @@ public class Auto{
     private static final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
     public record NamedCommand(String name, Command command){}
 
-    public static void configure(Command defaultAuto, NamedCommand... events){
-        Shuffleboard.getTab("Auto").add("Selected Auto", m_autoChooser).withSize(2, 1);
-        for(NamedCommand event : events){
-            NamedCommands.registerCommand(event.name(), event.command());
+    public static void configure(Command defaultAuto, NamedCommand... namedCommands){
+        for(NamedCommand namedCommand : namedCommands){
+            NamedCommands.registerCommand(namedCommand.name(), namedCommand.command());
         }
+        Shuffleboard.getTab("Auto").add("Selected Auto", m_autoChooser).withSize(2, 1);
         m_autoChooser.setDefaultOption(defaultAuto.getName(), defaultAuto);
     }
 
@@ -27,10 +25,10 @@ public class Auto{
         return m_autoChooser.getSelected();
     }
 
-    public static void addRoutines(Command... autos){
+    public static void addRoutines(Command... routines){
         
-        for(Command auto : autos){
-            m_autoChooser.addOption(auto.getName(), auto);
+        for(Command routine : routines){
+            m_autoChooser.addOption(routine.getName(), routine);
         }
     }
 }

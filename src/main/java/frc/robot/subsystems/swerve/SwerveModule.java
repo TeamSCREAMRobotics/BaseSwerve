@@ -134,7 +134,7 @@ public class SwerveModule {
             m_driveMotor.setControl(m_driveCycle);
         } else {
             m_driveVoltage.Velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond,
-                    SwerveConstants.WHEEL_CIRCUMFERENCE, 1);
+                    SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
             m_driveVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
             m_driveMotor.setControl(m_driveVoltage);
         }  

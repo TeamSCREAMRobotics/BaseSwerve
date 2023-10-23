@@ -58,7 +58,7 @@ public class DeviceConfig {
     public static CANcoderConfiguration swerveEncoderConfig(){
         CANcoderConfiguration config = new CANcoderConfiguration();
         config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
-        config.MagnetSensor.SensorDirection = SwerveConstants.CANCODER_INVERT;
+        config.MagnetSensor.SensorDirection = SwerveConstants.MODULE_TYPE.CANcoderInvert;
         return config;
     }
 

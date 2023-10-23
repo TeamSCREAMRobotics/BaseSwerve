@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.auto.Auto;
 import frc.robot.auto.Routines;
 import frc.robot.auto.Auto.NamedCommand;
@@ -11,6 +12,7 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.controlboard.Controlboard;
 import frc.robot.shuffleboard.ShuffleboardTabManager;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.swerve.SwerveModule;
 
 public class RobotContainer {
 
@@ -27,16 +29,11 @@ public class RobotContainer {
         /* Controlboard */
         configButtonBindings();
 
+        /* Default Commands */
+        configDefaultCommands();
+
         /* Auto */
         configAuto();
-
-        m_swerve.setDefaultCommand(
-                new TeleopSwerve(
-                        m_swerve,
-                        Controlboard.getTranslationY(),
-                        Controlboard.getTranslationX(),
-                        Controlboard.getRotation(),
-                        Controlboard.getFieldCentric()));
     }
 
     /**
@@ -44,6 +41,18 @@ public class RobotContainer {
      */
     private void configButtonBindings() {
         Controlboard.getZeroGyro().onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
+    }
+
+    private void configDefaultCommands() {
+        m_swerve.setDefaultCommand(
+            new TeleopSwerve(
+                m_swerve,
+                Controlboard.getTranslationY(),
+                Controlboard.getTranslationX(),
+                Controlboard.getRotation(),
+                Controlboard.getFieldCentric()
+            )
+        );
     }
 
     /**
