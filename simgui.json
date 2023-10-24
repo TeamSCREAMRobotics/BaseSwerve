@@ -2,7 +2,8 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Shuffleboard/Auto/Selected Auto": "String Chooser"
+      "/Shuffleboard/Auto/Selected Auto": "String Chooser",
+      "/Shuffleboard/Swerve/Odometry Angle": "Gyro"
     }
   },
   "Plot": {

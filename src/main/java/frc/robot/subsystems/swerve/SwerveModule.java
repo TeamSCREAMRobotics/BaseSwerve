@@ -17,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.config.DeviceConfig;
 import frc.lib.math.Conversions;
 import frc.lib.pid.ScreamPIDConstants;
+import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
@@ -206,7 +207,7 @@ public class SwerveModule {
      * Configures the encoder with the specified configuration.
      */
     private void configAngleEncoder() {
-        DeviceConfig.configureSwerveEncoder(m_modLocation + " Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig());
+        DeviceConfig.configureSwerveEncoder(m_modLocation + " Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig(), Constants.LOOP_TIME_HZ);
     }
 
     /**
@@ -215,7 +216,7 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configSteerMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig());
+        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(), Constants.LOOP_TIME_HZ);
         resetToAbsolute();
     }
 
@@ -225,8 +226,7 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configDriveMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + " Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig());
-        m_driveMotor.setControl(new VelocityVoltage(0));
+        DeviceConfig.configureTalonFX(m_modLocation + " Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig(), Constants.LOOP_TIME_HZ);
     }
 
     public void configDriveMotorPID(ScreamPIDConstants constants) {

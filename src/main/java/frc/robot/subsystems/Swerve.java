@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.ScreamUtil;
+import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -87,7 +88,7 @@ public class Swerve extends SubsystemBase {
         ChassisSpeeds speeds = fieldCentric 
                       ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
                       : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
-        return ChassisSpeeds.discretize(speeds, 0.009);
+        return ChassisSpeeds.discretize(speeds, Constants.LOOP_TIME_SEC);
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop){
@@ -217,6 +218,7 @@ public class Swerve extends SubsystemBase {
      */
     public void configGyro() {
         m_gyro.getConfigurator().apply(new Pigeon2Configuration());
+        m_gyro.getYaw().setUpdateFrequency(50);
         m_gyro.optimizeBusUtilization();
         zeroGyro();
     }

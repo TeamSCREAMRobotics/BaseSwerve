@@ -66,30 +66,36 @@ public class DeviceConfig {
 
     ////////////////////////////////////// GENERIC CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-    public static void configureTalonFX(String name, TalonFX motor, TalonFXConfiguration config){
+    public static void configureTalonFX(String name, TalonFX motor, TalonFXConfiguration config, double updateFrequencyHz){
         DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 motor.getConfigurator().apply(config),
                 motor.getConfigurator().setPosition(0),
+                motor.getDutyCycle().setUpdateFrequency(updateFrequencyHz),
+                motor.getPosition().setUpdateFrequency(updateFrequencyHz),
+                motor.getVelocity().setUpdateFrequency(updateFrequencyHz),
                 motor.optimizeBusUtilization());
         }
         };
-        ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID(), true);
+        ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID() + " version " + motor.getVersion(), true);
     }
 
-    public static void configureSwerveEncoder(String name, CANcoder encoder, CANcoderConfiguration config){
+    public static void configureSwerveEncoder(String name, CANcoder encoder, CANcoderConfiguration config, double updateFrequencyHz){
         DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 encoder.getConfigurator().apply(config),
                 encoder.getConfigurator().setPosition(0), 
-                encoder.optimizeBusUtilization());
+                encoder.getPosition().setUpdateFrequency(updateFrequencyHz),
+                encoder.getAbsolutePosition().setUpdateFrequency(updateFrequencyHz),
+                encoder.optimizeBusUtilization()
+                );
         }
         };
-        ErrorChecker.configureDevice(deviceConfig, name + " " + encoder.getDeviceID(), true);
+        ErrorChecker.configureDevice(deviceConfig, name + " " + encoder.getDeviceID() + " version " + encoder.getVersion(), true);
     }
 
     public static MotorOutputConfigs FXMotorOutputConfig(InvertedValue invert, NeutralModeValue neutralMode){

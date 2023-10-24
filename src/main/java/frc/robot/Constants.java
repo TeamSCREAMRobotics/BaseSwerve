@@ -22,6 +22,10 @@ public final class Constants{
 
     public record MotionMagicConstants(double cruiseVelocity, double acceleration, int sCurveStrength){}
 
+    /* Robot loop time */
+    public static final double LOOP_TIME_SEC = 0.02;
+    public static final double LOOP_TIME_HZ = 1 / LOOP_TIME_SEC;
+
     public static final class Ports {
         /** Possible CAN bus strings are:
          *   • "rio" for the native roboRIO CAN bus 
