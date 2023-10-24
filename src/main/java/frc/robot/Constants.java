@@ -66,7 +66,7 @@ public final class Constants{
 
         /* Swerve Kinematics */
         // No need to ever change this unless there are more than four modules.
-        public static final SwerveDriveKinematics SWERVE_KINEMATICS = new SwerveDriveKinematics(
+        public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
                 new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
                 new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
                 new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),

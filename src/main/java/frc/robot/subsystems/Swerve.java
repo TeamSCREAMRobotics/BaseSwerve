@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.lib.pid.ScreamPIDConstants;
-import frc.lib.util.ScreamUtil;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
@@ -15,11 +14,11 @@ import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -31,7 +30,7 @@ public class Swerve extends SubsystemBase {
     private Pigeon2 m_gyro;
     private SwerveModule[] m_swerveModules;
     private SwerveDriveOdometry m_swerveOdometry;
-    private ChassisSpeeds m_currentSpeeds;
+    private ChassisSpeeds m_currentSpeeds = new ChassisSpeeds();
 
     /**
      * Constructs a new instance of the Swerve class.
@@ -57,7 +56,7 @@ public class Swerve extends SubsystemBase {
          * Configures the odometry, which requires the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
-        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.SWERVE_KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
 
         AutoBuilder.configureHolonomic(
             this::getPose,
@@ -93,7 +92,9 @@ public class Swerve extends SubsystemBase {
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop){
         m_currentSpeeds = chassisSpeeds;
-        SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+        SwerveModuleState[] swerveModuleStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
 
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
@@ -105,8 +106,7 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Drives the swerve drive system based on the given chassis speeds.
-     * Used as an input for FollowTrajectoryCommand.
+     * Drives the swerve drive system based on the given module states.
      *
      * @param chassisSpeeds The desired chassis speeds to drive.
      */

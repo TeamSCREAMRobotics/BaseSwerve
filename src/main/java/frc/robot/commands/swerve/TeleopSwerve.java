@@ -1,5 +1,6 @@
 package frc.robot.commands.swerve;
 
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 import java.util.function.BooleanSupplier;
@@ -59,7 +60,7 @@ public class TeleopSwerve extends Command {
 
         swerve.setChassisSpeeds(
             swerve.robotSpeeds(
-                new Translation2d(translationVal, strafeVal), 
+                new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED), 
                 rotationVal, 
                 fieldCentric
             ),
