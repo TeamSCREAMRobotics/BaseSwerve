@@ -1,6 +1,7 @@
 package frc.lib.config;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -29,29 +30,34 @@ public class DeviceConfig {
 
     public static TalonFXConfiguration driveFXConfig(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput = DeviceConfig.FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, DriveConstants.NEUTRAL_MODE);
-        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, DriveConstants.GEAR_RATIO);
-        config.CurrentLimits = DeviceConfig.FXCurrentLimitsConfig(
+        config.Audio.BeepOnBoot = false;
+        config.Audio.BeepOnConfig = false;
+        config.MotorOutput = FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, DriveConstants.NEUTRAL_MODE);
+        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, DriveConstants.GEAR_RATIO);
+        config.CurrentLimits = FXCurrentLimitsConfig(
             DriveConstants.CURRENT_LIMIT_ENABLE, 
             DriveConstants.SUPPLY_CURRENT_LIMIT, 
             DriveConstants.SUPPLY_CURRENT_THRESHOLD, 
             DriveConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = DeviceConfig.FXPIDConfig(DriveConstants.PID_CONSTANTS);
-        config.OpenLoopRamps = DeviceConfig.FXOpenLoopRampConfig(DriveConstants.OPEN_LOOP_RAMP);
-        config.ClosedLoopRamps = DeviceConfig.FXClosedLoopRampConfig(DriveConstants.CLOSED_LOOP_RAMP);
+        config.Slot0 = FXPIDConfig(DriveConstants.PID_CONSTANTS);
+        config.OpenLoopRamps = FXOpenLoopRampConfig(DriveConstants.OPEN_LOOP_RAMP);
+        config.ClosedLoopRamps = FXClosedLoopRampConfig(DriveConstants.CLOSED_LOOP_RAMP);
         return config;
     }
 
     public static TalonFXConfiguration steerFXConfig(){
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.MotorOutput = DeviceConfig.FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, SteerConstants.NEUTRAL_MODE);
-        config.Feedback = DeviceConfig.FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, SteerConstants.GEAR_RATIO);
-        config.CurrentLimits = DeviceConfig.FXCurrentLimitsConfig(
+        config.Audio.BeepOnBoot = false;
+        config.Audio.BeepOnConfig = false;
+        config.MotorOutput = FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, SteerConstants.NEUTRAL_MODE);
+        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, SteerConstants.GEAR_RATIO);
+        config.ClosedLoopGeneral = FXClosedLoopGeneralConfig(true);
+        config.CurrentLimits = FXCurrentLimitsConfig(
             SteerConstants.CURRENT_LIMIT_ENABLE, 
             SteerConstants.SUPPLY_CURRENT_LIMIT, 
             SteerConstants.SUPPLY_CURRENT_THRESHOLD, 
             SteerConstants.SUPPLY_TIME_THRESHOLD);
-        config.Slot0 = DeviceConfig.FXPIDConfig(SteerConstants.PID_CONSTANTS);
+        config.Slot0 = FXPIDConfig(SteerConstants.PID_CONSTANTS);
         return config;
     }
 
@@ -88,7 +94,6 @@ public class DeviceConfig {
             public boolean configureSettings(){
             return ErrorChecker.hasConfiguredWithoutErrors(
                 encoder.getConfigurator().apply(config),
-                encoder.getConfigurator().setPosition(0), 
                 encoder.getPosition().setUpdateFrequency(updateFrequencyHz),
                 encoder.getAbsolutePosition().setUpdateFrequency(updateFrequencyHz),
                 encoder.optimizeBusUtilization()
@@ -141,6 +146,12 @@ public class DeviceConfig {
         config.SupplyCurrentLimit = limit;
         config.SupplyCurrentThreshold = currentThreshold;
         config.SupplyTimeThreshold = timeThreshold;
+        return config;
+    }
+
+    public static ClosedLoopGeneralConfigs FXClosedLoopGeneralConfig(boolean continuousWrap){
+        ClosedLoopGeneralConfigs config = new ClosedLoopGeneralConfigs();
+        config.ContinuousWrap = continuousWrap;
         return config;
     }
 }

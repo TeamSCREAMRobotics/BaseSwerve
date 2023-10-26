@@ -4,6 +4,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -17,11 +18,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.config.DeviceConfig;
 import frc.lib.math.Conversions;
 import frc.lib.pid.ScreamPIDConstants;
+import frc.lib.util.CTREModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
+import frc.robot.controlboard.Controlboard;
 
 /**
  * A swerve module, which consists of an angle motor, a drive motor, and an angle encoder.
@@ -118,9 +121,18 @@ public class SwerveModule {
      * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
     public void set(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = SwerveModuleState.optimize(desiredState, getState(true).angle);
+        desiredState = optimize(desiredState, getState(true).angle);
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
+        if(m_modLocation == "BACK_LEF") {
+            System.out.println("Encoder: " + m_angleEncoder.getAbsolutePosition());
+            System.out.println("");
+            System.out.println("Motor: " + m_steerMotor.getPosition());
+            System.out.println("");
+            System.out.println("Desired: " + desiredState.angle.getRotations());
+            System.out.println("");
+        }
+        //System.out.println(m_modLocation + ": " + getEncoderAngle(false).getRotations());
     }
 
     /**
@@ -147,12 +159,13 @@ public class SwerveModule {
      * @param desiredState The desired state of the swerve module.
      */
     private void setAngle(SwerveModuleState desiredState) {
-        //System.out.println(getAngle());
         /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01)) ? m_lastAngle : desiredState.angle;
+        //if(m_modLocation == "BACK_LEFT") System.out.println(desiredState.angle);
 
-        m_steerVoltage.Position = angle.getRotations();//Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
-        m_steerMotor.setControl(m_steerVoltage);
+        m_steerVoltage.Position = angle.getRotations();//Rotation2d.fromRadians(Math.atan2(Controlboard.getTranslationY().getAsDouble(), Controlboard.getTranslationX().getAsDouble())).rotateBy(Rotation2d.fromDegrees(90)).getRotations();//angle.getRotations();//Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
+        //System.out.println(m_steerVoltage.Position);
+        /* if(m_modLocation == "BACK_LEFT") */ m_steerMotor.setControl(m_steerVoltage);
         m_lastAngle = angle;
     }
 
@@ -188,7 +201,7 @@ public class SwerveModule {
      * @return The current absolute rotation of the CANcoder sensor as a Rotation2d.
      */
     public Rotation2d getEncoderAngle(boolean waitForUpdate) {
-        if(waitForUpdate) return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(0.5).getValue());
+        if(waitForUpdate) return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(1).getValue());
         return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().refresh().getValue());
     }
 
@@ -243,8 +256,12 @@ public class SwerveModule {
             //m_driveVelocity.refresh();
             m_driveMotor.getVelocity().refresh();
         }
+        double speedMetersPerSecond = Conversions.falconRPSToMechanismMPS(
+            m_driveMotor.getVelocity().getValue(), 
+            SwerveConstants.MODULE_TYPE.wheelCircumference, 
+            1);
 
-        return new SwerveModuleState(m_driveMotor.getVelocity().getValue(), getAngle());
+        return new SwerveModuleState(speedMetersPerSecond, getAngle());
     }
 
     /**
@@ -264,7 +281,7 @@ public class SwerveModule {
         double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveMotor.getVelocity());
         double angleRotations = BaseStatusSignal.getLatencyCompensatedValue(m_steerPosition, m_steerVelocity);
 
-        double distance = driveRotations;
+        double distance = Conversions.falconRotationsToMechanismMeters(driveRotations, SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
         m_internalState.distanceMeters = distance;
         Rotation2d angle = Rotation2d.fromRotations(angleRotations);
         m_internalState.angle = angle;

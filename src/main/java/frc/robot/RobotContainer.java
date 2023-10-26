@@ -1,8 +1,11 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import frc.lib.LimelightHelpers;
 import frc.robot.auto.Auto;
 import frc.robot.auto.Routines;
 import frc.robot.auto.Auto.NamedCommand;
@@ -65,8 +68,8 @@ public class RobotContainer {
         );
 
         Auto.addRoutines(
-            //Routines.exampleSequence(),
-            //Routines.exampleAuto()
+            Routines.exampleSequence(),
+            Routines.exampleAuto()
         );
     }
 
@@ -77,7 +80,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         System.out.println("Selected auto routine: " + Auto.getSelected().getName());
-        return Auto.getSelected();
+        return Routines.exampleSequence();
     }
 
     /**

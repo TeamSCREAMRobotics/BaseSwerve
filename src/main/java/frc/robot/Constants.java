@@ -75,7 +75,7 @@ public final class Constants{
 
         /** Selected Modules */
         // Use this if there are multiple sets of modules.
-        // Set each location's constants to their corresponding module constants.
+        // Set each Module to it's corresponding constants.
         public static final Module FRONT_LEFT =  new Module(0, ModuleConstants.MODULE_0);
         public static final Module FRONT_RIGHT = new Module(1, ModuleConstants.MODULE_1);
         public static final Module BACK_LEFT =   new Module(2, ModuleConstants.MODULE_2);
@@ -83,11 +83,11 @@ public final class Constants{
 
         /* PID Controllers */
         /* Swerve Heading Correction */
-        public static final PIDController HEADING_CORRECT_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+        public static final PIDController HEADING_CORRECT_CONTROLLER = new PIDController(0.15, 0.0, 0.0);
 
         /* PathPlanner Constants */
-        public static final PIDConstants PATH_TRANSLATION_CONSTANTS = new PIDConstants(0.0, 0.0, 0.0); // TODO ROBOT SPECIFIC
-        public static final PIDConstants PATH_ROTATION_CONSTANTS = new PIDConstants(0.0, 0.0, 0.0);
+        public static final PIDConstants PATH_TRANSLATION_CONSTANTS = new PIDConstants(25, 0.0, 0.0); // TODO ROBOT SPECIFIC
+        public static final PIDConstants PATH_ROTATION_CONSTANTS = new PIDConstants(25, 0.0, 0.0);
 
         public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
                 PATH_TRANSLATION_CONSTANTS, 
@@ -140,7 +140,7 @@ public final class Constants{
             public static final InvertedValue MOTOR_INVERT = MODULE_TYPE.steerMotorInvert;
 
             /* Neutral Modes */
-            public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Coast; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
+            public static final NeutralModeValue NEUTRAL_MODE = NeutralModeValue.Brake; // TODO CHANGE TO BRAKE AFTER MEASURING OFFSETS
 
             /* Current Limits */
             public static final int SUPPLY_CURRENT_LIMIT = 25;
@@ -149,7 +149,7 @@ public final class Constants{
             public static final boolean CURRENT_LIMIT_ENABLE = true;        
 
             /* PID */
-            public static final double KP = MODULE_TYPE.steerKP; 
+            public static final double KP = 20;//MODULE_TYPE.steerKP; 
             public static final double KI = MODULE_TYPE.steerKI;
             public static final double KD = MODULE_TYPE.steerKD;
             public static final double KF = MODULE_TYPE.steerKF;
@@ -175,34 +175,34 @@ public final class Constants{
                     return null;
                 }
             }
-            
+
             /* Front Left */
             public static final SwerveModuleConstants MODULE_0 = new SwerveModuleConstants(
-                23,           
+                23, 
                 24, 
                 8, 
-                Rotation2d.fromDegrees(294.961)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(0.508544921875)); // TODO ROBOT SPECIFIC
 
             /* Front Right */
             public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
                 13, 
                 14, 
                 3, 
-                Rotation2d.fromDegrees(310.166)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(0.35253906249999994)); // TODO ROBOT SPECIFIC
 
             /* Back Left */
             public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
                 19, 
                 20, 
                 6, 
-                Rotation2d.fromDegrees(163.037)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(0.28759765625)); // TODO ROBOT SPECIFIC
 
             /* Back Right */
             public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
                 17, 
                 18, 
                 5, 
-                Rotation2d.fromDegrees(45.176)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(0.324462890625)); // TODO ROBOT SPECIFIC
         }
     }
 }

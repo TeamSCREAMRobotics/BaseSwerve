@@ -15,6 +15,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -29,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Swerve extends SubsystemBase {
     private Pigeon2 m_gyro;
     private SwerveModule[] m_swerveModules;
-    private SwerveDriveOdometry m_swerveOdometry;
+    private SwerveDrivePoseEstimator m_swervePoseEstimator;
     private ChassisSpeeds m_currentSpeeds = new ChassisSpeeds();
 
     /**
@@ -56,7 +57,7 @@ public class Swerve extends SubsystemBase {
          * Configures the odometry, which requires the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
-        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+        m_swervePoseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
 
         AutoBuilder.configureHolonomic(
             this::getPose,
@@ -135,7 +136,7 @@ public class Swerve extends SubsystemBase {
      * @param pose The new pose to set.
      */
     public void resetPose(Pose2d pose) {
-        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
+        m_swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
     }
 
     /**
@@ -147,7 +148,7 @@ public class Swerve extends SubsystemBase {
     public void resetPose(PathPlannerPath trajectory) {
         Translation2d location = trajectory.getAllPathPoints().get(0).position;
         Rotation2d angle = trajectory.getAllPathPoints().get(0).holonomicRotation;
-        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), new Pose2d(location, angle));
+        m_swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), new Pose2d(location, angle));
     }
 
     /**
@@ -156,7 +157,7 @@ public class Swerve extends SubsystemBase {
      * @return The current pose of the odometry.
      */
     public Pose2d getPose() {
-        return m_swerveOdometry.getPoseMeters();
+        return m_swervePoseEstimator.getEstimatedPosition();
     }
 
     /**
@@ -234,6 +235,6 @@ public class Swerve extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        m_swerveOdometry.update(getYaw(), getModulePositions()); /* Updates the pose estimator with the current angle and module positions */
+        m_swervePoseEstimator.update(getYaw(), getModulePositions()); /* Updates the pose estimator with the current angle and module positions */
     }
 }
