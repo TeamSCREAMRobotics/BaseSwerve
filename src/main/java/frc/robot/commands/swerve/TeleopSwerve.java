@@ -1,17 +1,16 @@
 package frc.robot.commands.swerve;
 
-import frc.robot.Constants.SwerveConstants;
-import frc.robot.controlboard.Controlboard;
-import frc.robot.subsystems.Swerve;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.util.Timer;
+import frc.robot.Constants.SwerveConstants;
+import frc.robot.controlboard.Controlboard;
+import frc.robot.subsystems.Swerve;
 
 /**
  * A command that controls the swerve drive system.
@@ -23,7 +22,7 @@ public class TeleopSwerve extends Command {
     private DoubleSupplier rotationSup;
     private BooleanSupplier fieldCentricSup;
     private Rotation2d lastAngle;
-    private Timer holdTimer = new Timer();
+    private Timer correctionTimer = new Timer();
 
 
     /**
@@ -48,6 +47,8 @@ public class TeleopSwerve extends Command {
 
     @Override
     public void initialize() {
+        correctionTimer.stop();
+        correctionTimer.reset();
         lastAngle = swerve.getYaw();
     } 
 
@@ -77,19 +78,23 @@ public class TeleopSwerve extends Command {
     }
 
     private double getRotation(double current){
-        boolean isRotating = Math.abs(current) > 0;
-        if(isRotating){
-            holdTimer.reset();
-            return current * SwerveConstants.MAX_ANGULAR_VELOCITY;
-        } else { 
-            holdTimer.start();
-            if(holdTimer.get() < 0.2){
-                lastAngle = swerve.getYaw();
-            }
-            if(holdTimer.hasElapsed(0.2)){
-                return swerve.calculateHeadingCorrection(swerve.getYaw().getDegrees(), lastAngle.getDegrees());
-            }
+        boolean rotating = Math.abs(current) > 0;
+
+        if(rotating){
+            correctionTimer.reset();
             return current * SwerveConstants.MAX_ANGULAR_VELOCITY;
         }
+
+        correctionTimer.start();
+
+        if(correctionTimer.withinRange(0, SwerveConstants.CORRECTION_TIME_THRESHOLD)){
+            lastAngle = swerve.getYaw();
+        }
+
+        if(correctionTimer.hasElapsed(SwerveConstants.CORRECTION_TIME_THRESHOLD)){
+            return swerve.calculateHeadingCorrection(swerve.getYaw().getDegrees(), lastAngle.getDegrees());
+        }
+
+        return current * SwerveConstants.MAX_ANGULAR_VELOCITY;
     }
 }

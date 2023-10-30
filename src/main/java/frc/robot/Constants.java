@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
@@ -60,10 +59,6 @@ public final class Constants{
         public static final double MAX_SPEED = 5.7349; // m/s
         public static final double MAX_ANGULAR_VELOCITY = 8.0; // rad/s
 
-        /* Selected Module Constants */
-        // TODO ROBOT SPECIFIC
-        public static final COTSFalconSwerveConstants MODULE_TYPE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
-
         /* Swerve Kinematics */
         // No need to ever change this unless there are more than four modules.
         public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
@@ -73,6 +68,10 @@ public final class Constants{
                 new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0)
         );
 
+        /* Selected Module Constants */
+        // TODO ROBOT SPECIFIC
+        public static final COTSFalconSwerveConstants MODULE_TYPE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
+
         /** Selected Modules */
         // Use this if there are multiple sets of modules.
         // Set each Module to it's corresponding constants.
@@ -81,9 +80,12 @@ public final class Constants{
         public static final Module BACK_LEFT =   new Module(2, ModuleConstants.MODULE_2);
         public static final Module BACK_RIGHT =  new Module(3, ModuleConstants.MODULE_3);
 
-        /* PID Controllers */
         /* Swerve Heading Correction */
         public static final PIDController HEADING_CORRECT_CONTROLLER = new PIDController(0.15, 0.0, 0.0);
+        public static final double CORRECTION_TIME_THRESHOLD = 0.2;
+        static {
+            HEADING_CORRECT_CONTROLLER.enableContinuousInput(0, 360);
+        }
 
         /* PathPlanner Constants */
         public static final PIDConstants PATH_TRANSLATION_CONSTANTS = new PIDConstants(25, 0.0, 0.0); // TODO ROBOT SPECIFIC
@@ -114,7 +116,7 @@ public final class Constants{
             public static final double SUPPLY_TIME_THRESHOLD = 0.1;
             public static final boolean CURRENT_LIMIT_ENABLE = true;
 
-            /* Ramps Constants */
+            /* Ramps */
             public static final double OPEN_LOOP_RAMP = 0.25;
             public static final double CLOSED_LOOP_RAMP = 0.0;
 
@@ -148,7 +150,7 @@ public final class Constants{
             public static final double SUPPLY_TIME_THRESHOLD = 0.1;
             public static final boolean CURRENT_LIMIT_ENABLE = true;        
 
-            /* PID */
+            /* PID Constants */
             public static final double KP = 20;//MODULE_TYPE.steerKP; 
             public static final double KI = MODULE_TYPE.steerKI;
             public static final double KD = MODULE_TYPE.steerKD;
