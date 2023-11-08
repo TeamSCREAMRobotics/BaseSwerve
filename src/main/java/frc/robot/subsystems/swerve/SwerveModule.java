@@ -20,6 +20,7 @@ import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.SwerveConstants.SteerConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
 
@@ -100,15 +101,11 @@ public class SwerveModule {
     }
 
     public void setSteerNeutralMode(NeutralModeValue mode){
-        MotorOutputConfigs configs = new MotorOutputConfigs();
-        configs.NeutralMode = mode;
-        m_steerMotor.getConfigurator().refresh(configs);
+        m_steerMotor.getConfigurator().apply(DeviceConfig.FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, mode));
     }
 
     public void setDriveNeutralMode(NeutralModeValue mode){
-        MotorOutputConfigs configs = new MotorOutputConfigs();
-        configs.NeutralMode = mode;
-        m_driveMotor.getConfigurator().refresh(configs);
+        m_driveMotor.getConfigurator().apply(DeviceConfig.FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, mode));
     }
 
     /**
@@ -118,18 +115,9 @@ public class SwerveModule {
      * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
     public void set(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = optimize(desiredState, getState(true).angle);
+        desiredState = SwerveModuleState.optimize(desiredState, getAngle());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
-        if(m_modLocation == "BACK_LEF") {
-            System.out.println("Encoder: " + m_angleEncoder.getAbsolutePosition());
-            System.out.println("");
-            System.out.println("Motor: " + m_steerMotor.getPosition());
-            System.out.println("");
-            System.out.println("Desired: " + desiredState.angle.getRotations());
-            System.out.println("");
-        }
-        //System.out.println(m_modLocation + ": " + getEncoderAngle(false).getRotations());
     }
 
     /**
@@ -179,7 +167,7 @@ public class SwerveModule {
 		if(invert) deltaDegrees -= Math.signum(deltaDegrees)*180;
 		return new SwerveModuleState(
 			(invert ? -1 : 1) * desiredState.speedMetersPerSecond,
-			Rotation2d.fromDegrees(currentAngle.getDegrees() + deltaDegrees)
+			currentAngle.plus(Rotation2d.fromDegrees(deltaDegrees))
 		);
 	}
 
@@ -240,7 +228,7 @@ public class SwerveModule {
     }
 
     public void configDriveMotorPID(ScreamPIDConstants constants) {
-        m_driveMotor.getConfigurator().apply(constants.slot0Configs());
+        m_driveMotor.getConfigurator().apply(constants.toSlot0Configs());
     }
 
     /**

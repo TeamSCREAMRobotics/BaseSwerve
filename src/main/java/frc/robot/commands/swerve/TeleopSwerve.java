@@ -3,11 +3,12 @@ package frc.robot.commands.swerve;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.util.Timer;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.controlboard.Controlboard;
 import frc.robot.subsystems.Swerve;
@@ -34,8 +35,7 @@ public class TeleopSwerve extends Command {
      * @param rotationSup A supplier for the rotation value.
      * @param fieldCentricSup A supplier for the drive mode. Robot centric = false; Field centric = true
      */
-    public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup,
-            DoubleSupplier rotationSup, BooleanSupplier fieldCentricSup) {
+    public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier fieldCentricSup) {
         this.swerve = swerve;
         addRequirements(swerve);
 
@@ -87,7 +87,7 @@ public class TeleopSwerve extends Command {
 
         correctionTimer.start();
 
-        if(correctionTimer.withinRange(0, SwerveConstants.CORRECTION_TIME_THRESHOLD)){
+        if(correctionTimer.get() <= SwerveConstants.CORRECTION_TIME_THRESHOLD){
             lastAngle = swerve.getYaw();
         }
 

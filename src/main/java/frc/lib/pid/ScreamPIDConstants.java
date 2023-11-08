@@ -3,6 +3,9 @@ package frc.lib.pid;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
 import com.ctre.phoenix6.configs.Slot2Configs;
+import com.pathplanner.lib.util.PIDConstants;
+
+import edu.wpi.first.math.controller.PIDController;
 
 /**
  * A container class for PID constants, along with additional methods.
@@ -175,7 +178,7 @@ public class ScreamPIDConstants implements Cloneable{
         return minOutput;
     }
 
-    public Slot0Configs slot0Configs(){
+    public Slot0Configs toSlot0Configs(){
         Slot0Configs config = new Slot0Configs();
         config.kP = kP;
         config.kI = kI;
@@ -184,7 +187,7 @@ public class ScreamPIDConstants implements Cloneable{
         return config;
     }
 
-    public Slot1Configs slot1Configs(){
+    public Slot1Configs toSlot1Configs(){
         Slot1Configs config = new Slot1Configs();
         config.kP = kP;
         config.kI = kI;
@@ -193,13 +196,21 @@ public class ScreamPIDConstants implements Cloneable{
         return config;
     }
 
-    public Slot2Configs slot2Configs(){
+    public Slot2Configs toSlot2Configs(){
         Slot2Configs config = new Slot2Configs();
         config.kP = kP;
         config.kI = kI;
         config.kD = kD;
         config.kV = kF;
         return config;
+    }
+
+    public PIDConstants toPathPlannerPIDConstants(){
+        return new PIDConstants(kP, kI, kD, integralZone);
+    }
+
+    public PIDController toPIDController(){
+        return new PIDController(kP, kI, kD, period);
     }
 
     public boolean equals(ScreamPIDConstants other){

@@ -24,8 +24,6 @@ import frc.robot.Constants.SwerveConstants.DriveConstants;
 
 public class DeviceConfig {
 
-    public DeviceConfig(){}
-
     ////////////////////////////////////// CUSTOM CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     public static TalonFXConfiguration driveFXConfig(){
@@ -69,7 +67,6 @@ public class DeviceConfig {
     }
 
 
-
     ////////////////////////////////////// GENERIC CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     public static void configureTalonFX(String name, TalonFX motor, TalonFXConfiguration config, double updateFrequencyHz){
@@ -82,8 +79,9 @@ public class DeviceConfig {
                 motor.getDutyCycle().setUpdateFrequency(updateFrequencyHz),
                 motor.getPosition().setUpdateFrequency(updateFrequencyHz),
                 motor.getVelocity().setUpdateFrequency(updateFrequencyHz),
-                motor.optimizeBusUtilization());
-        }
+                motor.optimizeBusUtilization()
+                );
+            }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID() + " version " + motor.getVersion(), true);
     }
@@ -92,13 +90,13 @@ public class DeviceConfig {
         DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
             public boolean configureSettings(){
-            return ErrorChecker.hasConfiguredWithoutErrors(
-                encoder.getConfigurator().apply(config),
-                encoder.getPosition().setUpdateFrequency(updateFrequencyHz),
-                encoder.getAbsolutePosition().setUpdateFrequency(updateFrequencyHz),
-                encoder.optimizeBusUtilization()
-                );
-        }
+                return ErrorChecker.hasConfiguredWithoutErrors(
+                    encoder.getConfigurator().apply(config),
+                    encoder.getPosition().setUpdateFrequency(updateFrequencyHz),
+                    encoder.getAbsolutePosition().setUpdateFrequency(updateFrequencyHz),
+                    encoder.optimizeBusUtilization()
+                    );
+            }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + encoder.getDeviceID() + " version " + encoder.getVersion(), true);
     }
@@ -125,7 +123,7 @@ public class DeviceConfig {
     }
 
     public static Slot0Configs FXPIDConfig(ScreamPIDConstants constants){
-        return constants.slot0Configs();
+        return constants.toSlot0Configs();
     }
 
     public static OpenLoopRampsConfigs FXOpenLoopRampConfig(double ramp){

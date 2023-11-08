@@ -49,6 +49,10 @@ public class Controlboard{
         return () -> -MathUtil.applyDeadband(driverController.getRightX(), STICK_DEADBAND);
     }
 
+    public static Trigger getTest() {
+        return driverController.b();
+    }
+
     /**
      * Retrieves whether to zero the gyro from the driver controller.
      *
@@ -68,5 +72,4 @@ public class Controlboard{
         driverController.start().onTrue(new InstantCommand(() -> fieldCentric =! fieldCentric));
         return () -> fieldCentric;
     }
-
 }

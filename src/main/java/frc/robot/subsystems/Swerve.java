@@ -1,7 +1,10 @@
 package frc.robot.subsystems;
 
+import java.sql.Driver;
+
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 
@@ -11,8 +14,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants;
@@ -28,7 +35,7 @@ import frc.robot.subsystems.swerve.SwerveModule;
 public class Swerve extends SubsystemBase {
     private Pigeon2 m_gyro;
     private SwerveModule[] m_swerveModules;
-    private SwerveDrivePoseEstimator m_swervePoseEstimator;
+    private SwerveDriveOdometry m_odometry;
     private ChassisSpeeds m_currentSpeeds = new ChassisSpeeds();
 
     /**
@@ -55,7 +62,7 @@ public class Swerve extends SubsystemBase {
          * Configures the odometry, which requires the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
-        m_swervePoseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+        m_odometry = new SwerveDriveOdometry(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
 
         AutoBuilder.configureHolonomic(
             this::getPose,
@@ -90,10 +97,10 @@ public class Swerve extends SubsystemBase {
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop){
-        m_currentSpeeds = chassisSpeeds;
         SwerveModuleState[] swerveModuleStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
+        m_currentSpeeds = SwerveConstants.KINEMATICS.toChassisSpeeds(swerveModuleStates);
 
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
@@ -117,6 +124,13 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    public void setNeutralModes(NeutralModeValue driveMode, NeutralModeValue steerMode){
+        for (SwerveModule mod : m_swerveModules) {
+            mod.setDriveNeutralMode(driveMode);
+            mod.setSteerNeutralMode(steerMode);
+        }
+    }
+
     /** 
      * Calculates the hold value based on the provided measurement and setpoint. 
      *  
@@ -125,7 +139,7 @@ public class Swerve extends SubsystemBase {
      * @return The calculated value from the hold controller.
     */
     public double calculateHeadingCorrection(double measurement, double setpoint){
-        return SwerveConstants.HEADING_CORRECT_CONTROLLER.calculate(measurement, setpoint);
+        return SwerveConstants.HEADING_CONSTANTS.toPIDController().calculate(measurement, setpoint);
     }
 
     /**
@@ -134,7 +148,7 @@ public class Swerve extends SubsystemBase {
      * @param pose The new pose to set.
      */
     public void resetPose(Pose2d pose) {
-        m_swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), pose);
+        m_odometry.resetPosition(getYaw(), getModulePositions(), pose);
     }
 
     /**
@@ -146,7 +160,7 @@ public class Swerve extends SubsystemBase {
     public void resetPose(PathPlannerPath trajectory) {
         Translation2d location = trajectory.getAllPathPoints().get(0).position;
         Rotation2d angle = trajectory.getAllPathPoints().get(0).holonomicRotation;
-        m_swervePoseEstimator.resetPosition(getYaw(), getModulePositions(), new Pose2d(location, angle));
+        m_odometry.resetPosition(getYaw(), getModulePositions(), new Pose2d(location, angle));
     }
 
     /**
@@ -155,7 +169,7 @@ public class Swerve extends SubsystemBase {
      * @return The current pose of the odometry.
      */
     public Pose2d getPose() {
-        return m_swervePoseEstimator.getEstimatedPosition();
+        return m_odometry.getPoseMeters();
     }
 
     /**
@@ -194,7 +208,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public ChassisSpeeds getRobotCentricSpeeds(){
-        return m_currentSpeeds;
+        return ChassisSpeeds.fromFieldRelativeSpeeds(m_currentSpeeds, getYaw());
     }
 
     /**
@@ -217,7 +231,7 @@ public class Swerve extends SubsystemBase {
      */
     public void configGyro() {
         m_gyro.getConfigurator().apply(new Pigeon2Configuration());
-        m_gyro.getYaw().setUpdateFrequency(50);
+        m_gyro.getYaw().setUpdateFrequency(Constants.LOOP_TIME_HZ);
         m_gyro.optimizeBusUtilization();
         zeroGyro();
     }
@@ -228,11 +242,26 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    Timer coastTimer = new Timer();
     /**
      * Called periodically through SubsystemBase
      */
     @Override
     public void periodic() {
-        m_swervePoseEstimator.update(getYaw(), getModulePositions()); /* Updates the pose estimator with the current angle and module positions */
+        m_odometry.update(getYaw(), getModulePositions()); /* Updates the odometry with the current angle and module positions */
+
+        if(DriverStation.isDisabled()){
+            coastTimer.start();
+
+            if(coastTimer.hasElapsed(5.0)){
+                setNeutralModes(NeutralModeValue.Coast, NeutralModeValue.Coast);
+            }
+
+        } else if(DriverStation.isEnabled()){
+            coastTimer.reset();
+            setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
+        } else {
+            setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
+        }
     }
 }

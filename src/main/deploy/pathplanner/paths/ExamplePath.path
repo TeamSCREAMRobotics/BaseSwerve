@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.108730360317863,
-        "y": 0.8875140607424081
+        "x": 6.486325098185146,
+        "y": 0.7089983937457166
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.464566929133857,
-        "y": 1.2453826336224103
+        "x": 5.8421616670011405,
+        "y": 1.0668669666257184
       },
       "isLocked": false
     },
@@ -30,27 +30,27 @@
     },
     {
       "anchor": {
-        "x": 6.795838020247469,
-        "y": 2.3476178380928188
+        "x": 7.138146202112662,
+        "y": 2.6758971634919013
       },
       "prevControl": {
-        "x": 6.715787127170851,
-        "y": 2.0684345065808842
+        "x": 7.058095309036044,
+        "y": 2.396713831979967
       },
       "nextControl": {
-        "x": 6.875888913324087,
-        "y": 2.6268011696047533
+        "x": 7.2181970951892795,
+        "y": 2.955080495003835
       },
       "isLocked": false
     },
     {
       "anchor": {
-        "x": 5.536140643709859,
-        "y": 3.5786857288000293
+        "x": 5.307104757066657,
+        "y": 4.242554904510665
       },
       "prevControl": {
-        "x": 5.536140643709859,
-        "y": 2.469270064817244
+        "x": 5.307104757066657,
+        "y": 3.1331392405278793
       },
       "nextControl": null,
       "isLocked": false
@@ -66,30 +66,7 @@
       "rotationDegrees": 0
     }
   ],
-  "constraintZones": [
-    {
-      "name": "New Constraints Zone",
-      "minWaypointRelativePos": 1.0,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 0.1,
-        "maxAcceleration": 3,
-        "maxAngularVelocity": 1000.0,
-        "maxAngularAcceleration": 1000.0
-      }
-    },
-    {
-      "name": "New Constraints Zone",
-      "minWaypointRelativePos": 1.85,
-      "maxWaypointRelativePos": 1.9500000000000002,
-      "constraints": {
-        "maxVelocity": 0.1,
-        "maxAcceleration": 3,
-        "maxAngularVelocity": 540,
-        "maxAngularAcceleration": 720
-      }
-    }
-  ],
+  "constraintZones": [],
   "eventMarkers": [
     {
       "name": "ExampleEvent",

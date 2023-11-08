@@ -3,13 +3,16 @@ package frc.robot;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.COTSFalconSwerveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
@@ -49,11 +52,11 @@ public final class Constants{
 
         /* Drivebase Constants */
         // TODO ROBOT SPECIFIC
-        public static final double TRACK_WIDTH = 0.50165; // Distance from left wheels to right wheels/vice versa
-        public static final double WHEEL_BASE = 0.57531; // Distance from front wheels to back wheels/vice versa
+        public static final double TRACK_WIDTH = 0.50165; // Distance from left wheels to right wheels
+        public static final double WHEEL_BASE = 0.57531; // Distance from front wheels to back wheels
 
         /* Gyro Constants */
-        public static final boolean GYRO_INVERT = false; // TODO ALWAYS ENSURE GYRO READS CCW+ CW-
+        public static final boolean GYRO_INVERT = false; // TODO Always ensure gyro reads CCW+ CW-
 
         /* Swerve Kinematics */
         public static final double MAX_SPEED = 5.7349; // m/s
@@ -70,7 +73,7 @@ public final class Constants{
 
         /* Selected Module Constants */
         // TODO ROBOT SPECIFIC
-        public static final COTSFalconSwerveConstants MODULE_TYPE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.SDSMK4i_L3); 
+        public static final COTSFalconSwerveConstants MODULE_TYPE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.L3); 
 
         /** Selected Modules */
         // Use this if there are multiple sets of modules.
@@ -81,22 +84,20 @@ public final class Constants{
         public static final Module BACK_RIGHT =  new Module(3, ModuleConstants.MODULE_3);
 
         /* Swerve Heading Correction */
-        public static final PIDController HEADING_CORRECT_CONTROLLER = new PIDController(0.15, 0.0, 0.0);
+        public static final ScreamPIDConstants HEADING_CONSTANTS = new ScreamPIDConstants(0.1, 0.0, 0.001);
         public static final double CORRECTION_TIME_THRESHOLD = 0.2;
-        static {
-            HEADING_CORRECT_CONTROLLER.enableContinuousInput(0, 360);
-        }
 
         /* PathPlanner Constants */
-        public static final PIDConstants PATH_TRANSLATION_CONSTANTS = new PIDConstants(25, 0.0, 0.0); // TODO ROBOT SPECIFIC
-        public static final PIDConstants PATH_ROTATION_CONSTANTS = new PIDConstants(25, 0.0, 0.0);
+        public static final ScreamPIDConstants PATH_TRANSLATION_CONSTANTS = new ScreamPIDConstants(25, 0.0, 0.0); // TODO ROBOT SPECIFIC
+        public static final ScreamPIDConstants PATH_ROTATION_CONSTANTS = new ScreamPIDConstants(45, 0.0, 0.0);
 
         public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG = new HolonomicPathFollowerConfig(
-                PATH_TRANSLATION_CONSTANTS, 
-                PATH_ROTATION_CONSTANTS, 
+                PATH_TRANSLATION_CONSTANTS.toPathPlannerPIDConstants(), 
+                PATH_ROTATION_CONSTANTS.toPathPlannerPIDConstants(), 
                 MAX_SPEED, 
-                new Translation2d(SwerveConstants.WHEEL_BASE/2, SwerveConstants.TRACK_WIDTH/2).getDistance(new Translation2d()), 
-                new ReplanningConfig()
+                new Translation2d(SwerveConstants.WHEEL_BASE/2, SwerveConstants.TRACK_WIDTH/2).getNorm(), 
+                new ReplanningConfig(),
+                LOOP_TIME_SEC
         );
 
         
@@ -124,7 +125,7 @@ public final class Constants{
             public static final double KP = 0.05; // TODO ROBOT SPECIFIC
             public static final double KI = 0.0;
             public static final double KD = 0.0;
-            public static final double KF = 0.0;
+            public static final double KF = 0.001;
             public static final ScreamPIDConstants PID_CONSTANTS = new ScreamPIDConstants(KP, KI, KD, KF);
 
             /* Feedforward Constants */
@@ -151,7 +152,7 @@ public final class Constants{
             public static final boolean CURRENT_LIMIT_ENABLE = true;        
 
             /* PID Constants */
-            public static final double KP = 20;//MODULE_TYPE.steerKP; 
+            public static final double KP = 25;//MODULE_TYPE.steerKP; 
             public static final double KI = MODULE_TYPE.steerKI;
             public static final double KD = MODULE_TYPE.steerKD;
             public static final double KF = MODULE_TYPE.steerKF;
