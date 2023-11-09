@@ -37,13 +37,13 @@ public class RobotContainer {
     }
 
     /**
-     * Configures button bindings using methods from Controlboard.
+     * Configures button bindings from Controlboard.
      */
     private void configButtonBindings() {
         Controlboard.getZeroGyro().onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
     }
 
-    private void configDefaultCommands() {
+    private void configDefaultCommands() { 
         m_swerve.setDefaultCommand(
             new TeleopSwerve(
                 m_swerve,
@@ -57,9 +57,9 @@ public class RobotContainer {
 
     /**
      * Configures auto. <p>
-     * Add events with {@code}registerEvents(Event... events){@code} <p> <STRONG> MUST BE DONE FIRST</STRONG> <p>
-     * Set the default command with {@code}setDefault(Command auto){@code} <p>
-     * Add additional commands with {@code}add(Command... autos){@code}
+     * Configure named commands with {@code}configure(NamedCommand... namedCommands){@code} <p> <STRONG> MUST BE DONE FIRST</STRONG> <p>
+     * The default command will automatically be set to Commands.none()<p>
+     * Add auto routines with {@code}addCommands(Command... commands){@code}
      */
     private void configAuto() {
         Auto.configure(

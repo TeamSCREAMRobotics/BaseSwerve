@@ -1,14 +1,11 @@
 package frc.robot.subsystems;
 
-import java.sql.Driver;
-
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,7 +16,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants;
@@ -41,7 +37,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Constructs a new instance of the Swerve class.
      * 
-     * Initializes the gyro, swerve modules, and odometry.
+     * Initializes the gyro, swerve modules, odometry, and auto builder.
      */
     public Swerve() {
         m_gyro = new Pigeon2(Ports.PIGEON_ID, Ports.CAN_BUS_NAME);
@@ -124,6 +120,12 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    /**
+     * Sets the neutral mode of the motors.<p>
+     * Use {@code}NeutralModeValue.Brake{@code} or {@code}NeutralModeValue.Coast{@code}
+     * @param driveMode The NeutralModeValue to set the drive motor to.
+     * @param steerMode The NeutralModeValue to set the drive motor to.
+     */
     public void setNeutralModes(NeutralModeValue driveMode, NeutralModeValue steerMode){
         for (SwerveModule mod : m_swerveModules) {
             mod.setDriveNeutralMode(driveMode);
@@ -158,9 +160,13 @@ public class Swerve extends SubsystemBase {
      * @param trajectory The trajectory to get the inital pose from.
      */
     public void resetPose(PathPlannerPath trajectory) {
-        Translation2d location = trajectory.getAllPathPoints().get(0).position;
-        Rotation2d angle = trajectory.getAllPathPoints().get(0).holonomicRotation;
-        m_odometry.resetPosition(getYaw(), getModulePositions(), new Pose2d(location, angle));
+        m_odometry.resetPosition(
+            getYaw(), 
+            getModulePositions(), 
+            new Pose2d(
+                trajectory.getAllPathPoints().get(0).position, 
+                trajectory.getAllPathPoints().get(0).holonomicRotation)
+            );
     }
 
     /**
