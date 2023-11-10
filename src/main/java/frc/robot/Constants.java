@@ -108,16 +108,16 @@ public final class Constants{
             public static final double CLOSED_LOOP_RAMP = 0.0;
 
             /* PID Constants */
-            public static final double KP = 0.05; // TODO ROBOT SPECIFIC
+            public static final double KP = 0.12; // TODO ROBOT SPECIFIC
             public static final double KI = 0.0;
             public static final double KD = 0.0;
-            public static final double KF = 0.001;
+            public static final double KF = 0.0;
             public static final ScreamPIDConstants PID_CONSTANTS = new ScreamPIDConstants(KP, KI, KD, KF);
 
             /* Feedforward Constants */
-            public static final double KS = (0.32 / 12); // TODO ROBOT SPECIFIC
-            public static final double KV = (1.51 / 12);
-            public static final double KA = (0.27 / 12);
+            public static final double KS = 0.32; // TODO ROBOT SPECIFIC
+            public static final double KV = 1.51;
+            public static final double KA = 0.27;
         }
 
 
@@ -138,7 +138,7 @@ public final class Constants{
             public static final boolean CURRENT_LIMIT_ENABLE = true;        
 
             /* PID Constants */
-            public static final double KP = 25;//MODULE_TYPE.steerKP; 
+            public static final double KP = MODULE_TYPE.steerKP; 
             public static final double KI = MODULE_TYPE.steerKI;
             public static final double KD = MODULE_TYPE.steerKD;
             public static final double KF = MODULE_TYPE.steerKF;
