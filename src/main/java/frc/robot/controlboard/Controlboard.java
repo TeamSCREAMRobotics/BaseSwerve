@@ -3,8 +3,6 @@ package frc.robot.controlboard;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -47,10 +45,6 @@ public class Controlboard{
      */
     public static DoubleSupplier getRotation() {
         return () -> -MathUtil.applyDeadband(driverController.getRightX(), STICK_DEADBAND);
-    }
-
-    public static Trigger getTest() {
-        return driverController.b();
     }
 
     /**

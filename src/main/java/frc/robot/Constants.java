@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.COTSFalconSwerveConstants;
-import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
 
 /**
  * A class for constants used in various places in the project.
@@ -69,14 +68,6 @@ public final class Constants{
         /* Selected Module Constants */
         // TODO ROBOT SPECIFIC
         public static final COTSFalconSwerveConstants MODULE_TYPE = COTSFalconSwerveConstants.SDSMK4i(COTSFalconSwerveConstants.driveGearRatios.L3); 
-
-        /** Selected Modules */
-        // Use this if there are multiple sets of modules.
-        // Set each Module to it's corresponding constants.
-        public static final Module FRONT_LEFT =  new Module(0, ModuleConstants.MODULE_0);
-        public static final Module FRONT_RIGHT = new Module(1, ModuleConstants.MODULE_1);
-        public static final Module BACK_LEFT =   new Module(2, ModuleConstants.MODULE_2);
-        public static final Module BACK_RIGHT =  new Module(3, ModuleConstants.MODULE_3);
 
         /* Swerve Heading Correction */
         public static final ScreamPIDConstants HEADING_CONSTANTS = new ScreamPIDConstants(0.1, 0.0, 0.001);
@@ -158,21 +149,6 @@ public final class Constants{
         public static class ModuleConstants{
 
             public record SwerveModuleConstants(int driveMotorID, int steerMotorID, int encoderID, Rotation2d angleOffset){}
-            public record Module(int number, SwerveModuleConstants constants){
-                public String toString(){
-                    switch(number){
-                        case 0:
-                        return "FRONT_LEFT";
-                        case 1:
-                        return "FRONT_RIGHT";
-                        case 2:
-                        return "BACK_LEFT";
-                        case 3:
-                        return "BACK_RIGHT";
-                    }
-                    return null;
-                }
-            }
 
             /* Front Left */
             public static final SwerveModuleConstants MODULE_0 = new SwerveModuleConstants(

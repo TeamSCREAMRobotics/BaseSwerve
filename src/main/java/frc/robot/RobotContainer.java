@@ -1,13 +1,10 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-import frc.robot.Constants.SwerveConstants;
-import frc.robot.auto.Auto;
-import frc.robot.auto.Auto.NamedCommand;
+import frc.robot.auto.Autonomous;
+import frc.robot.auto.Autonomous.NamedCommand;
 import frc.robot.auto.Routines;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.controlboard.Controlboard;
@@ -20,19 +17,12 @@ public class RobotContainer {
     private static final Swerve m_swerve = new Swerve();
     
     /**
-     * Configures the subsystems, default commands, button bindings, and autonomous classes.
+     * Configures the basic robot systems, such as Shuffleboard, autonomous, default commands, and button bindings.
      */
     public RobotContainer() {
-        /* Shuffleboard */
         ShuffleboardTabManager.addTabs(true);
-
-        /* Controlboard */
         configButtonBindings();
-
-        /* Default Commands */
         configDefaultCommands();
-
-        /* Auto */
         configAuto();
     }
 
@@ -44,6 +34,7 @@ public class RobotContainer {
     }
 
     private void configDefaultCommands() { 
+        /* Sets the default command for the swerve subsystem */
         m_swerve.setDefaultCommand(
             new TeleopSwerve(
                 m_swerve,
@@ -57,17 +48,18 @@ public class RobotContainer {
 
     /**
      * Configures auto. <p>
-     * Configure named commands with {@code}configure(NamedCommand... namedCommands){@code} <p> <STRONG> MUST BE DONE FIRST</STRONG> <p>
-     * The default command will automatically be set to Commands.none()<p>
+     * Configure named commands with {@code}configure(NamedCommand... namedCommands){@code} <p> <STRONG>THIS MUST BE DONE FIRST</STRONG> <p>
+     * The default command will automatically be set to Commands.none(). 
+     * Use {@code}configure(Command defaultCommand, NamedCommand... namedCommands){@code} to set a custom one.
      * Add auto routines with {@code}addCommands(Command... commands){@code}
      */
     private void configAuto() {
-        Auto.configure(
+        Autonomous.configure(
             new NamedCommand("ExampleEvent", new PrintCommand("This is an example event :)"))
         );
 
-        Auto.addCommands(
-            Routines.exampleAuto()
+        Autonomous.addRoutines(
+            Routines.exampleAuto().withName("Example Auto")
         );
     }
 
@@ -77,8 +69,8 @@ public class RobotContainer {
      * @return The selected autonomous command.
      */
     public Command getAutonomousCommand() {
-        System.out.println("Selected auto routine: " + Auto.getSelected().getName());
-        return Auto.getSelected();
+        System.out.println("Selected auto routine: " + Autonomous.getSelected().getName());
+        return Autonomous.getSelected();
     }
 
     /**

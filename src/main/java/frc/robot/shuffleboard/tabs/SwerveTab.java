@@ -48,7 +48,7 @@ public class SwerveTab extends ShuffleboardTabBase {
     /**
      * This method creates number entries for various sensors related to the Swerve subsystem.
      * These entries are used to display and update values on the Shuffleboard.
-     * Set {@code SwerveConstants.updateSwerveFromShuffleboard} for entries that get values.
+     * Set {@code ShuffleboardConstants.UPDATE_SWERVE} to true for entries that get values.
      */
     @Override
     public void createEntries() {
@@ -79,20 +79,20 @@ public class SwerveTab extends ShuffleboardTabBase {
 
     /**
      * Updates the values of various Shuffleboard widgets with the current state of the swerve drive.
-     * Set {@code}updateSwerveFromShuffleboard{@code} for getting values.
+     * Set {@code ShuffleboardConstants.UPDATE_SWERVE} to true for entries that get values.
      */
     @Override
     public void periodic() {
-        m_FLEncoder.setDouble(round(m_swerve.getModules()[0].getEncoderAngle(false).getDegrees(), 3));
+        m_FLEncoder.setDouble(round(m_swerve.getModules()[0].getEncoderAngle().getDegrees(), 3));
         m_FLIntegrated.setDouble(round(m_swerve.getModules()[0].getPosition(true).angle.getDegrees(), 3));
 
-        m_FREncoder.setDouble(round(m_swerve.getModules()[1].getEncoderAngle(false).getDegrees(), 3));
+        m_FREncoder.setDouble(round(m_swerve.getModules()[1].getEncoderAngle().getDegrees(), 3));
         m_FRIntegrated.setDouble(round(m_swerve.getModules()[1].getPosition(true).angle.getDegrees(), 3));
 
-        m_BLEncoder.setDouble(round(m_swerve.getModules()[2].getEncoderAngle(false).getDegrees(), 3));
+        m_BLEncoder.setDouble(round(m_swerve.getModules()[2].getEncoderAngle().getDegrees(), 3));
         m_BLIntegrated.setDouble(round(m_swerve.getModules()[2].getPosition(true).angle.getDegrees(), 3));
 
-        m_BREncoder.setDouble(round(m_swerve.getModules()[3].getEncoderAngle(false).getDegrees(), 3));
+        m_BREncoder.setDouble(round(m_swerve.getModules()[3].getEncoderAngle().getDegrees(), 3));
         m_BRIntegrated.setDouble(round(m_swerve.getModules()[3].getPosition(true).angle.getDegrees(), 3));
 
         m_odometryX.setDouble(m_swerve.getPose().getX());

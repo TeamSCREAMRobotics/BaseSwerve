@@ -68,6 +68,11 @@ public class DeviceConfig {
         return config;
     }
 
+    public static Pigeon2Configuration swervePigeonConfig(){
+        Pigeon2Configuration config = new Pigeon2Configuration();
+        return config;
+    }
+
 
     ////////////////////////////////////// GENERIC CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 

@@ -1,11 +1,8 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -17,10 +14,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.config.DeviceConfig;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants;
 import frc.robot.subsystems.swerve.SwerveModule;
 
 /**
@@ -46,12 +45,13 @@ public class Swerve extends SubsystemBase {
         /**
          * Initializes an array of SwerveModule objects with their respective names, IDs, and constants.
          * This array represents the robot's four swerve modules.
+         * If there are multiple sets of modules, swap out the constants for the module in use.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule(SwerveConstants.FRONT_LEFT),
-                new SwerveModule(SwerveConstants.FRONT_RIGHT),
-                new SwerveModule(SwerveConstants.BACK_LEFT),
-                new SwerveModule(SwerveConstants.BACK_RIGHT)
+                new SwerveModule(0, ModuleConstants.MODULE_0), // Front Left
+                new SwerveModule(1, ModuleConstants.MODULE_1), // Front Right
+                new SwerveModule(2, ModuleConstants.MODULE_2), // Back Left
+                new SwerveModule(3, ModuleConstants.MODULE_3)  // Back Right
         };
         
         /**
@@ -60,6 +60,10 @@ public class Swerve extends SubsystemBase {
          */
         m_odometry = new SwerveDriveOdometry(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
 
+        /**
+         * Configures the AutoBuilder for holonomic mode.
+         * The AutoBuilder uses methods from this class to follow paths.
+         */
         AutoBuilder.configureHolonomic(
             this::getPose,
             this::resetPose,
@@ -80,18 +84,25 @@ public class Swerve extends SubsystemBase {
     /**
      * Returns a new ChassisSpeeds based on the given inputs.
      *
-     * @param translation A Translation2d representing the desired movement in x and y directions.
-     * @param angularVel The desired angular velocity in rads/sec.
-     * @param fieldRelative Whether the speeds should be field-relative or robot-relative.
+     * @param translation A Translation2d representing the desired movement (m/s) in the x and y directions.
+     * @param angularVel The desired angular velocity (rad/s)
+     * @param fieldRelative Whether the speeds should be field or robot centric.
      * @return The calculated ChassisSpeeds.
      */
     public ChassisSpeeds robotSpeeds(Translation2d translation, double angularVel, boolean fieldCentric){
         ChassisSpeeds speeds = fieldCentric 
                       ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
                       : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
+
         return ChassisSpeeds.discretize(speeds, Constants.LOOP_TIME_SEC);
     }
 
+    /**
+     * Set the ChassisSpeeds to drive the robot. Use predefined methods such as {@code}robotSpeeds{@code} or create a new ChassisSpeeds object.
+     * 
+     * @param chassisSpeeds The ChassisSpeeds to generate states for.
+     * @param isOpenLoop Whether the ChassisSpeeds is open loop (Tele-Op driving), or closed loop (Autonomous driving).
+     */
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop){
         SwerveModuleState[] swerveModuleStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds);
 
@@ -103,26 +114,20 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    /**
+     * Set the ChassisSpeeds to drive the robot. Defaults to closed loop.<p>
+     * Used by AutoBuilder.
+     * 
+     * @param chassisSpeeds The ChassisSpeeds to generate states for.
+     */
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds){
         setChassisSpeeds(chassisSpeeds, false);
     }
 
     /**
-     * Drives the swerve drive system based on the given module states.
-     *
-     * @param chassisSpeeds The desired chassis speeds to drive.
-     */
-    public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
-
-        for (SwerveModule mod : m_swerveModules) {
-            mod.set(swerveModuleStates[mod.getModuleNumber()], false);
-        }
-    }
-
-    /**
      * Sets the neutral mode of the motors.<p>
      * Use {@code}NeutralModeValue.Brake{@code} or {@code}NeutralModeValue.Coast{@code}
+     * 
      * @param driveMode The NeutralModeValue to set the drive motor to.
      * @param steerMode The NeutralModeValue to set the drive motor to.
      */
@@ -134,15 +139,34 @@ public class Swerve extends SubsystemBase {
     }
 
     /** 
-     * Calculates the hold value based on the provided measurement and setpoint. 
+     * Calculates the hold value based on the provided current and last angles.
      *  
-     * @param measurement The current measurement value. 
-     * @param setpoint The desired setpoint value. 
-     * @return The calculated value from the hold controller.
+     * @param currentAngle The current angle measurement.
+     * @param lastAngle The desired angle to calculate towards.
+     * @return The calculated value from the heading controller.
     */
-    public double calculateHeadingCorrection(double measurement, double setpoint){
-        return SwerveConstants.HEADING_CONSTANTS.toPIDController().calculate(measurement, setpoint);
+    public double calculateHeadingCorrection(double currentAngle, double lastAngle){
+        return SwerveConstants.HEADING_CONSTANTS.toPIDController().calculate(currentAngle, lastAngle);
     }
+
+    private Timer coastTimer = new Timer();
+    /**
+     * Checks if the robot is disabled then sets the motors to coast after the specified amount of seconds.
+     * 
+     * @param elapsedSec Amount of seconds to wait after disable.
+     */
+    public void coastAfterDisable(double elapsedSec){
+        if(DriverStation.isEnabled()){
+            setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
+            coastTimer.reset();
+        } else {
+            coastTimer.start();
+            if(coastTimer.hasElapsed(elapsedSec)){
+                setNeutralModes(NeutralModeValue.Coast, NeutralModeValue.Coast);
+            }
+        }
+    }
+    
 
     /**
      * Resets the pose reported by the odometry to the specified pose.
@@ -151,22 +175,6 @@ public class Swerve extends SubsystemBase {
      */
     public void resetPose(Pose2d pose) {
         m_odometry.resetPosition(getYaw(), getModulePositions(), pose);
-    }
-
-    /**
-     * Resets the pose reported by the odometry to the initial pose of the specified trajectory.
-     * For use in auto routines.
-     *
-     * @param trajectory The trajectory to get the inital pose from.
-     */
-    public void resetPose(PathPlannerPath trajectory) {
-        m_odometry.resetPosition(
-            getYaw(), 
-            getModulePositions(), 
-            new Pose2d(
-                trajectory.getAllPathPoints().get(0).position, 
-                trajectory.getAllPathPoints().get(0).holonomicRotation)
-            );
     }
 
     /**
@@ -179,18 +187,18 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Returns an array of SwerveModule objects representing the swerve modules in the system.
+     * Returns an array composed of the swerve modules in the system.
      *
-     * @return An array of SwerveModule objects.
+     * @return The array of SwerveModule objects.
      */
     public SwerveModule[] getModules() {
         return m_swerveModules;
     }
 
     /**
-     * Retrieves the current state of all swerve modules.
+     * Returns an array composed of the state of each module in the system.
      *
-     * @return An array of SwerveModuleState objects representing the state of each swerve module.
+     * @return The array of SwerveModuleState objects.
      */
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
@@ -201,9 +209,9 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Retrieves the positions of all swerve modules.
+     * Returns an array composed of the positions of each module in the system.
      *
-     * @return An array of SwerveModulePosition objects representing the positions of each swerve module.
+     * @return The array of SwerveModulePosition objects.
      */
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
@@ -213,6 +221,12 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
+    /**
+     * Returns the current robot-centric ChassisSpeeds.<p>
+     * Used by AutoBuilder.
+     * 
+     * @return The current robot-centric ChassisSpeeds.
+     */
     public ChassisSpeeds getRobotCentricSpeeds(){
         return ChassisSpeeds.fromFieldRelativeSpeeds(m_currentSpeeds, getYaw());
     }
@@ -228,6 +242,12 @@ public class Swerve extends SubsystemBase {
                 : m_gyro.getRotation2d();
     }
 
+    /**
+     * Returns the gyro object.<p>
+     * Used by SwerveTab to display to Shuffleboard.
+     * 
+     * @return The gyro object.
+     */
     public Pigeon2 getGyro() {
         return m_gyro;
     }
@@ -236,38 +256,26 @@ public class Swerve extends SubsystemBase {
      * Configures the gyro. Resets it to factory default settings and zeroes it.
      */
     public void configGyro() {
-        m_gyro.getConfigurator().apply(new Pigeon2Configuration());
-        m_gyro.getYaw().setUpdateFrequency(Constants.LOOP_TIME_HZ);
-        m_gyro.optimizeBusUtilization();
-        zeroGyro();
+        DeviceConfig.configurePigeon2("Swerve Pigeon", m_gyro, DeviceConfig.swervePigeonConfig(), Constants.LOOP_TIME_HZ);
     }
 
+   /**
+     * Configures all module drive motors with the given constants.
+     * 
+     * @param constants ScreamPIDConstants to be applied.
+     */
     public void configDrivePID(ScreamPIDConstants constants){
         for (SwerveModule mod : m_swerveModules) {
             mod.configDriveMotorPID(constants);
         }
     }
 
-    Timer coastTimer = new Timer();
     /**
      * Called periodically through SubsystemBase
      */
     @Override
     public void periodic() {
         m_odometry.update(getYaw(), getModulePositions()); /* Updates the odometry with the current angle and module positions */
-
-        if(DriverStation.isDisabled()){
-            coastTimer.start();
-
-            if(coastTimer.hasElapsed(5.0)){
-                setNeutralModes(NeutralModeValue.Coast, NeutralModeValue.Coast);
-            }
-
-        } else if(DriverStation.isEnabled()){
-            coastTimer.reset();
-            setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
-        } else {
-            setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
-        }
+        coastAfterDisable(5);
     }
 }

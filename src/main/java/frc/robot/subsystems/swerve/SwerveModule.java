@@ -2,7 +2,6 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -22,12 +21,12 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.SteerConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
-import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.SwerveModuleConstants;
 
 /**
  * A swerve module, which consists of an angle motor, a drive motor, and an angle encoder.
  * 
- * This class provides methods to get and set all parts of the module, including the speed and angle.
+ * Provides methods to get and set all parts of the module, such as the speed and angle.
  */
 public class SwerveModule {
     private int m_modNumber;
@@ -45,10 +44,6 @@ public class SwerveModule {
     private StatusSignal<Double> m_steerVelocity;
     private SwerveModulePosition m_internalState = new SwerveModulePosition();
 
-    private DutyCycleOut m_driveCycle = new DutyCycleOut(0);
-    private VelocityVoltage m_driveVoltage = new VelocityVoltage(0);
-    private PositionVoltage m_steerVoltage = new PositionVoltage(0);
-
     private SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.KS, DriveConstants.KV, DriveConstants.KA);
 
     /**
@@ -57,21 +52,21 @@ public class SwerveModule {
      * @param module The enum to get the location, number, and constants from.
      * Set each module's constants in ModuleConstants.
      */
-    public SwerveModule(Module module) {
-        m_modNumber = module.number();
-        m_modLocation = module.toString();
-        m_angleOffset = module.constants().angleOffset();
+    public SwerveModule(int number, SwerveModuleConstants constants) {
+        m_modNumber = number;
+        m_modLocation = convertToLocation(number);
+        m_angleOffset = constants.angleOffset();
 
         /* Angle Encoder Config */
-        m_angleEncoder = new CANcoder(module.constants().encoderID(), Ports.CAN_BUS_NAME);
+        m_angleEncoder = new CANcoder(constants.encoderID(), Ports.CAN_BUS_NAME);
         configAngleEncoder();
 
         /* Steer Motor Config */
-        m_steerMotor = new TalonFX(module.constants().steerMotorID(), Ports.CAN_BUS_NAME);
+        m_steerMotor = new TalonFX(constants.steerMotorID(), Ports.CAN_BUS_NAME);
         configSteerMotor();
 
         /* Drive Motor Config */
-        m_driveMotor = new TalonFX(module.constants().driveMotorID(), Ports.CAN_BUS_NAME);
+        m_driveMotor = new TalonFX(constants.driveMotorID(), Ports.CAN_BUS_NAME);
         configDriveMotor();
 
         m_lastAngle = getState(true).angle;
@@ -100,22 +95,34 @@ public class SwerveModule {
         return m_modNumber;
     }
 
+    /**
+     * Sets the neutral mode of the steer motor.<p>
+     * Use {@code}NeutralModeValue.Brake{@code} or {@code}NeutralModeValue.Coast{@code}
+     * 
+     * @param mode The NeutralModeValue to set.
+     */
     public void setSteerNeutralMode(NeutralModeValue mode){
         m_steerMotor.getConfigurator().apply(DeviceConfig.FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, mode));
     }
 
+    /**
+     * Sets the neutral mode of the drive motor.<p>
+     * Use {@code}NeutralModeValue.Brake{@code} or {@code}NeutralModeValue.Coast{@code}
+     * 
+     * @param mode The NeutralModeValue to set.
+     */
     public void setDriveNeutralMode(NeutralModeValue mode){
         m_driveMotor.getConfigurator().apply(DeviceConfig.FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, mode));
     }
 
     /**
-     * Sets the desired state of the Swerve module, including the angle and the speed
+     * Sets the desired state of the Swerve module, including the speed and angle.
      *
      * @param desiredState The desired state of the Swerve module.
-     * @param isOpenLoop   A boolean indicating whether the module is in open loop (Tele-Op driving), or closed loop (Autonomous driving).
+     * @param isOpenLoop   Whether the desired state is open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
     public void set(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = SwerveModuleState.optimize(desiredState, getAngle());
+        desiredState = optimize(desiredState, getAngle());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
@@ -124,17 +131,16 @@ public class SwerveModule {
      * Sets the speed of the swerve module based on the desired state's speed and whether it is in open loop or closed loop control.
      *
      * @param desiredState The desired state of the swerve module.
-     * @param isOpenLoop Indicates whether to drive in an open loop (Tele-Op) or closed loop (Autonomous driving) state.
+     * @param isOpenLoop Whether to drive in an open loop (Tele-Op) or closed loop (Autonomous) state.
      */
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            m_driveCycle.Output = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
-            m_driveMotor.setControl(m_driveCycle);
+            m_driveMotor.setControl(new DutyCycleOut(desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED));
         } else {
-            m_driveVoltage.Velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond,
-                    SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
-            m_driveVoltage.FeedForward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
-            m_driveMotor.setControl(m_driveVoltage);
+            double velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond, SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
+            double feedforward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
+
+            m_driveMotor.setControl(new VelocityVoltage(velocity).withFeedForward(feedforward));
         }  
     }
 
@@ -147,8 +153,7 @@ public class SwerveModule {
         /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01)) ? m_lastAngle : desiredState.angle;
 
-        m_steerVoltage.Position = angle.getRotations();
-        m_steerMotor.setControl(m_steerVoltage);
+        m_steerMotor.setControl(new PositionVoltage(angle.getRotations()));
         m_lastAngle = angle;
     }
 
@@ -183,18 +188,25 @@ public class SwerveModule {
      *
      * @return The current absolute rotation of the CANcoder sensor as a Rotation2d.
      */
-    public Rotation2d getEncoderAngle(boolean waitForUpdate) {
-        if(waitForUpdate) return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(1).getValue());
+    public Rotation2d getEncoderAngle() {
         return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().refresh().getValue());
     }
 
     /**
      * Resets the angle motor to the absolute position provided by the CANcoder.
      * 
-     * Waits for 500 ms to prevent problems with getting the CANcoder angle before it is initialized.
+     * @param timeoutSec Amount of time to wait for a position reading from the CANcoder.
      */
-    public void resetToAbsolute() {
-        m_steerMotor.setPosition(getEncoderAngle(true).minus(m_angleOffset).getRotations());//Conversions.degreesToFalcon(position.minus(m_angleOffset).getDegrees(), AngleConstants.GEAR_RATIO));
+    public void resetToAbsolute(double timeoutSec) {
+        m_steerMotor.setPosition(
+            Rotation2d.fromRotations(
+                m_angleEncoder
+                .getAbsolutePosition()
+                .waitForUpdate(timeoutSec)
+                .getValue())
+            .minus(m_angleOffset)
+            .getRotations()
+        );
     }
 
     /**
@@ -203,7 +215,7 @@ public class SwerveModule {
      * Configures the encoder with the specified configuration.
      */
     private void configAngleEncoder() {
-        DeviceConfig.configureSwerveEncoder(m_modLocation + " Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig(), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configureSwerveEncoder(m_modLocation + "Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig(), Constants.LOOP_TIME_HZ);
     }
 
     /**
@@ -212,8 +224,8 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configSteerMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(), Constants.LOOP_TIME_HZ);
-        resetToAbsolute();
+        DeviceConfig.configureTalonFX(m_modLocation + "Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(), Constants.LOOP_TIME_HZ);
+        resetToAbsolute(0.75);
     }
 
     /**
@@ -222,9 +234,14 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configDriveMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + " Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig(), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configureTalonFX(m_modLocation + "Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig(), Constants.LOOP_TIME_HZ);
     }
 
+    /**
+     * Configures the drive motor with the given constants.
+     * 
+     * @param constants ScreamPIDConstants to be applied.
+     */
     public void configDriveMotorPID(ScreamPIDConstants constants) {
         m_driveMotor.getConfigurator().apply(constants.toSlot0Configs());
     }
@@ -232,17 +249,23 @@ public class SwerveModule {
     /**
      * Retrieves the current state of the swerve module.
      *
+     * @param refresh Whether to refresh the readings from the motors.
+     * 
      * @return The state of the swerve module, including the velocity (m/s) and angle.
      */
     public SwerveModuleState getState(boolean refresh) {
         if(refresh) {
             //m_driveVelocity.refresh();
             m_driveMotor.getVelocity().refresh();
+            //m_steerPosition.refresh();
         }
+
         double speedMetersPerSecond = Conversions.falconRPSToMechanismMPS(
             m_driveMotor.getVelocity().getValue(), 
             SwerveConstants.MODULE_TYPE.wheelCircumference, 
             1);
+
+        //Rotation2d angle = Rotation2d.fromRotations(m_steerPosition.getValue());
 
         return new SwerveModuleState(speedMetersPerSecond, getAngle());
     }
@@ -250,6 +273,8 @@ public class SwerveModule {
     /**
      * Retrieves the current position of the swerve module.
      *
+     * @param refresh Whether to refresh the readings from the motors.
+     * 
      * @return The position of the swerve module, consisting of the distance traveled in meters and the angle.
      */
     public SwerveModulePosition getPosition(boolean refresh) {
@@ -270,5 +295,20 @@ public class SwerveModule {
         m_internalState.angle = angle;
         
         return m_internalState;
+    }
+
+    private String convertToLocation(int number){
+        switch(number){
+            case 0:
+            return "FRONT_LEFT";
+            case 1:
+            return "FRONT_RIGHT";
+            case 2:
+            return "BACK_LEFT";
+            case 3:
+            return "BACK_RIGHT";
+            default:
+            throw new IllegalArgumentException("Invalid module number!");
+        }
     }
 }

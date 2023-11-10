@@ -3,10 +3,8 @@ package frc.robot.commands.swerve;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.SwerveConstants;
@@ -77,6 +75,13 @@ public class TeleopSwerve extends Command {
         );
     }
 
+    /**
+     * Checks if the swerve drive should start heading correction.<p>
+     * If no manual input is given for a time, this method will return the rotation value required to maintain the current heading.
+     * 
+     * @param current The current rotation value.
+     * @return The determined rotation value.
+     */
     private double getRotation(double current){
         boolean rotating = Math.abs(current) > 0;
 
