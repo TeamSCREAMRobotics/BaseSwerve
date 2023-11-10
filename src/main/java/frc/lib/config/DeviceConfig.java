@@ -8,8 +8,10 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -73,14 +75,15 @@ public class DeviceConfig {
         DeviceConfiguration deviceConfig = new DeviceConfiguration() {
             @Override
             public boolean configureSettings(){
-            return ErrorChecker.hasConfiguredWithoutErrors(
-                motor.getConfigurator().apply(config),
-                motor.getConfigurator().setPosition(0),
-                motor.getDutyCycle().setUpdateFrequency(updateFrequencyHz),
-                motor.getPosition().setUpdateFrequency(updateFrequencyHz),
-                motor.getVelocity().setUpdateFrequency(updateFrequencyHz),
-                motor.optimizeBusUtilization()
-                );
+                return ErrorChecker.hasConfiguredWithoutErrors(
+                    motor.getConfigurator().apply(config),
+                    motor.getConfigurator().setPosition(0),
+                    motor.getDutyCycle().setUpdateFrequency(updateFrequencyHz),
+                    motor.getPosition().setUpdateFrequency(updateFrequencyHz),
+                    motor.getVelocity().setUpdateFrequency(updateFrequencyHz),
+                    motor.optimizeBusUtilization()
+
+                    );
             }
         };
         ErrorChecker.configureDevice(deviceConfig, name + " " + motor.getDeviceID() + " version " + motor.getVersion(), true);
@@ -101,6 +104,23 @@ public class DeviceConfig {
         ErrorChecker.configureDevice(deviceConfig, name + " " + encoder.getDeviceID() + " version " + encoder.getVersion(), true);
     }
 
+    public static void configurePigeon2(String name, Pigeon2 pigeon, Pigeon2Configuration config, double updateFrequencyHz){
+        DeviceConfiguration deviceConfig = new DeviceConfiguration() {
+            @Override
+            public boolean configureSettings(){
+                return ErrorChecker.hasConfiguredWithoutErrors(
+                    pigeon.getConfigurator().apply(config),
+                    pigeon.setYaw(0),
+                    pigeon.getYaw().setUpdateFrequency(updateFrequencyHz),
+                    pigeon.getPitch().setUpdateFrequency(updateFrequencyHz),
+                    pigeon.getRoll().setUpdateFrequency(updateFrequencyHz),
+                    pigeon.optimizeBusUtilization()
+                    );
+            }
+        };
+        ErrorChecker.configureDevice(deviceConfig, name + " " + pigeon.getDeviceID() + " version " + pigeon.getVersion(), true);
+    }
+
     public static MotorOutputConfigs FXMotorOutputConfig(InvertedValue invert, NeutralModeValue neutralMode){
         MotorOutputConfigs config = new MotorOutputConfigs();
         config.Inverted = invert;
@@ -108,17 +128,11 @@ public class DeviceConfig {
         return config;
     }
 
-    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor){
-        FeedbackConfigs config = new FeedbackConfigs();
-        config.FeedbackSensorSource = sensor;
-        return config;
-    }
-
-    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double gearRatio){
+    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double sensorToMechGR){
         FeedbackConfigs config = new FeedbackConfigs();
         config.FeedbackSensorSource = sensor;
         config.FeedbackRemoteSensorID = remoteSensorID;
-        config.SensorToMechanismRatio = gearRatio;
+        config.SensorToMechanismRatio = sensorToMechGR;
         return config;
     }
 

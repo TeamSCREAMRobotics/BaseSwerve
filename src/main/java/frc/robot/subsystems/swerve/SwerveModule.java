@@ -146,11 +146,9 @@ public class SwerveModule {
     private void setAngle(SwerveModuleState desiredState) {
         /* Prevent rotating module if speed is less then 1%. Prevents jittering when not moving. */
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.MAX_SPEED * 0.01)) ? m_lastAngle : desiredState.angle;
-        //if(m_modLocation == "BACK_LEFT") System.out.println(desiredState.angle);
 
-        m_steerVoltage.Position = angle.getRotations();//Rotation2d.fromRadians(Math.atan2(Controlboard.getTranslationY().getAsDouble(), Controlboard.getTranslationX().getAsDouble())).rotateBy(Rotation2d.fromDegrees(90)).getRotations();//angle.getRotations();//Conversions.degreesToFalcon(angle.getDegrees(), AngleConstants.GEAR_RATIO);
-        //System.out.println(m_steerVoltage.Position);
-        /* if(m_modLocation == "BACK_LEFT") */ m_steerMotor.setControl(m_steerVoltage);
+        m_steerVoltage.Position = angle.getRotations();
+        m_steerMotor.setControl(m_steerVoltage);
         m_lastAngle = angle;
     }
 
