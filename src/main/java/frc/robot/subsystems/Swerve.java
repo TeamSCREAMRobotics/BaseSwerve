@@ -20,6 +20,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
 import frc.robot.subsystems.swerve.SwerveModule;
 
 /**
@@ -48,10 +49,10 @@ public class Swerve extends SubsystemBase {
          * If there are multiple sets of modules, swap out the constants for the module in use.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule(0, ModuleConstants.MODULE_0), // Front Left
-                new SwerveModule(1, ModuleConstants.MODULE_1), // Front Right
-                new SwerveModule(2, ModuleConstants.MODULE_2), // Back Left
-                new SwerveModule(3, ModuleConstants.MODULE_3)  // Back Right
+                new SwerveModule(Module.FRONT_LEFT.withConstants(ModuleConstants.MODULE_0)), // Front Left
+                new SwerveModule(Module.FRONT_RIGHT.withConstants(ModuleConstants.MODULE_1)), // Front Right
+                new SwerveModule(Module.BACK_LEFT.withConstants(ModuleConstants.MODULE_2)), // Back Left
+                new SwerveModule(Module.BACK_RIGHT.withConstants(ModuleConstants.MODULE_3))  // Back Right
         };
         
         /**
@@ -129,7 +130,7 @@ public class Swerve extends SubsystemBase {
      * Use {@code}NeutralModeValue.Brake{@code} or {@code}NeutralModeValue.Coast{@code}
      * 
      * @param driveMode The NeutralModeValue to set the drive motor to.
-     * @param steerMode The NeutralModeValue to set the drive motor to.
+     * @param steerMode The NeutralModeValue to set the steer motor to.
      */
     public void setNeutralModes(NeutralModeValue driveMode, NeutralModeValue steerMode){
         for (SwerveModule mod : m_swerveModules) {

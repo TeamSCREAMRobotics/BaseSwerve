@@ -42,7 +42,7 @@ public class COTSFalconSwerveConstants {
         /** 12.8 : 1 */
         double angleGearRatio = (12.8 / 1.0);
 
-        double angleKP = 4.8;
+        double angleKP = 9.6;
         double angleKI = 0.0;
         double angleKD = 0.0;
         double angleKF = 0.0;
@@ -61,7 +61,7 @@ public class COTSFalconSwerveConstants {
         /** 12.8 : 1 */
         double angleGearRatio = (12.8 / 1.0);
 
-        double angleKP = 4.8;
+        double angleKP = 9.6;
         double angleKI = 0.0;
         double angleKD = 0.0;
         double angleKF = 0.0;
@@ -80,7 +80,7 @@ public class COTSFalconSwerveConstants {
         /** 21.42 : 1 */
         double angleGearRatio = ((150.0 / 7.0) / 1.0);
 
-        double angleKP = 7.2;
+        double angleKP = 18.5;
         double angleKI = 0.0;
         double angleKD = 0.0;
         double angleKF = 0.0;

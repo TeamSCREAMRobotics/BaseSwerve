@@ -16,11 +16,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.config.DeviceConfig;
 import frc.lib.math.Conversions;
 import frc.lib.pid.ScreamPIDConstants;
+import frc.lib.util.CTREModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.SteerConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.SwerveModuleConstants;
 
 /**
@@ -52,21 +54,21 @@ public class SwerveModule {
      * @param module The enum to get the location, number, and constants from.
      * Set each module's constants in ModuleConstants.
      */
-    public SwerveModule(int number, SwerveModuleConstants constants) {
-        m_modNumber = number;
-        m_modLocation = convertToLocation(number);
-        m_angleOffset = constants.angleOffset();
+    public SwerveModule(Module module) {
+        m_modNumber = module.getNumber();
+        m_modLocation = module.toString();
+        m_angleOffset = module.getConstants().angleOffset();
 
         /* Angle Encoder Config */
-        m_angleEncoder = new CANcoder(constants.encoderID(), Ports.CAN_BUS_NAME);
+        m_angleEncoder = new CANcoder(module.getConstants().encoderID(), Ports.CAN_BUS_NAME);
         configAngleEncoder();
 
         /* Steer Motor Config */
-        m_steerMotor = new TalonFX(constants.steerMotorID(), Ports.CAN_BUS_NAME);
+        m_steerMotor = new TalonFX(module.getConstants().steerMotorID(), Ports.CAN_BUS_NAME);
         configSteerMotor();
 
         /* Drive Motor Config */
-        m_driveMotor = new TalonFX(constants.driveMotorID(), Ports.CAN_BUS_NAME);
+        m_driveMotor = new TalonFX(module.getConstants().driveMotorID(), Ports.CAN_BUS_NAME);
         configDriveMotor();
 
         m_lastAngle = getState(true).angle;
@@ -122,7 +124,7 @@ public class SwerveModule {
      * @param isOpenLoop   Whether the desired state is open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
     public void set(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = optimize(desiredState, getAngle());
+        desiredState = CTREModuleState.optimize(desiredState, getAngle());
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
@@ -135,7 +137,7 @@ public class SwerveModule {
      */
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            m_driveMotor.setControl(new DutyCycleOut(desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED));
+            m_driveMotor.setControl(new DutyCycleOut(0));//desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED));
         } else {
             double velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond, SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
             double feedforward = m_feedforward.calculate(desiredState.speedMetersPerSecond);

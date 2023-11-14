@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.COTSFalconSwerveConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.SwerveModuleConstants;
 
 /**
  * A class for constants used in various places in the project.
@@ -149,6 +150,33 @@ public final class Constants{
         public static class ModuleConstants{
 
             public record SwerveModuleConstants(int driveMotorID, int steerMotorID, int encoderID, Rotation2d angleOffset){}
+
+            public enum Module{
+                FRONT_LEFT(0),
+                FRONT_RIGHT(1),
+                BACK_LEFT(2),
+                BACK_RIGHT(3);
+
+                private int number;
+                private SwerveModuleConstants constants;
+
+                private Module(int number){
+                    this.number = number;
+                }
+
+                public Module withConstants(SwerveModuleConstants constants){
+                    this.constants = constants;
+                    return this;
+                }
+
+                public int getNumber() {
+                    return number;
+                }
+
+                public SwerveModuleConstants getConstants(){
+                    return constants;
+                }
+            }
 
             /* Front Left */
             public static final SwerveModuleConstants MODULE_0 = new SwerveModuleConstants(
