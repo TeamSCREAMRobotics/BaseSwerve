@@ -17,21 +17,6 @@ public class Autonomous{
 
     private static boolean configured = false;
 
-    public static void configure(NamedCommand... namedCommands){
-        if(configured){
-            throw new RuntimeException("Auto already configured!");
-        }
-
-        for(NamedCommand command : namedCommands){
-            NamedCommands.registerCommand(command.name(), command.command());
-        }
-
-        SmartDashboard.putData("Auto Chooser", m_autoChooser);
-
-        m_autoChooser.setDefaultOption("Do Nothing", Commands.none());
-        configured = true;
-    }
-
     public static void configure(Command defaultCommand, NamedCommand... namedCommands){
         if(configured){
             throw new RuntimeException("Auto already configured!");

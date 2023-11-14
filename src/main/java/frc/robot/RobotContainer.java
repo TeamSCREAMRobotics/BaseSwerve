@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.auto.Autonomous;
@@ -47,14 +48,14 @@ public class RobotContainer {
     }
 
     /**
-     * Configures auto. <p>
-     * Configure named commands with {@code}configure(NamedCommand... namedCommands){@code} <p> <STRONG>THIS MUST BE DONE FIRST</STRONG> <p>
-     * The default command will automatically be set to Commands.none(). 
-     * Use {@code}configure(Command defaultCommand, NamedCommand... namedCommands){@code} to set a custom one.
-     * Add auto routines with {@code}addCommands(Command... commands){@code}
+     * Configures auto.
+     * Configure default auto and named commands with configure(Command defaultAuto, NamedCommand... namedCommands)
+     *  ^^ THE ABOVE STEP MUST BE DONE FIRST ^^
+     * Add auto routines with addCommands(Command... commands)
      */
     private void configAuto() {
         Autonomous.configure(
+            Commands.none(),
             new NamedCommand("ExampleEvent", new PrintCommand("This is an example event :)"))
         );
 

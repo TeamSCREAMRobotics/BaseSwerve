@@ -41,7 +41,7 @@ public class SwerveModule {
     private CANcoder m_angleEncoder;
 
     private StatusSignal<Double> m_drivePosition;
-    //private StatusSignal<Double> m_driveVelocity;
+    private StatusSignal<Double> m_driveVelocity;
     private StatusSignal<Double> m_steerPosition;
     private StatusSignal<Double> m_steerVelocity;
     private SwerveModulePosition m_internalState = new SwerveModulePosition();
@@ -71,12 +71,12 @@ public class SwerveModule {
         m_driveMotor = new TalonFX(module.getConstants().driveMotorID(), Ports.CAN_BUS_NAME);
         configDriveMotor();
 
-        m_lastAngle = getState(true).angle;
-
         m_drivePosition = m_driveMotor.getPosition();
-        //m_driveVelocity = m_driveMotor.getVelocity();
+        m_driveVelocity = m_driveMotor.getVelocity();
         m_steerPosition = m_steerMotor.getPosition();
         m_steerVelocity = m_steerMotor.getVelocity();
+
+        m_lastAngle = getState(true).angle;
     }
 
     /**
@@ -137,7 +137,7 @@ public class SwerveModule {
      */
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            m_driveMotor.setControl(new DutyCycleOut(0));//desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED));
+            m_driveMotor.setControl(new DutyCycleOut(desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED));
         } else {
             double velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond, SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
             double feedforward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
@@ -158,23 +158,6 @@ public class SwerveModule {
         m_steerMotor.setControl(new PositionVoltage(angle.getRotations()));
         m_lastAngle = angle;
     }
-
-    /**
-     * Optimizes the movement of the module to travel the least distance to get to the desired angle.
-     *
-     * @param desiredState The desired state of the swerve module.
-     * @param currentAngle The current angle of the swerve module as a Rotation2d.
-     * @return The optimized swerve module state.
-     */
-    private static SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle){
-		double deltaDegrees = desiredState.angle.minus(currentAngle).getDegrees();
-		boolean invert = Math.abs(deltaDegrees) > 90;
-		if(invert) deltaDegrees -= Math.signum(deltaDegrees)*180;
-		return new SwerveModuleState(
-			(invert ? -1 : 1) * desiredState.speedMetersPerSecond,
-			currentAngle.plus(Rotation2d.fromDegrees(deltaDegrees))
-		);
-	}
 
     /**
      * Retrieves the current agnle of the angle motor.
@@ -201,11 +184,7 @@ public class SwerveModule {
      */
     public void resetToAbsolute(double timeoutSec) {
         m_steerMotor.setPosition(
-            Rotation2d.fromRotations(
-                m_angleEncoder
-                .getAbsolutePosition()
-                .waitForUpdate(timeoutSec)
-                .getValue())
+            Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(timeoutSec).getValue())
             .minus(m_angleOffset)
             .getRotations()
         );
@@ -217,7 +196,7 @@ public class SwerveModule {
      * Configures the encoder with the specified configuration.
      */
     private void configAngleEncoder() {
-        DeviceConfig.configureSwerveEncoder(m_modLocation + "Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig(), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configureSwerveEncoder(m_modLocation + " Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig(), Constants.LOOP_TIME_HZ);
     }
 
     /**
@@ -226,7 +205,7 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configSteerMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + "Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(), Constants.LOOP_TIME_HZ);
         resetToAbsolute(0.75);
     }
 
@@ -236,7 +215,7 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configDriveMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + "Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig(), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configureTalonFX(m_modLocation + " Drive Motor", m_driveMotor, DeviceConfig.driveFXConfig(), Constants.LOOP_TIME_HZ);
     }
 
     /**
@@ -257,9 +236,8 @@ public class SwerveModule {
      */
     public SwerveModuleState getState(boolean refresh) {
         if(refresh) {
-            //m_driveVelocity.refresh();
-            m_driveMotor.getVelocity().refresh();
-            //m_steerPosition.refresh();
+            m_driveVelocity.refresh();
+            m_steerPosition.refresh();
         }
 
         double speedMetersPerSecond = Conversions.falconRPSToMechanismMPS(
@@ -267,9 +245,9 @@ public class SwerveModule {
             SwerveConstants.MODULE_TYPE.wheelCircumference, 
             1);
 
-        //Rotation2d angle = Rotation2d.fromRotations(m_steerPosition.getValue());
+        Rotation2d angle = Rotation2d.fromRotations(m_steerPosition.getValue());
 
-        return new SwerveModuleState(speedMetersPerSecond, getAngle());
+        return new SwerveModuleState(speedMetersPerSecond, angle);
     }
 
     /**
@@ -282,35 +260,20 @@ public class SwerveModule {
     public SwerveModulePosition getPosition(boolean refresh) {
         if(refresh) {
             m_drivePosition.refresh();
-            //m_driveVelocity.refresh();
-            m_driveMotor.getVelocity().refresh();
+            m_driveVelocity.refresh();
             m_steerPosition.refresh();
             m_steerVelocity.refresh();
         }
         
-        double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveMotor.getVelocity());
+        double driveRotations = BaseStatusSignal.getLatencyCompensatedValue(m_drivePosition, m_driveVelocity);
         double angleRotations = BaseStatusSignal.getLatencyCompensatedValue(m_steerPosition, m_steerVelocity);
 
         double distance = Conversions.falconRotationsToMechanismMeters(driveRotations, SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
-        m_internalState.distanceMeters = distance;
         Rotation2d angle = Rotation2d.fromRotations(angleRotations);
+        
+        m_internalState.distanceMeters = distance;
         m_internalState.angle = angle;
         
         return m_internalState;
-    }
-
-    private String convertToLocation(int number){
-        switch(number){
-            case 0:
-            return "FRONT_LEFT";
-            case 1:
-            return "FRONT_RIGHT";
-            case 2:
-            return "BACK_LEFT";
-            case 3:
-            return "BACK_RIGHT";
-            default:
-            throw new IllegalArgumentException("Invalid module number!");
-        }
     }
 }
