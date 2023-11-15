@@ -11,19 +11,20 @@ import frc.robot.shuffleboard.tabs.SwerveTab;
  */
 public class ShuffleboardTabManager extends SubsystemBase {
 
-    // Adds more tabs to use when debugging
-    public final boolean m_debug = true;
+    private static final ArrayList<ShuffleboardTabBase> m_tabs = new ArrayList<ShuffleboardTabBase>();
 
-    private final ArrayList<ShuffleboardTabBase> mTabs = new ArrayList<ShuffleboardTabBase>();
-
-    public ShuffleboardTabManager() {
-        if (m_debug) {
-            mTabs.add(new SwerveTab(RobotContainer.getSwerve()));
+    /**
+     * Adds predefined tabs to Shuffleboard.<p>
+     * @param includeDebug Whether to include additional debug tabs.
+     */
+    public static void addTabs(boolean includeDebug){
+        if (includeDebug) {
+            m_tabs.add(new SwerveTab(RobotContainer.getSwerve()));
         } else {
             /* Add code here */
         }
 
-        for (ShuffleboardTabBase tab : mTabs) {
+        for (ShuffleboardTabBase tab : m_tabs) {
             tab.createEntries();
         }
     }
@@ -32,7 +33,7 @@ public class ShuffleboardTabManager extends SubsystemBase {
      * Calls the periodic method for each Shuffleboard tab in the list of tabs.
      */
     public void periodic() {
-        for (ShuffleboardTabBase tab : mTabs) {
+        for (ShuffleboardTabBase tab : m_tabs) {
             tab.periodic();
     
     }

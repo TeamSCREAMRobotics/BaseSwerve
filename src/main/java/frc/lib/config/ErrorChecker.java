@@ -1,22 +1,23 @@
-package frc.lib.deviceConfiguration;
+package frc.lib.config;
 
-import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix6.StatusCode;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 
 public class ErrorChecker {
 
-    public static final double kDefaultBootAllowanceSeconds = 3.0;
-    public static final int kTriesToGenerateWarning = 5;
+    public static final double BOOT_ALLOWANCE_SECONDS = 3.0;
+    public static final int TRIES_TO_GENERATE_WARNING = 5;
     
     /**
      * This method takes a list of StatusCodes and returns true if they are all OK. When we configure our devices, we wrap all our our calls to the devices in this method
      * to tell us if the device has configured correctly, or if there are errors.
      */
-    public static boolean hasConfiguredWithoutErrors(ErrorCode... statusCodes){
+    public static boolean hasConfiguredWithoutErrors(StatusCode... statusCodes){
         boolean okay = true;
-        for(ErrorCode statusCode : statusCodes){
-            okay = okay && ErrorCode.OK == statusCode;
+        for(StatusCode statusCode : statusCodes){
+            okay = okay && StatusCode.OK == statusCode;
         }
         return okay;
     }
@@ -48,7 +49,7 @@ public class ErrorChecker {
             }
 
         }
-        if(printInfo && tries > kTriesToGenerateWarning)  DriverStation.reportWarning("Possible issue with " + name + ". Configuration took " + tries + " tries", false);
+        if(printInfo && tries > TRIES_TO_GENERATE_WARNING)  DriverStation.reportWarning("Possible issue with " + name + ". Configuration took " + tries + " tries", false);
         else if(printInfo) System.out.println( "   " + name + " | configuration took " + tries + " tries. ");
     }
 
@@ -57,7 +58,7 @@ public class ErrorChecker {
      * If printInfo is true, it will print if the configuration succeeded and how many tries it took
      */
     public static void configureDevice(DeviceConfiguration config, String name, boolean printInfo){
-        configureDevice(config, name, kDefaultBootAllowanceSeconds, printInfo);
+        configureDevice(config, name, BOOT_ALLOWANCE_SECONDS, printInfo);
     }
 
     /**

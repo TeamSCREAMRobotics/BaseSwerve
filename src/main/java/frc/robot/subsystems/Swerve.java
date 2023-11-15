@@ -1,25 +1,27 @@
 package frc.robot.subsystems;
 
-import frc.robot.subsystems.swerve.SwerveModule;
-import frc.robot.Constants.Ports;
-import frc.robot.Constants.SwerveConstants;
-import frc.robot.auto.AutoEvents;
+import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-
-import com.ctre.phoenix.sensors.Pigeon2;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.commands.FollowPathWithEvents;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.config.DeviceConfig;
+import frc.lib.pid.ScreamPIDConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.Ports;
+import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
+import frc.robot.subsystems.swerve.SwerveModule;
 
 /**
  * A swerve drive subsystem.
@@ -27,36 +29,50 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * This class provides methods for high-level control of the swerve drivetrain.
  */
 public class Swerve extends SubsystemBase {
-    private SwerveDriveOdometry m_swerveOdometry;
-    private SwerveModule[] m_swerveModules;
     private Pigeon2 m_gyro;
+    private SwerveModule[] m_swerveModules;
+    private SwerveDriveOdometry m_odometry;
+    private ChassisSpeeds m_currentSpeeds = new ChassisSpeeds();
 
     /**
      * Constructs a new instance of the Swerve class.
      * 
-     * Initializes the gyro, swerve modules, and odometry.
+     * Initializes the gyro, swerve modules, odometry, and auto builder.
      */
     public Swerve() {
-        m_gyro = new Pigeon2(Ports.PIGEON_ID, Ports.CANIVORE_BUS_NAME); //TODO delete CANIVORE_BUS_NAME if the robot is not using a CANivore
+        m_gyro = new Pigeon2(Ports.PIGEON_ID, Ports.CAN_BUS_NAME);
         configGyro();
         
         /**
          * Initializes an array of SwerveModule objects with their respective names, IDs, and constants.
          * This array represents the robot's four swerve modules.
+         * If there are multiple sets of modules, swap out the constants for the module in use.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule("FL", 0, SwerveConstants.FRONT_LEFT_MODULE),
-                new SwerveModule("FR", 1, SwerveConstants.FRONT_RIGHT_MODULE),
-                new SwerveModule("BL", 2, SwerveConstants.BACK_LEFT_MODULE),
-                new SwerveModule("BR", 3, SwerveConstants.BACK_RIGHT_MODULE)
+                new SwerveModule(Module.FRONT_LEFT.withConstants(ModuleConstants.MODULE_0)), // Front Left
+                new SwerveModule(Module.FRONT_RIGHT.withConstants(ModuleConstants.MODULE_1)), // Front Right
+                new SwerveModule(Module.BACK_LEFT.withConstants(ModuleConstants.MODULE_2)), // Back Left
+                new SwerveModule(Module.BACK_RIGHT.withConstants(ModuleConstants.MODULE_3))  // Back Right
         };
         
         /**
          * Configures the odometry, which requires the kinematics, gyro reading, and module positions.
          * It uses these values to estimate the robot's position on the field.
          */
-        m_swerveOdometry = new SwerveDriveOdometry(SwerveConstants.SWERVE_KINEMATICS, getYaw(),
-                getModulePositions(), new Pose2d());
+        m_odometry = new SwerveDriveOdometry(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+
+        /**
+         * Configures the AutoBuilder for holonomic mode.
+         * The AutoBuilder uses methods from this class to follow paths.
+         */
+        AutoBuilder.configureHolonomic(
+            this::getPose,
+            this::resetPose,
+            this::getRobotCentricSpeeds,
+            this::setChassisSpeeds,
+            SwerveConstants.PATH_FOLLOWER_CONFIG,
+            this
+        );
     }
 
     /**
@@ -67,26 +83,32 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Drives the swerve drive system based on the given translation and rotation inputs.
-     * Uses inputs for field relative control and if the control is open-loop.
+     * Returns a new ChassisSpeeds based on the given inputs.
      *
-     * @param translation A Translation2d representing the desired movement in x and y directions.
-     * @param omega The desired angular velocity in rads/sec.
-     * @param fieldRelative Whether the movement should be field-relative or robot-relative.
-     * @param isOpenLoop Whether the driving should be open loop (Tele-Op driving) or closed loop (Autonomous driving).
+     * @param translation A Translation2d representing the desired movement (m/s) in the x and y directions.
+     * @param angularVel The desired angular velocity (rad/s)
+     * @param fieldRelative Whether the speeds should be field or robot centric.
+     * @return The calculated ChassisSpeeds.
      */
-    public void drive(Translation2d translation, double omega, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates = SwerveConstants.SWERVE_KINEMATICS.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                        translation.getX(),
-                        translation.getY(),
-                        omega,
-                        getYaw())
-                        : new ChassisSpeeds(
-                                translation.getX(),
-                                translation.getY(),
-                                omega));
+    public ChassisSpeeds robotSpeeds(Translation2d translation, double angularVel, boolean fieldCentric){
+        ChassisSpeeds speeds = fieldCentric 
+                      ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
+                      : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
+
+        return ChassisSpeeds.discretize(speeds, Constants.LOOP_TIME_SEC);
+    }
+
+    /**
+     * Set the ChassisSpeeds to drive the robot. Use predefined methods such as {@code}robotSpeeds{@code} or create a new ChassisSpeeds object.
+     * 
+     * @param chassisSpeeds The ChassisSpeeds to generate states for.
+     * @param isOpenLoop Whether the ChassisSpeeds is open loop (Tele-Op driving), or closed loop (Autonomous driving).
+     */
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean isOpenLoop){
+        SwerveModuleState[] swerveModuleStates = SwerveConstants.KINEMATICS.toSwerveModuleStates(chassisSpeeds);
+
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
+        m_currentSpeeds = SwerveConstants.KINEMATICS.toChassisSpeeds(swerveModuleStates);
 
         for (SwerveModule mod : m_swerveModules) {
             mod.set(swerveModuleStates[mod.getModuleNumber()], isOpenLoop);
@@ -94,18 +116,58 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Drives the swerve drive system based on the given chassis speeds.
-     * Used as an input for followTrajectoryCommand.
-     *
-     * @param chassisSpeeds The desired chassis speeds to drive.
+     * Set the ChassisSpeeds to drive the robot. Defaults to closed loop.<p>
+     * Used by AutoBuilder.
+     * 
+     * @param chassisSpeeds The ChassisSpeeds to generate states for.
      */
-    public void setModuleStates(SwerveModuleState[] swerveModuleStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SwerveConstants.MAX_SPEED);
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds){
+        setChassisSpeeds(chassisSpeeds, false);
+    }
 
+    /**
+     * Sets the neutral mode of the motors.<p>
+     * Use {@code}NeutralModeValue.Brake{@code} or {@code}NeutralModeValue.Coast{@code}
+     * 
+     * @param driveMode The NeutralModeValue to set the drive motor to.
+     * @param steerMode The NeutralModeValue to set the steer motor to.
+     */
+    public void setNeutralModes(NeutralModeValue driveMode, NeutralModeValue steerMode){
         for (SwerveModule mod : m_swerveModules) {
-            mod.set(swerveModuleStates[mod.getModuleNumber()], false);
+            mod.setDriveNeutralMode(driveMode);
+            mod.setSteerNeutralMode(steerMode);
         }
     }
+
+    /** 
+     * Calculates the hold value based on the provided current and last angles.
+     *  
+     * @param currentAngle The current angle measurement.
+     * @param lastAngle The desired angle to calculate towards.
+     * @return The calculated value from the heading controller.
+    */
+    public double calculateHeadingCorrection(double currentAngle, double lastAngle){
+        return SwerveConstants.HEADING_CONSTANTS.toPIDController().calculate(currentAngle, lastAngle);
+    }
+
+    private Timer coastTimer = new Timer();
+    /**
+     * Checks if the robot is disabled then sets the motors to coast after the specified amount of seconds.
+     * 
+     * @param elapsedSec Amount of seconds to wait after disable.
+     */
+    public void coastAfterDisable(double elapsedSec){
+        if(DriverStation.isEnabled()){
+            setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
+            coastTimer.reset();
+        } else {
+            coastTimer.start();
+            if(coastTimer.hasElapsed(elapsedSec)){
+                setNeutralModes(NeutralModeValue.Coast, NeutralModeValue.Coast);
+            }
+        }
+    }
+    
 
     /**
      * Resets the pose reported by the odometry to the specified pose.
@@ -113,17 +175,7 @@ public class Swerve extends SubsystemBase {
      * @param pose The new pose to set.
      */
     public void resetPose(Pose2d pose) {
-        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), pose);
-    }
-
-    /**
-     * Resets the pose reported by the odometry to the initial pose of the specified trajectory.
-     * For use in auto routines.
-     *
-     * @param trajectory The trajectory to get the inital pose from.
-     */
-    public void resetPose(PathPlannerTrajectory trajectory) {
-        m_swerveOdometry.resetPosition(getYaw(), getModulePositions(), trajectory.getInitialHolonomicPose() );
+        m_odometry.resetPosition(getYaw(), getModulePositions(), pose);
     }
 
     /**
@@ -132,42 +184,52 @@ public class Swerve extends SubsystemBase {
      * @return The current pose of the odometry.
      */
     public Pose2d getPose() {
-        return m_swerveOdometry.getPoseMeters();
+        return m_odometry.getPoseMeters();
     }
 
     /**
-     * Returns an array of SwerveModule objects representing the swerve modules in the system.
+     * Returns an array composed of the swerve modules in the system.
      *
-     * @return An array of SwerveModule objects.
+     * @return The array of SwerveModule objects.
      */
     public SwerveModule[] getModules() {
         return m_swerveModules;
     }
 
     /**
-     * Retrieves the current state of all swerve modules.
+     * Returns an array composed of the state of each module in the system.
      *
-     * @return An array of SwerveModuleState objects representing the state of each swerve module.
+     * @return The array of SwerveModuleState objects.
      */
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for (SwerveModule mod : m_swerveModules) {
-            states[mod.getModuleNumber()] = mod.getState();
+            states[mod.getModuleNumber()] = mod.getState(true);
         }
         return states;
     }
 
     /**
-     * Retrieves the positions of all swerve modules.
+     * Returns an array composed of the positions of each module in the system.
      *
-     * @return An array of SwerveModulePosition objects representing the positions of each swerve module.
+     * @return The array of SwerveModulePosition objects.
      */
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for (SwerveModule mod : m_swerveModules) {
-            positions[mod.getModuleNumber()] = mod.getPosition();
+            positions[mod.getModuleNumber()] = mod.getPosition(true);
         }
         return positions;
+    }
+
+    /**
+     * Returns the current robot-centric ChassisSpeeds.<p>
+     * Used by AutoBuilder.
+     * 
+     * @return The current robot-centric ChassisSpeeds.
+     */
+    public ChassisSpeeds getRobotCentricSpeeds(){
+        return ChassisSpeeds.fromFieldRelativeSpeeds(m_currentSpeeds, getYaw());
     }
 
     /**
@@ -177,16 +239,36 @@ public class Swerve extends SubsystemBase {
      * @return The yaw rotation as a Rotation2d.
      */
     public Rotation2d getYaw() {
-        return (SwerveConstants.INVERT_GYRO) ? Rotation2d.fromDegrees(360 - m_gyro.getYaw())
-                : Rotation2d.fromDegrees(m_gyro.getYaw());
+        return (SwerveConstants.GYRO_INVERT) ? m_gyro.getRotation2d().minus(Rotation2d.fromDegrees(360))
+                : m_gyro.getRotation2d();
+    }
+
+    /**
+     * Returns the gyro object.<p>
+     * Used by SwerveTab to display to Shuffleboard.
+     * 
+     * @return The gyro object.
+     */
+    public Pigeon2 getGyro() {
+        return m_gyro;
     }
 
     /**
      * Configures the gyro. Resets it to factory default settings and zeroes it.
      */
-    public void configGyro(){
-        m_gyro.configFactoryDefault();
-        zeroGyro();
+    public void configGyro() {
+        DeviceConfig.configurePigeon2("Swerve Pigeon", m_gyro, DeviceConfig.swervePigeonConfig(), Constants.LOOP_TIME_HZ);
+    }
+
+   /**
+     * Configures all module drive motors with the given constants.
+     * 
+     * @param constants ScreamPIDConstants to be applied.
+     */
+    public void configDrivePID(ScreamPIDConstants constants){
+        for (SwerveModule mod : m_swerveModules) {
+            mod.configDriveMotorPID(constants);
+        }
     }
 
     /**
@@ -194,32 +276,7 @@ public class Swerve extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        m_swerveOdometry.update(getYaw(), getModulePositions()); /* Updates the pose estimator with the current angle and module positions */
-    }
-
-    /**
-     * Generates a command that follows the given trajectory.
-     * Will automatically trigger events associated with that trajectory.
-     *
-     * @param trajectory The trajectory to follow.
-     * @param mirrorWithAlliance If the trajectory should be flipped according to alliance color.
-     * @return The full path, including the events triggered along it.
-     */
-    public Command followTrajectoryCommand(PathPlannerTrajectory trajectory, boolean mirrorWithAlliance) {
-        FollowPathWithEvents path = new FollowPathWithEvents(
-            new PPSwerveControllerCommand(
-                trajectory, 
-                this::getPose, // Pose supplier
-                SwerveConstants.SWERVE_KINEMATICS, // SwerveDriveKinematics
-                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // X controller
-                SwerveConstants.PATH_TRANSLATION_CONTROLLER, // Y controller 
-                SwerveConstants.PATH_ROTATION_CONTROLLER, // Rotation controller
-                this::setModuleStates, // Module states consumer
-                mirrorWithAlliance, // If the path should be mirrored depending on alliance color
-                this // Requires this drive subsystem
-            ), 
-            trajectory.getMarkers(), 
-            AutoEvents.getEvents());
-            return path;
+        m_odometry.update(getYaw(), getModulePositions()); /* Updates the odometry with the current angle and module positions */
+        coastAfterDisable(5);
     }
 }

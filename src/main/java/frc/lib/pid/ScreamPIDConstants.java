@@ -1,5 +1,12 @@
 package frc.lib.pid;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.Slot2Configs;
+import com.pathplanner.lib.util.PIDConstants;
+
+import edu.wpi.first.math.controller.PIDController;
+
 /**
  * A container class for PID constants, along with additional methods.
  */
@@ -14,50 +21,50 @@ public class ScreamPIDConstants implements Cloneable{
 
     public ScreamPIDConstants(){}
 
-    public ScreamPIDConstants(double kP, double kI, double kD){
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
+    public ScreamPIDConstants(double p, double i, double d){
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
     }
 
-    public ScreamPIDConstants(double kP, double kI, double kD, double kF){
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
-        this.kF = kF;
+    public ScreamPIDConstants(double p, double i, double d, double f){
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
+        this.kF = f;
     }
 
-	public void setPID(double kP, double kI, double kD){
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
+	public void setPID(double p, double i, double d){
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
     }
 
-    public void setPIDF(double kP, double kI, double kD, double kF){
-        this.kP = kP;
-        this.kI = kI;
-        this.kD = kD;
-        this.kF = kF;
+    public void setPIDF(double p, double i, double d, double f){
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
+        this.kF = f;
     }
 
     public void setPeriod(double period){
         this.period = period;
     }
 
-    public void setkP(double kP){
-        this.kP = kP;
+    public void setP(double p){
+        this.kP = p;
     }
     
-    public void setkI(double kI){
-        this.kI = kI;
+    public void setI(double i){
+        this.kI = i;
     }
     
-    public void setkD(double kD){
-        this.kD = kD;
+    public void setD(double d){
+        this.kD = d;
     }
 
-    public void setkF(double kF){
-        this.kF = kF;
+    public void setF(double f){
+        this.kF = f;
     }
 
     public void setIntegralZone(double Izone){
@@ -72,6 +79,63 @@ public class ScreamPIDConstants implements Cloneable{
     public void setOutputBounds(double max, double min){
         this.maxOutput = max;
         this.minOutput = min;
+    }
+
+    public ScreamPIDConstants withPID(double p, double i, double d){
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
+        return this;
+    }
+
+    public ScreamPIDConstants withPIDF(double p, double i, double d, double f){
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
+        this.kF = f;
+        return this;
+    }
+
+    public ScreamPIDConstants withPeriod(double period){
+        this.period = period;
+        return this;
+    }
+
+    public ScreamPIDConstants withP(double p){
+        this.kP = p;
+        return this;
+    }
+    
+    public ScreamPIDConstants withI(double i){
+        this.kI = i;
+        return this;
+    }
+    
+    public ScreamPIDConstants withD(double d){
+        this.kD = d;
+        return this;
+    }
+
+    public ScreamPIDConstants withF(double f){
+        this.kF = f;
+        return this;
+    }
+
+    public ScreamPIDConstants withIntegralZone(double Izone){
+        this.integralZone = Izone;
+        return this;
+    }
+
+    public ScreamPIDConstants withIntegralAccumulatorBounds(double max, double min){
+        this.maxIntegralAccumulator = max;
+        this.minIntegralAccumulator = min;
+        return this;
+    }
+
+    public ScreamPIDConstants withOutputBounds(double max, double min){
+        this.maxOutput = max;
+        this.minOutput = min;
+        return this;
     }
 
     public double period(){
@@ -112,6 +176,41 @@ public class ScreamPIDConstants implements Cloneable{
 
     public double minOutput(){
         return minOutput;
+    }
+
+    public Slot0Configs toSlot0Configs(){
+        Slot0Configs config = new Slot0Configs();
+        config.kP = kP;
+        config.kI = kI;
+        config.kD = kD;
+        config.kV = kF;
+        return config;
+    }
+
+    public Slot1Configs toSlot1Configs(){
+        Slot1Configs config = new Slot1Configs();
+        config.kP = kP;
+        config.kI = kI;
+        config.kD = kD;
+        config.kV = kF;
+        return config;
+    }
+
+    public Slot2Configs toSlot2Configs(){
+        Slot2Configs config = new Slot2Configs();
+        config.kP = kP;
+        config.kI = kI;
+        config.kD = kD;
+        config.kV = kF;
+        return config;
+    }
+
+    public PIDConstants toPathPlannerPIDConstants(){
+        return new PIDConstants(kP, kI, kD, integralZone);
+    }
+
+    public PIDController toPIDController(){
+        return new PIDController(kP, kI, kD, period);
     }
 
     public boolean equals(ScreamPIDConstants other){

@@ -1,74 +1,67 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.auto.AutoEvents;
-import frc.robot.auto.AutoRoutines;
-import frc.robot.commands.*;
+import frc.robot.auto.Autonomous;
+import frc.robot.auto.Autonomous.NamedCommand;
+import frc.robot.auto.Routines;
+import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.controlboard.Controlboard;
 import frc.robot.shuffleboard.ShuffleboardTabManager;
-import frc.robot.subsystems.*;
+import frc.robot.subsystems.Swerve;
 
 public class RobotContainer {
 
     /* Subsystems */
     private static final Swerve m_swerve = new Swerve();
-
-    /* Auto */
-    private final SendableChooser<Command> m_autoChooser = new SendableChooser<Command>();
-
-    /* Shuffleboard */
-    private final ShuffleboardTabManager m_shuffleboardTabManager = new ShuffleboardTabManager();
     
     /**
-     * Configures the subsystems, default commands, button bindings, and autonomous classes.
+     * Configures the basic robot systems, such as Shuffleboard, autonomous, default commands, and button bindings.
      */
     public RobotContainer() {
-        /* Controlboard */
+        ShuffleboardTabManager.addTabs(true);
         configButtonBindings();
-
-        /* Auto */
+        configDefaultCommands();
         configAuto();
-
-        m_swerve.setDefaultCommand(
-                new TeleopSwerve(
-                        m_swerve,
-                        () -> Controlboard.getTranslation().getY(),
-                        () -> Controlboard.getTranslation().getX(),
-                        () -> Controlboard.getRotation(),
-                        () -> Controlboard.getFieldCentric()));
     }
 
     /**
-     * Configures button bindings using methods from Controlboard.
+     * Configures button bindings from Controlboard.
      */
     private void configButtonBindings() {
-        new Trigger(() -> Controlboard.getZeroGyro()).onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
+        Controlboard.getZeroGyro().onTrue(new InstantCommand(() -> m_swerve.zeroGyro()));
+    }
+
+    private void configDefaultCommands() { 
+        /* Sets the default command for the swerve subsystem */
+        m_swerve.setDefaultCommand(
+            new TeleopSwerve(
+                m_swerve,
+                Controlboard.getTranslationY(),
+                Controlboard.getTranslationX(),
+                Controlboard.getRotation(),
+                Controlboard.getFieldCentric()
+            )
+        );
     }
 
     /**
-     * Configures the autonomous chooser on the SmartDashboard.
-     * Add options with {@code}addOption(String name, Command object){@code}
+     * Configures auto. 
+     * Configure default auto and named commands with configure(Command defaultAuto, NamedCommand... namedCommands)
+     *  ^^ THE ABOVE STEP MUST BE DONE FIRST ^^
+     * Add auto routines with addCommands(Command... commands)
      */
     private void configAuto() {
-        Shuffleboard.getTab("Auto").add("Selected Auto", m_autoChooser).withSize(2, 1);
-        addAutoEvents();
+        Autonomous.configure(
+            Commands.none(),
+            new NamedCommand("ExampleEvent", new PrintCommand("This is an example event :)"))
+        );
 
-        m_autoChooser.setDefaultOption("Do Nothing", AutoRoutines.doNothing());
-        m_autoChooser.addOption("Example Routine", AutoRoutines.exampleRoutine());
-    }
-
-    /**
-     * Adds an event to the event map.
-     * The event map defines what command will be run with the corresponding event.
-     * Reference these events in PathPlanner to trigger the commands along a path.
-     */
-    private void addAutoEvents(){
-        AutoEvents.addEvent("ExampleEvent", new PrintCommand("This is an example event :)"));
+        Autonomous.addRoutines(
+            Routines.exampleAuto().withName("Example Auto")
+        );
     }
 
     /**
@@ -77,8 +70,8 @@ public class RobotContainer {
      * @return The selected autonomous command.
      */
     public Command getAutonomousCommand() {
-        System.out.println("Selected auto routine: " + m_autoChooser.getSelected().getName());
-        return m_autoChooser.getSelected();
+        System.out.println("Selected auto routine: " + Autonomous.getSelected().getName());
+        return Autonomous.getSelected();
     }
 
     /**

@@ -17,7 +17,7 @@ import edu.wpi.first.util.CircularBuffer;
  *  Various utility methods 
  * */
 public class ScreamUtil {
-    public static final double kEpsilon = 1e-12;
+    public static final double EPSILON = 1e-12;
 
 	public static Rotation2d boundRotation(Rotation2d rotation){
 		return new Rotation2d(MathUtil.angleModulus(rotation.getRadians()));
@@ -39,7 +39,7 @@ public class ScreamUtil {
     }
 
     public static boolean epsilonEquals(double a, double b) {
-        return epsilonEquals(a, b, kEpsilon);
+        return epsilonEquals(a, b, EPSILON);
     }
 
     public static boolean epsilonEquals(int a, int b, int epsilon) {
@@ -61,7 +61,7 @@ public class ScreamUtil {
     }
 
 	public static boolean epsilonEquals(final Twist2d twist, final Twist2d other) {
-        return epsilonEquals(twist, other, kEpsilon);
+        return epsilonEquals(twist, other, EPSILON);
     }
 
 	public static Twist2d getPoseLog(Pose2d transform){
@@ -69,7 +69,7 @@ public class ScreamUtil {
         final double half_dtheta = 0.5 * dtheta;
         final double cos_minus_one = transform.getRotation().getCos() - 1.0;
         double halftheta_by_tan_of_halfdtheta;
-        if (Math.abs(cos_minus_one) < kEpsilon) {
+        if (Math.abs(cos_minus_one) < EPSILON) {
             halftheta_by_tan_of_halfdtheta = 1.0 - 1.0 / 12.0 * dtheta * dtheta;
         } else {
             halftheta_by_tan_of_halfdtheta = -(half_dtheta * transform.getRotation().getSin()) / cos_minus_one;
@@ -78,7 +78,6 @@ public class ScreamUtil {
                 .rotateBy(new Rotation2d(halftheta_by_tan_of_halfdtheta, -half_dtheta));
         return new Twist2d(translation_part.getX(), translation_part.getY(), dtheta);
 	}
-
 
 	public static ProfiledPIDController createProfiledPIDController(ScreamPIDConstants pidConstants, Constraints motionConstraints, double updatePeriod){
 		return new ProfiledPIDController(pidConstants.kP(), pidConstants.kI(), pidConstants.kD(), motionConstraints, updatePeriod);

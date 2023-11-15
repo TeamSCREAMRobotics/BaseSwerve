@@ -3,165 +3,90 @@ package frc.robot.shuffleboard;
 import java.util.Map;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
-
-import java.util.Set;
 
 /**
  * Base class for Shuffleboard tabs.
  */
 public abstract class ShuffleboardTabBase {
-    protected ShuffleboardTab mTab;
-
-    private final Set<String> validPropertyKeys = Set.of("min", "max", "block increment", "center", "show value", "visible time", "color when true", "color when false", "orientation", "number of tick marks", "show voltage and current values", "show text", "precision", "show tick marks", "range", "major tick spacing", "starting angle", "show tick mark ring", "number of wheels", "wheel diameter", "show velocity vectors", "show crosshair", "crosshair color", "show controls", "rotation");
+    protected ShuffleboardTab m_tab;
 
     public abstract void createEntries();
 
-    /**
-     * Creates a number entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @return The created number entry.
-     */
-    protected GenericEntry createNumberEntry(String name, double defaultValue) {
-        return createEntry(name, defaultValue, null, null, null);
-    }
-
-    /**
-     * Creates a number entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @param entryProps The EntryProperties to use for the entry.
-     * @return The created number entry.
-     */
-    protected GenericEntry createNumberEntry(String name, double defaultValue, EntryProperties entryProps) {
-        return createEntry(name, defaultValue, null, null, entryProps);
-    }
-
-    /**
-     * Creates a boolean entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @return The created boolean entry.
-     */
-    protected GenericEntry createBooleanEntry(String name, boolean defaultValue) {
-        return createEntry(name, defaultValue, null, null, null);
-    }
-
-    /**
-     * Creates a boolean entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @param entryProps The EntryProperties to use for the entry.
-     * @return The created boolean entry.
-     */
-    protected GenericEntry createBooleanEntry(String name, boolean defaultValue, EntryProperties entryProps) {
-        return createEntry(name, defaultValue, null, null, entryProps);
-    }
-
-    /**
-     * Creates a new string entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @return The created string entry.
-     */
-    protected GenericEntry createStringEntry(String name, String defaultValue) {
-        return createEntry(name, defaultValue, null, null, null);
-    }
-
-    /**
-     * Creates a new string entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @param entryProps The EntryProperties to use for the entry.
-     * @return The created string entry.
-     */
-    protected GenericEntry createStringEntry(String name, String defaultValue, EntryProperties entryProps) {
-        return createEntry(name, defaultValue, null, null, entryProps);
-    }
-
-    /**
-     * Creates a new entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @param widgetType The WidgetType to use for the entry.
-     * @param propertyMap The properties to use for the specified widget.
-     * @param entryProps The EntryProperties to use for the entry.
-     * @return The created entry.
-     */
-    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType, Map<String, Object> propertyMap, EntryProperties entryProps) {
-        if (propertyMap != null) {
-            for (String key : propertyMap.keySet()) {
-                if (!validPropertyKeys.contains(key)) {
-                    throw new IllegalArgumentException("Invalid property key: " + key);
-                }
-            }
-        }
+    private GenericEntry createEntry(String name, Object defaultValue, EntryProperties entryProps, Widget widget){
+        SimpleWidget entry = m_tab.add(name, defaultValue);
         
-        SimpleWidget entry = mTab.add(name, defaultValue);
-        
-        if (entryProps != null) {
+        if (entryProps.xPos() != null && entryProps.yPos() != null) {
             entry = entry
-                .withPosition(entryProps.getXPosition(), entryProps.getYPosition())
-                .withSize(entryProps.getWidth(), entryProps.getHeight());
+                .withPosition(entryProps.xPos().intValue(), entryProps.yPos().intValue());
         }
-        
-        if (widgetType != null) {
-            entry = entry.withWidget(widgetType);
+
+        if (entryProps.width() != null && entryProps.height() != null) {
+            entry = entry
+                .withSize(entryProps.width().intValue(), entryProps.height().intValue());
         }
-        
-        if (propertyMap != null) {
-            entry = entry.withProperties(propertyMap);
+
+        if(widget.type() != null){
+            entry = entry.withWidget(widget.type());
+        }
+
+        if(widget.propertyMap() != null){
+            entry = entry.withProperties(widget.propertyMap());
         }
         
         return entry.getEntry();
     }
 
-    /**
-     * Creates a new entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @param widgetType The WidgetType to use for the entry.
-     * @return The created entry.
-     */
-    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType) {
-        return createEntry(name, defaultValue, widgetType, null, null);
+    protected GenericEntry createNumberEntry(String name, double defaultValue, EntryProperties entryProps){
+        return createEntry(name, defaultValue, entryProps, new Widget());
     }
 
-    /**
-     * Creates a new entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @param widgetType The WidgetType to use for the entry.
-     * @param entryProps The EntryProperties to use for the entry.
-     * @return The created entry.
-     */
-    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType, EntryProperties entryProps) {
-        return createEntry(name, defaultValue, widgetType, null, entryProps);
+    protected GenericEntry createNumberEntry(String name, double defaultValue, EntryProperties entryProps, Widget widget){
+        return createEntry(name, defaultValue, entryProps, widget);
     }
 
-    /**
-     * Creates a new entry with the given name and default value.
-     *
-     * @param name The name of the entry.
-     * @param defaultValue The default value of the entry.
-     * @param widgetType The WidgetType to use for the entry.
-     * @param propertyMap The properties to use for the specified widget.
-     * @return The created entry.
-     */
-    protected GenericEntry createEntry(String name, Object defaultValue, WidgetType widgetType, Map<String, Object> propertyMap) {
-        return createEntry(name, defaultValue, widgetType, propertyMap, null);
+    protected GenericEntry createStringEntry(String name, String defaultValue, EntryProperties entryProps){
+        return createEntry(name, defaultValue, entryProps, new Widget());
+    }
+
+    protected GenericEntry createStringEntry(String name, String defaultValue, EntryProperties entryProps, Widget widget){
+        return createEntry(name, defaultValue, entryProps, widget);
+    }
+
+    protected GenericEntry createBooleanEntry(String name, boolean defaultValue, EntryProperties entryProps){
+        return createEntry(name, defaultValue, entryProps, new Widget());
+    }
+
+    protected GenericEntry createBooleanEntry(String name, boolean defaultValue, EntryProperties entryProps, Widget widget){
+        return createEntry(name, defaultValue, entryProps, widget);
+    }
+
+    protected ComplexWidget createSendableEntry(String name, Sendable sendable, EntryProperties entryProps, Map<String, Object> propertyMap){
+        ComplexWidget entry =  m_tab.add(name, sendable);
+
+        if (entryProps.xPos() != null && entryProps.yPos() != null) {
+            entry = entry
+                .withPosition(entryProps.xPos().intValue(), entryProps.yPos().intValue());
+        }
+
+        if (entryProps.width() != null && entryProps.height() != null) {
+            entry = entry
+                .withSize(entryProps.width().intValue(), entryProps.height().intValue());
+        }
+
+        if(propertyMap != null){
+            entry = entry.withProperties(propertyMap);
+        }
+
+        return entry;
+    }
+
+    protected ComplexWidget createSendableEntry(String name, Sendable sendable, EntryProperties entryProps){
+        return createSendableEntry(name, sendable, entryProps, null);
     }
 
     public abstract void periodic();
@@ -179,59 +104,24 @@ public abstract class ShuffleboardTabBase {
     }
 
     public ShuffleboardTab getTab() {
-        return mTab;
+        return m_tab;
     }
 
-    public class EntryProperties {
-        private final int xPos;
-        private final int yPos;
-        private final int width;
-        private final int height;
-    
-        /** 
-         * Specifies an x-position, y-position, width, and height for an entry.
-         *  
-         * @param xPos The x-position of the entry (column) 
-         * @param yPos The y-position of the entry (row)
-         * @param width The width of the entry 
-         * @param height The height of the entry 
-         */
-        public EntryProperties(int xPos, int yPos, int width, int height) {
-            this.xPos = xPos;
-            this.yPos = yPos;
-            this.width = width;
-            this.height = height;
+    public record EntryProperties(Integer xPos, Integer yPos, Integer width, Integer height){
+        public EntryProperties(Integer xPos, Integer yPos) {
+            this(xPos, yPos, null, null);
         }
-
-        /** 
-         * Specifies an x-position and y-position for an entry.
-         * Size defaults to 1x1.
-         *  
-         * @param xPos The x-position of the entry (column)
-         * @param yPos The y-position of the entry (row)
-         */
-        public EntryProperties(int xPos, int yPos) {
-            this.xPos = xPos;
-            this.yPos = yPos;
-            this.width = 1;
-            this.height = 1;
-        }
-    
-        public int getXPosition() {
-            return xPos;
-        }
-
-        public int getYPosition() {
-            return yPos;
-        }
-    
-        public int getWidth() {
-            return width;
-        }
-    
-        public int getHeight() {
-            return height;
+        public EntryProperties() {
+            this(null, null, null, null);
         }
     }
-    
+
+    public record Widget(WidgetType type, Map<String, Object> propertyMap){
+        public Widget(WidgetType type) {
+            this(type, null);
+        }
+        private Widget(){
+            this(null, null);
+        }
+    }
 }
