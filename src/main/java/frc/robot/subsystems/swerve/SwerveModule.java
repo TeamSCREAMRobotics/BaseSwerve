@@ -16,14 +16,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.config.DeviceConfig;
 import frc.lib.math.Conversions;
 import frc.lib.pid.ScreamPIDConstants;
-import frc.lib.util.CTREModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.SteerConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
-import frc.robot.Constants.SwerveConstants.ModuleConstants.SwerveModuleConstants;
 
 /**
  * A swerve module, which consists of an angle motor, a drive motor, and an angle encoder.
@@ -124,9 +122,9 @@ public class SwerveModule {
      * @param isOpenLoop   Whether the desired state is open loop (Tele-Op driving), or closed loop (Autonomous driving).
      */
     public void set(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = CTREModuleState.optimize(desiredState, getAngle());
-        setAngle(desiredState);
+        desiredState = SwerveModuleState.optimize(desiredState, getAngle());
         setSpeed(desiredState, isOpenLoop);
+        setAngle(desiredState);
     }
 
     /**
@@ -270,7 +268,7 @@ public class SwerveModule {
 
         double distance = Conversions.falconRotationsToMechanismMeters(driveRotations, SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
         Rotation2d angle = Rotation2d.fromRotations(angleRotations);
-        
+
         m_internalState.distanceMeters = distance;
         m_internalState.angle = angle;
         

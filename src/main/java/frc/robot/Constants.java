@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.COTSFalconSwerveConstants;
-import frc.robot.Constants.SwerveConstants.ModuleConstants.SwerveModuleConstants;
 
 /**
  * A class for constants used in various places in the project.

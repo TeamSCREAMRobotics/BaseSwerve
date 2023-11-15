@@ -48,7 +48,7 @@ public class RobotContainer {
     }
 
     /**
-     * Configures auto.
+     * Configures auto. 
      * Configure default auto and named commands with configure(Command defaultAuto, NamedCommand... namedCommands)
      *  ^^ THE ABOVE STEP MUST BE DONE FIRST ^^
      * Add auto routines with addCommands(Command... commands)
