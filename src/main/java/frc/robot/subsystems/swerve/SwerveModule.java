@@ -19,7 +19,6 @@ import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Constants.SwerveConstants.SteerConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
 
@@ -102,7 +101,7 @@ public class SwerveModule {
      * @param mode The NeutralModeValue to set.
      */
     public void setSteerNeutralMode(NeutralModeValue mode){
-        m_steerMotor.getConfigurator().apply(DeviceConfig.FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, mode));
+        m_steerMotor.setNeutralMode(mode);
     }
 
     /**
@@ -112,7 +111,7 @@ public class SwerveModule {
      * @param mode The NeutralModeValue to set.
      */
     public void setDriveNeutralMode(NeutralModeValue mode){
-        m_driveMotor.getConfigurator().apply(DeviceConfig.FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, mode));
+        m_driveMotor.setNeutralMode(mode);
     }
 
     /**

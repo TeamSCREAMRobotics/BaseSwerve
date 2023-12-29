@@ -4,7 +4,10 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -21,6 +24,7 @@ public class Robot extends TimedRobot {
 
   private Command autonomousCommand;
   private RobotContainer robotContainer;
+  private Timer coastTimer = new Timer();
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -65,11 +69,16 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    coastTimer.reset();
+    coastTimer.start();
   }
 
     /** This function is called periodically when the robot is in Disabled mode. */
   @Override
   public void disabledPeriodic() {
+    if(((int)coastTimer.get()) == 5){
+      RobotContainer.getSwerve().setNeutralModes(NeutralModeValue.Coast, NeutralModeValue.Coast);
+    }
   }
 
   /**
@@ -97,6 +106,8 @@ public class Robot extends TimedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    RobotContainer.getSwerve().setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
   }
 
   /** This function is called periodically during operator control. */

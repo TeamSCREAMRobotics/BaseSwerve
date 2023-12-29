@@ -11,8 +11,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.config.DeviceConfig;
 import frc.lib.pid.ScreamPIDConstants;
@@ -149,26 +147,7 @@ public class Swerve extends SubsystemBase {
     public double calculateHeadingCorrection(double currentAngle, double lastAngle){
         return SwerveConstants.HEADING_CONSTANTS.toPIDController().calculate(currentAngle, lastAngle);
     }
-
-    private Timer coastTimer = new Timer();
-    /**
-     * Checks if the robot is disabled then sets the motors to coast after the specified amount of seconds.
-     * 
-     * @param elapsedSec Amount of seconds to wait after disable.
-     */
-    public void coastAfterDisable(double elapsedSec){
-        if(DriverStation.isEnabled()){
-            setNeutralModes(NeutralModeValue.Brake, NeutralModeValue.Brake);
-            coastTimer.reset();
-        } else {
-            coastTimer.start();
-            if(coastTimer.hasElapsed(elapsedSec)){
-                setNeutralModes(NeutralModeValue.Coast, NeutralModeValue.Coast);
-            }
-        }
-    }
     
-
     /**
      * Resets the pose reported by the odometry to the specified pose.
      *
@@ -277,6 +256,5 @@ public class Swerve extends SubsystemBase {
     @Override
     public void periodic() {
         m_odometry.update(getYaw(), getModulePositions()); /* Updates the odometry with the current angle and module positions */
-        coastAfterDisable(5);
     }
 }
