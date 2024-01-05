@@ -18,6 +18,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.config.ErrorChecker.DeviceConfiguration;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -33,7 +34,7 @@ public class DeviceConfig {
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
         config.MotorOutput = FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, DriveConstants.NEUTRAL_MODE);
-        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, DriveConstants.GEAR_RATIO);
+        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, DriveConstants.GEAR_RATIO, Rotation2d.fromRotations(0));
         config.CurrentLimits = FXCurrentLimitsConfig(
             DriveConstants.CURRENT_LIMIT_ENABLE, 
             DriveConstants.SUPPLY_CURRENT_LIMIT, 
@@ -45,12 +46,12 @@ public class DeviceConfig {
         return config;
     }
 
-    public static TalonFXConfiguration steerFXConfig(){
+    public static TalonFXConfiguration steerFXConfig(int remoteSensorID, Rotation2d sensorOffset){
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
         config.MotorOutput = FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, SteerConstants.NEUTRAL_MODE);
-        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, SteerConstants.GEAR_RATIO);
+        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.FusedCANcoder, remoteSensorID, SteerConstants.GEAR_RATIO, sensorOffset);
         config.ClosedLoopGeneral = FXClosedLoopGeneralConfig(true);
         config.CurrentLimits = FXCurrentLimitsConfig(
             SteerConstants.CURRENT_LIMIT_ENABLE, 
@@ -133,11 +134,12 @@ public class DeviceConfig {
         return config;
     }
 
-    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double sensorToMechGR){
+    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double sensorToMechGR, Rotation2d sensorOffset){
         FeedbackConfigs config = new FeedbackConfigs();
         config.FeedbackSensorSource = sensor;
         config.FeedbackRemoteSensorID = remoteSensorID;
         config.SensorToMechanismRatio = sensorToMechGR;
+        config.FeedbackRotorOffset = sensorOffset.getRotations();
         return config;
     }
 

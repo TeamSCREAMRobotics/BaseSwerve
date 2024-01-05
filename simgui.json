@@ -3,7 +3,8 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Auto/Selected Auto": "String Chooser",
-      "/Shuffleboard/Swerve/Odometry Angle": "Gyro"
+      "/Shuffleboard/Swerve/Odometry Angle": "Gyro",
+      "/SmartDashboard/Auto Chooser": "String Chooser"
     }
   },
   "Plot": {

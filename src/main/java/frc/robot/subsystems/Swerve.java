@@ -19,6 +19,7 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
+import frc.robot.subsystems.swerve.OdometryThread;
 import frc.robot.subsystems.swerve.SwerveModule;
 
 /**
@@ -30,6 +31,7 @@ public class Swerve extends SubsystemBase {
     private Pigeon2 m_gyro;
     private SwerveModule[] m_swerveModules;
     private SwerveDriveOdometry m_odometry;
+    private OdometryThread m_odometryThread;
     private ChassisSpeeds m_currentSpeeds = new ChassisSpeeds();
 
     /**
@@ -58,6 +60,8 @@ public class Swerve extends SubsystemBase {
          * It uses these values to estimate the robot's position on the field.
          */
         m_odometry = new SwerveDriveOdometry(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+        m_odometryThread = new OdometryThread(m_swerveModules.length, m_odometry, m_swerveModules, m_gyro);
+        m_odometryThread.start();
 
         /**
          * Configures the AutoBuilder for holonomic mode.
@@ -254,7 +258,5 @@ public class Swerve extends SubsystemBase {
      * Called periodically through SubsystemBase
      */
     @Override
-    public void periodic() {
-        m_odometry.update(getYaw(), getModulePositions()); /* Updates the odometry with the current angle and module positions */
-    }
+    public void periodic() {}
 }

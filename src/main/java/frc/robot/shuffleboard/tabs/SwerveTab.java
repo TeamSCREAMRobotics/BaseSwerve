@@ -83,17 +83,17 @@ public class SwerveTab extends ShuffleboardTabBase {
      */
     @Override
     public void periodic() {
-        m_FLEncoder.setDouble(round(m_swerve.getModules()[0].getEncoderAngle().getDegrees(), 3));
-        m_FLIntegrated.setDouble(round(m_swerve.getModules()[0].getPosition(true).angle.getDegrees(), 3));
+        m_FLEncoder.setDouble(filter(m_swerve.getModules()[0].getEncoderAngle().getDegrees()));
+        m_FLIntegrated.setDouble(filter(m_swerve.getModules()[0].getPosition(true).angle.getDegrees()));
 
-        m_FREncoder.setDouble(round(m_swerve.getModules()[1].getEncoderAngle().getDegrees(), 3));
-        m_FRIntegrated.setDouble(round(m_swerve.getModules()[1].getPosition(true).angle.getDegrees(), 3));
+        m_FREncoder.setDouble(filter(m_swerve.getModules()[1].getEncoderAngle().getDegrees()));
+        m_FRIntegrated.setDouble(filter(m_swerve.getModules()[1].getPosition(true).angle.getDegrees()));
 
-        m_BLEncoder.setDouble(round(m_swerve.getModules()[2].getEncoderAngle().getDegrees(), 3));
-        m_BLIntegrated.setDouble(round(m_swerve.getModules()[2].getPosition(true).angle.getDegrees(), 3));
+        m_BLEncoder.setDouble(filter(m_swerve.getModules()[2].getEncoderAngle().getDegrees()));
+        m_BLIntegrated.setDouble(filter(m_swerve.getModules()[2].getPosition(true).angle.getDegrees()));
 
-        m_BREncoder.setDouble(round(m_swerve.getModules()[3].getEncoderAngle().getDegrees(), 3));
-        m_BRIntegrated.setDouble(round(m_swerve.getModules()[3].getPosition(true).angle.getDegrees(), 3));
+        m_BREncoder.setDouble(filter(m_swerve.getModules()[3].getEncoderAngle().getDegrees()));
+        m_BRIntegrated.setDouble(filter(m_swerve.getModules()[3].getPosition(true).angle.getDegrees()));
 
         m_odometryX.setDouble(m_swerve.getPose().getX());
         m_odometryY.setDouble(m_swerve.getPose().getY());

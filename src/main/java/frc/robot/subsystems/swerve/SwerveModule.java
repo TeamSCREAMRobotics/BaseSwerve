@@ -2,9 +2,8 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -37,6 +36,7 @@ public class SwerveModule {
     private TalonFX m_driveMotor;
     private CANcoder m_angleEncoder;
 
+    private BaseStatusSignal[] m_signals;
     private StatusSignal<Double> m_drivePosition;
     private StatusSignal<Double> m_driveVelocity;
     private StatusSignal<Double> m_steerPosition;
@@ -72,6 +72,12 @@ public class SwerveModule {
         m_driveVelocity = m_driveMotor.getVelocity();
         m_steerPosition = m_steerMotor.getPosition();
         m_steerVelocity = m_steerMotor.getVelocity();
+
+        m_signals = new BaseStatusSignal[4];
+        m_signals[0] = m_drivePosition;
+        m_signals[1] = m_driveVelocity;
+        m_signals[2] = m_steerPosition;
+        m_signals[3] = m_steerVelocity;
 
         m_lastAngle = getState(true).angle;
     }
@@ -133,14 +139,14 @@ public class SwerveModule {
      * @param isOpenLoop Whether to drive in an open loop (Tele-Op) or closed loop (Autonomous) state.
      */
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-        if (isOpenLoop) {
-            m_driveMotor.setControl(new DutyCycleOut(desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED));
-        } else {
             double velocity = Conversions.mpsToFalconRPS(desiredState.speedMetersPerSecond, SwerveConstants.MODULE_TYPE.wheelCircumference, 1);
-            double feedforward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
 
-            m_driveMotor.setControl(new VelocityVoltage(velocity).withFeedForward(feedforward));
-        }  
+            if(isOpenLoop){
+                m_driveMotor.setControl(new VelocityTorqueCurrentFOC(velocity));
+            } else {
+                double feedforward = m_feedforward.calculate(desiredState.speedMetersPerSecond);
+                m_driveMotor.setControl(new VelocityTorqueCurrentFOC(velocity).withFeedForward(feedforward));
+            }
     }
 
     /**
@@ -175,19 +181,6 @@ public class SwerveModule {
     }
 
     /**
-     * Resets the angle motor to the absolute position provided by the CANcoder.
-     * 
-     * @param timeoutSec Amount of time to wait for a position reading from the CANcoder.
-     */
-    public void resetToAbsolute(double timeoutSec) {
-        m_steerMotor.setPosition(
-            Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition().waitForUpdate(timeoutSec).getValue())
-            .minus(m_angleOffset)
-            .getRotations()
-        );
-    }
-
-    /**
      * Configures the angle encoder.
      * 
      * Configures the encoder with the specified configuration.
@@ -202,8 +195,7 @@ public class SwerveModule {
      * Configures the motor with the specified configuration.
      */
     private void configSteerMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(), Constants.LOOP_TIME_HZ);
-        resetToAbsolute(0.75);
+        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(m_angleEncoder.getDeviceID(), m_angleOffset), Constants.LOOP_TIME_HZ);
     }
 
     /**
@@ -272,5 +264,9 @@ public class SwerveModule {
         m_internalState.angle = angle;
         
         return m_internalState;
+    }
+
+    public BaseStatusSignal[] getSignals() {
+        return m_signals;
     }
 }

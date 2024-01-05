@@ -8,6 +8,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.COTSFalconSwerveConstants;
 
@@ -46,8 +47,8 @@ public final class Constants{
 
         /* Drivebase Constants */
         // TODO ROBOT SPECIFIC
-        public static final double TRACK_WIDTH = 0.50165; // Distance from left wheels to right wheels
-        public static final double WHEEL_BASE = 0.57531; // Distance from front wheels to back wheels
+        public static final double TRACK_WIDTH = Units.inchesToMeters(19.75); // Distance from left wheels to right wheels
+        public static final double WHEEL_BASE = Units.inchesToMeters(22.65); // Distance from front wheels to back wheels
 
         /* Gyro Constants */
         public static final boolean GYRO_INVERT = false; // TODO Always ensure gyro reads CCW+ CW-

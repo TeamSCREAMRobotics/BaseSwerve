@@ -49,8 +49,8 @@ public class RobotContainer {
 
     /**
      * Configures auto. 
-     * Configure default auto and named commands with configure(Command defaultAuto, NamedCommand... namedCommands)
-     *  ^^ THE ABOVE STEP MUST BE DONE FIRST ^^
+     * Configure default auto and named commands with configure(Command defaultAuto, NamedCommand... namedCommands)<p>
+     *  ^^ THE ABOVE STEP MUST BE DONE FIRST ^^ <p>
      * Add auto routines with addCommands(Command... commands)
      */
     private void configAuto() {

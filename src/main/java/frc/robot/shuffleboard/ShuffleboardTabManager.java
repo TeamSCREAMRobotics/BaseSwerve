@@ -35,7 +35,6 @@ public class ShuffleboardTabManager extends SubsystemBase {
     public void periodic() {
         for (ShuffleboardTabBase tab : m_tabs) {
             tab.periodic();
-    
     }
 }
 }

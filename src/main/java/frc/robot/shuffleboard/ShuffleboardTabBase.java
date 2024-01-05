@@ -2,6 +2,7 @@ package frc.robot.shuffleboard;
 
 import java.util.Map;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
@@ -14,6 +15,8 @@ import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
  */
 public abstract class ShuffleboardTabBase {
     protected ShuffleboardTab m_tab;
+
+    private LinearFilter filter = LinearFilter.movingAverage(50);
 
     public abstract void createEntries();
 
@@ -98,9 +101,9 @@ public abstract class ShuffleboardTabBase {
      * @param decimalPlaces The number of decimal places to round to.
      * @return The rounded number.
      */
-    protected double round(double number, int decimalPlaces) {
-        double tmp = Math.pow(10, decimalPlaces);
-        return Math.round(number * tmp) / tmp;
+    protected double filter(double number) {
+        double tmp = Math.pow(10, 3);
+        return filter.calculate(Math.round(number * tmp) / tmp);
     }
 
     public ShuffleboardTab getTab() {
