@@ -9,17 +9,16 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.controlboard.Controlboard;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.swerve.Swerve;
 
 /**
  * A command that controls the swerve drive system.
  */
 public class TeleopSwerve extends Command {
     private Swerve swerve;
-    private DoubleSupplier translationSup;
-    private DoubleSupplier strafeSup;
+    private DoubleSupplier[] translation;
     private DoubleSupplier rotationSup;
-    private BooleanSupplier fieldCentricSup;
+    private BooleanSupplier fieldRelativeSup;
     private Rotation2d lastAngle;
     private Timer correctionTimer = new Timer();
 
@@ -33,14 +32,13 @@ public class TeleopSwerve extends Command {
      * @param rotationSup A supplier for the rotation value.
      * @param fieldCentricSup A supplier for the drive mode. Robot centric = false; Field centric = true
      */
-    public TeleopSwerve(Swerve swerve, DoubleSupplier translationSup, DoubleSupplier strafeSup, DoubleSupplier rotationSup, BooleanSupplier fieldCentricSup) {
+    public TeleopSwerve(Swerve swerve, DoubleSupplier[] translation, DoubleSupplier rotationSup, BooleanSupplier fieldCentricSup) {
         this.swerve = swerve;
         addRequirements(swerve);
 
-        this.translationSup = translationSup;
-        this.strafeSup = strafeSup;
+        this.translation = translation;
         this.rotationSup = rotationSup;
-        this.fieldCentricSup = fieldCentricSup;
+        this.fieldRelativeSup = fieldCentricSup;
     }
 
     @Override
@@ -58,19 +56,14 @@ public class TeleopSwerve extends Command {
     @Override
     public void execute() {
         
-        double translationVal = translationSup.getAsDouble();
-        double strafeVal = strafeSup.getAsDouble();
+        Translation2d translationVal = new Translation2d(translation[0].getAsDouble(), translation[1].getAsDouble());
         double rotationVal = getRotation(rotationSup.getAsDouble());
-        boolean fieldCentric = fieldCentricSup.getAsBoolean();
+        boolean fieldRelativeVal = fieldRelativeSup.getAsBoolean();
 
-        if(Controlboard.getZeroGyro().getAsBoolean()) lastAngle = Rotation2d.fromDegrees(0);
+        if(Controlboard.getZeroGyro().getAsBoolean()) lastAngle = Rotation2d.fromDegrees(0.0);
 
         swerve.setChassisSpeeds(
-            swerve.robotSpeeds(
-                new Translation2d(translationVal, strafeVal).times(SwerveConstants.MAX_SPEED), 
-                rotationVal, 
-                fieldCentric
-            ),
+            fieldRelativeVal ? swerve.fieldRelativeSpeeds(translationVal, rotationVal) : swerve.robotRelativeSpeeds(translationVal, rotationVal),
             true
         );
     }

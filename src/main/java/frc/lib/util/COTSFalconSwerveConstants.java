@@ -80,7 +80,7 @@ public class COTSFalconSwerveConstants {
         /** 21.42 : 1 */
         double angleGearRatio = ((150.0 / 7.0) / 1.0);
 
-        double angleKP = 18.5;
+        double angleKP = 100.0;
         double angleKI = 0.0;
         double angleKD = 0.0;
         double angleKF = 0.0;

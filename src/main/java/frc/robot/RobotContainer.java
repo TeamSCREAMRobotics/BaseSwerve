@@ -1,27 +1,33 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.auto.Autonomous;
-import frc.robot.auto.Autonomous.NamedCommand;
+import frc.robot.auto.Autonomous.PPEvent;
 import frc.robot.auto.Routines;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.controlboard.Controlboard;
 import frc.robot.shuffleboard.ShuffleboardTabManager;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.swerve.Swerve;
 
 public class RobotContainer {
 
     /* Subsystems */
     private static final Swerve m_swerve = new Swerve();
+
+    private static final ShuffleboardTabManager m_shuffleboardTabManager = new ShuffleboardTabManager();
+
+    private static final Alliance m_alliance = DriverStation.getAlliance().get();
     
     /**
      * Configures the basic robot systems, such as Shuffleboard, autonomous, default commands, and button bindings.
      */
     public RobotContainer() {
-        ShuffleboardTabManager.addTabs(true);
+        m_shuffleboardTabManager.addTabs(true);
         configButtonBindings();
         configDefaultCommands();
         configAuto();
@@ -39,8 +45,7 @@ public class RobotContainer {
         m_swerve.setDefaultCommand(
             new TeleopSwerve(
                 m_swerve,
-                Controlboard.getTranslationY(),
-                Controlboard.getTranslationX(),
+                Controlboard.getTranslation(),
                 Controlboard.getRotation(),
                 Controlboard.getFieldCentric()
             )
@@ -55,8 +60,8 @@ public class RobotContainer {
      */
     private void configAuto() {
         Autonomous.configure(
-            Commands.none(),
-            new NamedCommand("ExampleEvent", new PrintCommand("This is an example event :)"))
+            Commands.none().withName("Do Nothing"),
+            new PPEvent("ExampleEvent", new PrintCommand("This is an example event :)"))
         );
 
         Autonomous.addRoutines(
@@ -81,5 +86,14 @@ public class RobotContainer {
      */
     public static Swerve getSwerve() {
         return m_swerve;
+    }
+    
+    /**
+     * Retrieves the current Alliance as detected by the DriverStation. 
+     * Use this opposed to DriverStation.getAlliance().
+     * @return The current Alliance.
+     */
+    public static Alliance getAlliance(){
+        return m_alliance;
     }
 }

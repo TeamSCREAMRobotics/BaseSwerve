@@ -25,7 +25,7 @@ public class OdometryThread extends Thread {
     private SwerveDriveOdometry m_odometry;
     private Pigeon2 m_pigeon2;
 
-    public OdometryThread(int modCount, SwerveDriveOdometry odometry, SwerveModule[] modules, Pigeon2 pigeon2) {
+    public OdometryThread(SwerveDriveOdometry odometry, SwerveModule[] modules, Pigeon2 pigeon2, int modCount) {
         super();
         // 4 signals for each module + 2 for Pigeon2
         ModuleCount = modCount;
@@ -42,7 +42,7 @@ public class OdometryThread extends Thread {
             m_allSignals[(i * 4) + 3] = signals[3];
         }
         m_allSignals[m_allSignals.length - 2] = m_pigeon2.getYaw();
-        m_allSignals[m_allSignals.length - 1] = m_pigeon2.getAngularVelocityZ();
+        m_allSignals[m_allSignals.length - 1] = m_pigeon2.getAngularVelocityZWorld();
     }
 
     @Override
@@ -71,8 +71,8 @@ public class OdometryThread extends Thread {
                 /* No need to refresh since it's automatically refreshed from the waitForAll() */
                 m_modulePositions[i] = m_modules[i].getPosition(false);
             }
-            // Assume Pigeon2 is flat-and-level so latency compensation can be performed
-            Rotation2d yawDegrees = Rotation2d.fromDegrees(BaseStatusSignal.getLatencyCompensatedValue(m_pigeon2.getYaw(), m_pigeon2.getAngularVelocityZ()));
+
+            Rotation2d yawDegrees = Rotation2d.fromDegrees(BaseStatusSignal.getLatencyCompensatedValue(m_pigeon2.getYaw(), m_pigeon2.getAngularVelocityZWorld()));
 
             m_odometry.update(yawDegrees, m_modulePositions);
         }

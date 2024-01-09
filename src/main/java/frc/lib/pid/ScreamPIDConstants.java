@@ -6,6 +6,8 @@ import com.ctre.phoenix6.configs.Slot2Configs;
 import com.pathplanner.lib.util.PIDConstants;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 
 /**
  * A container class for PID constants, along with additional methods.
@@ -211,6 +213,10 @@ public class ScreamPIDConstants implements Cloneable{
 
     public PIDController toPIDController(){
         return new PIDController(kP, kI, kD, period);
+    }
+
+    public ProfiledPIDController toProfiledPIDController(Constraints constraints){
+        return new ProfiledPIDController(kP, kI, kD, constraints, period);
     }
 
     public boolean equals(ScreamPIDConstants other){

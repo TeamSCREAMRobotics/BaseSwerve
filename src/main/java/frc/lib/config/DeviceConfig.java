@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -43,6 +44,7 @@ public class DeviceConfig {
         config.Slot0 = FXPIDConfig(DriveConstants.PID_CONSTANTS);
         config.OpenLoopRamps = FXOpenLoopRampConfig(DriveConstants.OPEN_LOOP_RAMP);
         config.ClosedLoopRamps = FXClosedLoopRampConfig(DriveConstants.CLOSED_LOOP_RAMP);
+        config.TorqueCurrent = FXTorqueCurrentConfig(DriveConstants.SLIP_CURRENT, -DriveConstants.SLIP_CURRENT, 0);
         return config;
     }
 
@@ -75,7 +77,7 @@ public class DeviceConfig {
     }
 
 
-    ////////////////////////////////////// GENERIC CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    ////////////////////////////////////// GENERAL CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     public static void configureTalonFX(String name, TalonFX motor, TalonFXConfiguration config, double updateFrequencyHz){
         DeviceConfiguration deviceConfig = new DeviceConfiguration() {
@@ -88,7 +90,6 @@ public class DeviceConfig {
                     motor.getPosition().setUpdateFrequency(updateFrequencyHz),
                     motor.getVelocity().setUpdateFrequency(updateFrequencyHz),
                     motor.optimizeBusUtilization()
-
                     );
             }
         };
@@ -171,6 +172,14 @@ public class DeviceConfig {
     public static ClosedLoopGeneralConfigs FXClosedLoopGeneralConfig(boolean continuousWrap){
         ClosedLoopGeneralConfigs config = new ClosedLoopGeneralConfigs();
         config.ContinuousWrap = continuousWrap;
+        return config;
+    }
+
+    public static TorqueCurrentConfigs FXTorqueCurrentConfig(double peakForward, double peakReverse, double neutralDeadband){
+        TorqueCurrentConfigs config = new TorqueCurrentConfigs();
+        config.PeakForwardTorqueCurrent = peakForward;
+        config.PeakReverseTorqueCurrent = peakReverse;
+        config.TorqueNeutralDeadband = neutralDeadband;
         return config;
     }
 }

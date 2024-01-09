@@ -1,15 +1,13 @@
 
 package frc.robot.shuffleboard.tabs;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Constants.ShuffleboardConstants;
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.DriveConstants;
 import frc.robot.shuffleboard.ShuffleboardTabBase;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.swerve.Swerve;
 
 public class SwerveTab extends ShuffleboardTabBase {
 
@@ -40,10 +38,7 @@ public class SwerveTab extends ShuffleboardTabBase {
     private GenericEntry m_odometryY;
     private ComplexWidget m_odometryYaw;
 
-    private GenericEntry m_robotSpeed;
-
     private GenericEntry m_driveP;
-
 
     /**
      * This method creates number entries for various sensors related to the Swerve subsystem.
@@ -66,11 +61,9 @@ public class SwerveTab extends ShuffleboardTabBase {
         m_BREncoder = createNumberEntry("BR Encoder", 0, new EntryProperties(0, 3));
         m_BRIntegrated = createNumberEntry("BR Integrated", 0, new EntryProperties(1, 3));
 
-        m_odometryX = createNumberEntry("Odometry X", 0, new EntryProperties(4, 0));
-        m_odometryY = createNumberEntry("Odometry Y", 0, new EntryProperties(4, 1));
-        m_odometryYaw = createSendableEntry("Odometry Angle", m_swerve.getGyro(), new EntryProperties(6, 0));
-
-        m_robotSpeed = createNumberEntry("Robot Speed m/s", 0, new EntryProperties(6, 0));
+        m_odometryX = createNumberEntry("Odometry X", 0, new EntryProperties(3, 0));
+        m_odometryY = createNumberEntry("Odometry Y", 0, new EntryProperties(3, 1));
+        m_odometryYaw = createSendableEntry("Odometry Angle", m_swerve.getGyro(), new EntryProperties(5, 0));
 
         if (ShuffleboardConstants.UPDATE_SWERVE) {
             m_driveP = createNumberEntry("Drive P Gain", DriveConstants.PID_CONSTANTS.kP(), new EntryProperties(9, 0));
@@ -97,8 +90,6 @@ public class SwerveTab extends ShuffleboardTabBase {
 
         m_odometryX.setDouble(m_swerve.getPose().getX());
         m_odometryY.setDouble(m_swerve.getPose().getY());
-
-        m_robotSpeed.setDouble(MathUtil.clamp(Math.hypot(m_swerve.getRobotCentricSpeeds().vxMetersPerSecond, m_swerve.getRobotCentricSpeeds().vyMetersPerSecond), 0.0, SwerveConstants.MAX_SPEED));
 
         if (ShuffleboardConstants.UPDATE_SWERVE) {
             m_swerve.configDrivePID(DriveConstants.PID_CONSTANTS.withP(m_driveP.get().getDouble()));

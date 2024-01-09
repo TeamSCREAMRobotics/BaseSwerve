@@ -3,9 +3,13 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Shuffleboard/Auto/Selected Auto": "String Chooser",
+      "/Shuffleboard/Match/Auto Chooser": "String Chooser",
       "/Shuffleboard/Swerve/Odometry Angle": "Gyro",
       "/SmartDashboard/Auto Chooser": "String Chooser"
     }
+  },
+  "NetworkTables Info": {
+    "visible": true
   },
   "Plot": {
     "Plot <0>": {

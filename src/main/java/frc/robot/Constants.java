@@ -38,7 +38,7 @@ public final class Constants{
     
     public static final class ShuffleboardConstants {
 
-        /* For live updating values like PID from Shuffleboard */
+        /* For updating values like PID from Shuffleboard */
         public static final boolean UPDATE_SWERVE = false;
     }
 
@@ -103,6 +103,7 @@ public final class Constants{
             public static final int SUPPLY_CURRENT_THRESHOLD = 60;
             public static final double SUPPLY_TIME_THRESHOLD = 0.1;
             public static final boolean CURRENT_LIMIT_ENABLE = true;
+            public static final double SLIP_CURRENT = 400;
 
             /* Ramps */
             public static final double OPEN_LOOP_RAMP = 0.25;
@@ -151,30 +152,20 @@ public final class Constants{
 
             public record SwerveModuleConstants(int driveMotorID, int steerMotorID, int encoderID, Rotation2d angleOffset){}
 
-            public enum Module{
+            public enum ModuleLocation{
                 FRONT_LEFT(0),
                 FRONT_RIGHT(1),
                 BACK_LEFT(2),
                 BACK_RIGHT(3);
 
                 private int number;
-                private SwerveModuleConstants constants;
 
-                private Module(int number){
+                private ModuleLocation(int number){
                     this.number = number;
-                }
-
-                public Module withConstants(SwerveModuleConstants constants){
-                    this.constants = constants;
-                    return this;
                 }
 
                 public int getNumber() {
                     return number;
-                }
-
-                public SwerveModuleConstants getConstants(){
-                    return constants;
                 }
             }
 

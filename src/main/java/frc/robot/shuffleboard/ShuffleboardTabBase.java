@@ -95,15 +95,13 @@ public abstract class ShuffleboardTabBase {
     public abstract void periodic();
 
     /**
-     * Rounds a given number to the specified number of decimal places.
+     * Filters and truncates a number.
      *
-     * @param number The number to be rounded.
-     * @param decimalPlaces The number of decimal places to round to.
-     * @return The rounded number.
+     * @param number The number to be filtered and truncated.
+     * @return The filtered and truncated number.
      */
     protected double filter(double number) {
-        double tmp = Math.pow(10, 3);
-        return filter.calculate(Math.round(number * tmp) / tmp);
+        return filter.calculate(Math.round(number * 1000) / 1000);
     }
 
     public ShuffleboardTab getTab() {

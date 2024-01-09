@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.util.CircularBuffer;
 
 /**
  *  Various utility methods 
@@ -88,17 +87,4 @@ public class ScreamUtil {
 		controller.setIntegratorRange(-pidConstants.integralZone(), pidConstants.integralZone());
 		return controller;
 	}
-
-	public static double getCircularBufferAverage(CircularBuffer buffer){
-        int num = 0;
-        for(int i = 0; i < buffer.size(); i++){
-            num += buffer.get(i);
-        }
-		try {
-            return num / buffer.size();
-        } catch(ArithmeticException exception){
-            System.out.println(exception + "... Returning 0");
-            return 0;
-        }
-    }
 }
