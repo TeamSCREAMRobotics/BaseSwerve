@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.config.DeviceConfig;
 import frc.lib.pid.ScreamPIDConstants;
@@ -267,5 +270,7 @@ public class Swerve extends SubsystemBase {
      * Called periodically through SubsystemBase
      */
     @Override
-    public void periodic() {}
+    public void periodic() {
+        Logger.recordOutput("Drive/ModuleStates", SwerveConstants.KINEMATICS.toSwerveModuleStates(m_currentSpeeds));
+    }
 }

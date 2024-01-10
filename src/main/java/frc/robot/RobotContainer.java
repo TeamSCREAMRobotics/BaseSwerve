@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.Optional;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,7 +23,7 @@ public class RobotContainer {
 
     private static final ShuffleboardTabManager m_shuffleboardTabManager = new ShuffleboardTabManager();
 
-    private static final Alliance m_alliance = DriverStation.getAlliance().get();
+    private static final Optional<Alliance> m_alliance = DriverStation.getAlliance();
     
     /**
      * Configures the basic robot systems, such as Shuffleboard, autonomous, default commands, and button bindings.
@@ -94,6 +96,10 @@ public class RobotContainer {
      * @return The current Alliance.
      */
     public static Alliance getAlliance(){
-        return m_alliance;
+        if(m_alliance.isPresent()){
+            return m_alliance.get();
+        } else {
+            return Alliance.Blue;
+        }
     }
 }
