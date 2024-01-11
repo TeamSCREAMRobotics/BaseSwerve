@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -11,15 +11,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.config.DeviceConfig;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.SwerveConstants.ModuleConstants;
-import frc.robot.Constants.SwerveConstants.ModuleConstants.Module;
-import frc.robot.subsystems.swerve.SwerveModule;
+import frc.robot.Constants.SwerveConstants.ModuleConstants.ModuleLocation;
 
 /**
  * A swerve drive subsystem.
@@ -27,9 +28,10 @@ import frc.robot.subsystems.swerve.SwerveModule;
  * This class provides methods for high-level control of the swerve drivetrain.
  */
 public class Swerve extends SubsystemBase {
-    private Pigeon2 m_gyro;
+    private Pigeon2 m_pigeon2;
     private SwerveModule[] m_swerveModules;
     private SwerveDriveOdometry m_odometry;
+    private OdometryThread m_odometryThread;
     private ChassisSpeeds m_currentSpeeds = new ChassisSpeeds();
 
     /**
@@ -38,7 +40,7 @@ public class Swerve extends SubsystemBase {
      * Initializes the gyro, swerve modules, odometry, and auto builder.
      */
     public Swerve() {
-        m_gyro = new Pigeon2(Ports.PIGEON_ID, Ports.CAN_BUS_NAME);
+        m_pigeon2 = new Pigeon2(Ports.PIGEON_ID, Ports.CAN_BUS_NAME);
         configGyro();
         
         /**
@@ -47,10 +49,10 @@ public class Swerve extends SubsystemBase {
          * If there are multiple sets of modules, swap out the constants for the module in use.
          */
         m_swerveModules = new SwerveModule[] {
-                new SwerveModule(Module.FRONT_LEFT.withConstants(ModuleConstants.MODULE_0)), // Front Left
-                new SwerveModule(Module.FRONT_RIGHT.withConstants(ModuleConstants.MODULE_1)), // Front Right
-                new SwerveModule(Module.BACK_LEFT.withConstants(ModuleConstants.MODULE_2)), // Back Left
-                new SwerveModule(Module.BACK_RIGHT.withConstants(ModuleConstants.MODULE_3))  // Back Right
+                new SwerveModule(ModuleLocation.FRONT_LEFT, ModuleConstants.MODULE_0),
+                new SwerveModule(ModuleLocation.FRONT_RIGHT, ModuleConstants.MODULE_1),
+                new SwerveModule(ModuleLocation.BACK_LEFT, ModuleConstants.MODULE_2),
+                new SwerveModule(ModuleLocation.BACK_RIGHT, ModuleConstants.MODULE_3)
         };
         
         /**
@@ -58,6 +60,8 @@ public class Swerve extends SubsystemBase {
          * It uses these values to estimate the robot's position on the field.
          */
         m_odometry = new SwerveDriveOdometry(SwerveConstants.KINEMATICS, getYaw(), getModulePositions(), new Pose2d());
+        m_odometryThread = new OdometryThread(m_odometry, m_swerveModules, m_pigeon2, m_swerveModules.length);
+        m_odometryThread.start();
 
         /**
          * Configures the AutoBuilder for holonomic mode.
@@ -66,9 +70,10 @@ public class Swerve extends SubsystemBase {
         AutoBuilder.configureHolonomic(
             this::getPose,
             this::resetPose,
-            this::getRobotCentricSpeeds,
+            this::getRobotRelativeSpeeds,
             this::setChassisSpeeds,
             SwerveConstants.PATH_FOLLOWER_CONFIG,
+            () -> RobotContainer.getAlliance() == Alliance.Blue ? false : true,
             this
         );
     }
@@ -77,22 +82,29 @@ public class Swerve extends SubsystemBase {
      * Resets the yaw of the gyro to zero.
      */
     public void zeroGyro() {
-        m_gyro.setYaw(0);
+        m_pigeon2.setYaw(0);
     }
 
     /**
-     * Returns a new ChassisSpeeds based on the given inputs.
+     * Returns a new robot-relative ChassisSpeeds based on the given inputs.
      *
      * @param translation A Translation2d representing the desired movement (m/s) in the x and y directions.
      * @param angularVel The desired angular velocity (rad/s)
-     * @param fieldRelative Whether the speeds should be field or robot centric.
      * @return The calculated ChassisSpeeds.
      */
-    public ChassisSpeeds robotSpeeds(Translation2d translation, double angularVel, boolean fieldCentric){
-        ChassisSpeeds speeds = fieldCentric 
-                      ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw())
-                      : new ChassisSpeeds(translation.getX(), translation.getY(), angularVel);
+    public ChassisSpeeds robotRelativeSpeeds(Translation2d translation, double angularVel){
+        return ChassisSpeeds.discretize(translation.getX(), translation.getY(), angularVel, Constants.LOOP_TIME_SEC);
+    }
 
+    /**
+     * Returns a new fie;d-relative ChassisSpeeds based on the given inputs.
+     *
+     * @param translation A Translation2d representing the desired movement (m/s) in the x and y directions.
+     * @param angularVel The desired angular velocity (rad/s)
+     * @return The calculated ChassisSpeeds.
+     */
+    public ChassisSpeeds fieldRelativeSpeeds(Translation2d translation, double angularVel){
+        ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), angularVel, getYaw());
         return ChassisSpeeds.discretize(speeds, Constants.LOOP_TIME_SEC);
     }
 
@@ -207,7 +219,7 @@ public class Swerve extends SubsystemBase {
      * 
      * @return The current robot-centric ChassisSpeeds.
      */
-    public ChassisSpeeds getRobotCentricSpeeds(){
+    public ChassisSpeeds getRobotRelativeSpeeds(){
         return ChassisSpeeds.fromFieldRelativeSpeeds(m_currentSpeeds, getYaw());
     }
 
@@ -218,8 +230,8 @@ public class Swerve extends SubsystemBase {
      * @return The yaw rotation as a Rotation2d.
      */
     public Rotation2d getYaw() {
-        return (SwerveConstants.GYRO_INVERT) ? m_gyro.getRotation2d().minus(Rotation2d.fromDegrees(360))
-                : m_gyro.getRotation2d();
+        return (SwerveConstants.GYRO_INVERT) ? m_pigeon2.getRotation2d().minus(Rotation2d.fromDegrees(360))
+                : m_pigeon2.getRotation2d();
     }
 
     /**
@@ -229,14 +241,15 @@ public class Swerve extends SubsystemBase {
      * @return The gyro object.
      */
     public Pigeon2 getGyro() {
-        return m_gyro;
+        return m_pigeon2;
     }
 
     /**
-     * Configures the gyro. Resets it to factory default settings and zeroes it.
+     * Configures the gyro.
+     * See DeviceConfig for more information.
      */
     public void configGyro() {
-        DeviceConfig.configurePigeon2("Swerve Pigeon", m_gyro, DeviceConfig.swervePigeonConfig(), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configurePigeon2("Swerve Pigeon", m_pigeon2, DeviceConfig.swervePigeonConfig(), Constants.LOOP_TIME_HZ);
     }
 
    /**
@@ -254,7 +267,5 @@ public class Swerve extends SubsystemBase {
      * Called periodically through SubsystemBase
      */
     @Override
-    public void periodic() {
-        m_odometry.update(getYaw(), getModulePositions()); /* Updates the odometry with the current angle and module positions */
-    }
+    public void periodic() {}
 }

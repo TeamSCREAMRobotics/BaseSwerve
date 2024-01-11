@@ -8,6 +8,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.lib.util.COTSFalconSwerveConstants;
 
@@ -37,7 +38,7 @@ public final class Constants{
     
     public static final class ShuffleboardConstants {
 
-        /* For live updating values like PID from Shuffleboard */
+        /* For updating values like PID from Shuffleboard */
         public static final boolean UPDATE_SWERVE = false;
     }
 
@@ -46,8 +47,8 @@ public final class Constants{
 
         /* Drivebase Constants */
         // TODO ROBOT SPECIFIC
-        public static final double TRACK_WIDTH = 0.50165; // Distance from left wheels to right wheels
-        public static final double WHEEL_BASE = 0.57531; // Distance from front wheels to back wheels
+        public static final double TRACK_WIDTH = Units.inchesToMeters(19.75); // Distance from left wheels to right wheels
+        public static final double WHEEL_BASE = Units.inchesToMeters(22.65); // Distance from front wheels to back wheels
 
         /* Gyro Constants */
         public static final boolean GYRO_INVERT = false; // TODO Always ensure gyro reads CCW+ CW-
@@ -102,6 +103,7 @@ public final class Constants{
             public static final int SUPPLY_CURRENT_THRESHOLD = 60;
             public static final double SUPPLY_TIME_THRESHOLD = 0.1;
             public static final boolean CURRENT_LIMIT_ENABLE = true;
+            public static final double SLIP_CURRENT = 400;
 
             /* Ramps */
             public static final double OPEN_LOOP_RAMP = 0.25;
@@ -150,30 +152,20 @@ public final class Constants{
 
             public record SwerveModuleConstants(int driveMotorID, int steerMotorID, int encoderID, Rotation2d angleOffset){}
 
-            public enum Module{
+            public enum ModuleLocation{
                 FRONT_LEFT(0),
                 FRONT_RIGHT(1),
                 BACK_LEFT(2),
                 BACK_RIGHT(3);
 
                 private int number;
-                private SwerveModuleConstants constants;
 
-                private Module(int number){
+                private ModuleLocation(int number){
                     this.number = number;
-                }
-
-                public Module withConstants(SwerveModuleConstants constants){
-                    this.constants = constants;
-                    return this;
                 }
 
                 public int getNumber() {
                     return number;
-                }
-
-                public SwerveModuleConstants getConstants(){
-                    return constants;
                 }
             }
 
@@ -182,28 +174,28 @@ public final class Constants{
                 23, 
                 24, 
                 8, 
-                Rotation2d.fromRotations(0.508544921875)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.51025390625)); // TODO ROBOT SPECIFIC
 
             /* Front Right */
             public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
                 13, 
                 14, 
                 3, 
-                Rotation2d.fromRotations(0.35253906249999994)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.353759765625)); // TODO ROBOT SPECIFIC
 
             /* Back Left */
             public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
                 19, 
                 20, 
                 6, 
-                Rotation2d.fromRotations(0.28759765625)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.2861328125)); // TODO ROBOT SPECIFIC
 
             /* Back Right */
             public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
                 17, 
                 18, 
                 5, 
-                Rotation2d.fromRotations(0.324462890625)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.3271484375)); // TODO ROBOT SPECIFIC
         }
     }
 }

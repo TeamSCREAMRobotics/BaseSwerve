@@ -2,6 +2,7 @@ package frc.robot.controlboard;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -21,21 +22,15 @@ public class Controlboard{
     private static boolean fieldCentric = true;
 
     /**
-     * Returns a DoubleSupplier of the x direction movement of the driver controller.
-     *
-     * @return A DoubleSupplier representing the movement in the x direction.
+     * Retrieves the swerve translation from the driver controller.
+     * 
+     * @return A DoubleSupplier array representing the x and y values from the controller.
      */
-    public static DoubleSupplier getTranslationX() {
-        return () -> -MathUtil.applyDeadband(driverController.getLeftX(), STICK_DEADBAND);
-    }
-
-    /**
-     * Returns a DoubleSupplier of the x direction movement of the driver controller.
-     *
-     * @return A DoubleSupplier representing the movement in the y direction.
-     */
-    public static DoubleSupplier getTranslationY() {
-        return () -> -MathUtil.applyDeadband(driverController.getLeftY(), STICK_DEADBAND);
+    public static DoubleSupplier[] getTranslation(){
+        return new DoubleSupplier[] {
+            () -> -MathUtil.applyDeadband(driverController.getLeftY(), STICK_DEADBAND),
+            () -> -MathUtil.applyDeadband(driverController.getLeftX(), STICK_DEADBAND)
+        };
     }
 
     /**

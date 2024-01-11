@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -18,6 +19,7 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.lib.config.ErrorChecker.DeviceConfiguration;
 import frc.lib.pid.ScreamPIDConstants;
 import frc.robot.Constants.SwerveConstants;
@@ -33,7 +35,7 @@ public class DeviceConfig {
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
         config.MotorOutput = FXMotorOutputConfig(DriveConstants.MOTOR_INVERT, DriveConstants.NEUTRAL_MODE);
-        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, DriveConstants.GEAR_RATIO);
+        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, DriveConstants.GEAR_RATIO, Rotation2d.fromRotations(0));
         config.CurrentLimits = FXCurrentLimitsConfig(
             DriveConstants.CURRENT_LIMIT_ENABLE, 
             DriveConstants.SUPPLY_CURRENT_LIMIT, 
@@ -42,15 +44,16 @@ public class DeviceConfig {
         config.Slot0 = FXPIDConfig(DriveConstants.PID_CONSTANTS);
         config.OpenLoopRamps = FXOpenLoopRampConfig(DriveConstants.OPEN_LOOP_RAMP);
         config.ClosedLoopRamps = FXClosedLoopRampConfig(DriveConstants.CLOSED_LOOP_RAMP);
+        config.TorqueCurrent = FXTorqueCurrentConfig(DriveConstants.SLIP_CURRENT, -DriveConstants.SLIP_CURRENT, 0);
         return config;
     }
 
-    public static TalonFXConfiguration steerFXConfig(){
+    public static TalonFXConfiguration steerFXConfig(int remoteSensorID){
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
         config.MotorOutput = FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, SteerConstants.NEUTRAL_MODE);
-        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.RotorSensor, 0, SteerConstants.GEAR_RATIO);
+        config.Feedback = FXSteerFeedbackConfig(FeedbackSensorSourceValue.FusedCANcoder, remoteSensorID, SteerConstants.GEAR_RATIO, Rotation2d.fromRotations(0));
         config.ClosedLoopGeneral = FXClosedLoopGeneralConfig(true);
         config.CurrentLimits = FXCurrentLimitsConfig(
             SteerConstants.CURRENT_LIMIT_ENABLE, 
@@ -61,10 +64,11 @@ public class DeviceConfig {
         return config;
     }
 
-    public static CANcoderConfiguration swerveEncoderConfig(){
+    public static CANcoderConfiguration swerveEncoderConfig(Rotation2d angleOffset){
         CANcoderConfiguration config = new CANcoderConfiguration();
         config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
         config.MagnetSensor.SensorDirection = SwerveConstants.MODULE_TYPE.CANcoderInvert;
+        config.MagnetSensor.MagnetOffset = angleOffset.getRotations();
         return config;
     }
 
@@ -74,7 +78,7 @@ public class DeviceConfig {
     }
 
 
-    ////////////////////////////////////// GENERIC CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    ////////////////////////////////////// GENERAL CONFIGURATION METHODS \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     public static void configureTalonFX(String name, TalonFX motor, TalonFXConfiguration config, double updateFrequencyHz){
         DeviceConfiguration deviceConfig = new DeviceConfiguration() {
@@ -87,7 +91,6 @@ public class DeviceConfig {
                     motor.getPosition().setUpdateFrequency(updateFrequencyHz),
                     motor.getVelocity().setUpdateFrequency(updateFrequencyHz),
                     motor.optimizeBusUtilization()
-
                     );
             }
         };
@@ -133,11 +136,21 @@ public class DeviceConfig {
         return config;
     }
 
-    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double sensorToMechGR){
+    public static FeedbackConfigs FXFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double sensorToMechGR, Rotation2d sensorOffset){
         FeedbackConfigs config = new FeedbackConfigs();
         config.FeedbackSensorSource = sensor;
         config.FeedbackRemoteSensorID = remoteSensorID;
         config.SensorToMechanismRatio = sensorToMechGR;
+        config.FeedbackRotorOffset = sensorOffset.getRotations();
+        return config;
+    }
+
+    public static FeedbackConfigs FXSteerFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double rotorToSensorGR, Rotation2d sensorOffset){
+        FeedbackConfigs config = new FeedbackConfigs();
+        config.FeedbackSensorSource = sensor;
+        config.FeedbackRemoteSensorID = remoteSensorID;
+        config.RotorToSensorRatio = rotorToSensorGR;
+        config.FeedbackRotorOffset = sensorOffset.getRotations();
         return config;
     }
 
@@ -169,6 +182,14 @@ public class DeviceConfig {
     public static ClosedLoopGeneralConfigs FXClosedLoopGeneralConfig(boolean continuousWrap){
         ClosedLoopGeneralConfigs config = new ClosedLoopGeneralConfigs();
         config.ContinuousWrap = continuousWrap;
+        return config;
+    }
+
+    public static TorqueCurrentConfigs FXTorqueCurrentConfig(double peakForward, double peakReverse, double neutralDeadband){
+        TorqueCurrentConfigs config = new TorqueCurrentConfigs();
+        config.PeakForwardTorqueCurrent = peakForward;
+        config.PeakReverseTorqueCurrent = peakReverse;
+        config.TorqueNeutralDeadband = neutralDeadband;
         return config;
     }
 }
