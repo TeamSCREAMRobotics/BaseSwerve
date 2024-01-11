@@ -174,28 +174,28 @@ public final class Constants{
                 23, 
                 24, 
                 8, 
-                Rotation2d.fromRotations(0.508544921875)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.51025390625)); // TODO ROBOT SPECIFIC
 
             /* Front Right */
             public static final SwerveModuleConstants MODULE_1 = new SwerveModuleConstants(
                 13, 
                 14, 
                 3, 
-                Rotation2d.fromRotations(0.35253906249999994)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.353759765625)); // TODO ROBOT SPECIFIC
 
             /* Back Left */
             public static final SwerveModuleConstants MODULE_2 = new SwerveModuleConstants(
                 19, 
                 20, 
                 6, 
-                Rotation2d.fromRotations(0.28759765625)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.2861328125)); // TODO ROBOT SPECIFIC
 
             /* Back Right */
             public static final SwerveModuleConstants MODULE_3 = new SwerveModuleConstants(
                 17, 
                 18, 
                 5, 
-                Rotation2d.fromRotations(0.324462890625)); // TODO ROBOT SPECIFIC
+                Rotation2d.fromRotations(-0.3271484375)); // TODO ROBOT SPECIFIC
         }
     }
 }

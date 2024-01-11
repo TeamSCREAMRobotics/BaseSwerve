@@ -56,7 +56,7 @@ public class TeleopSwerve extends Command {
     @Override
     public void execute() {
         
-        Translation2d translationVal = new Translation2d(translation[0].getAsDouble(), translation[1].getAsDouble());
+        Translation2d translationVal = new Translation2d(translation[0].getAsDouble(), translation[1].getAsDouble()).times(SwerveConstants.MAX_SPEED);
         double rotationVal = getRotation(rotationSup.getAsDouble());
         boolean fieldRelativeVal = fieldRelativeSup.getAsBoolean();
 

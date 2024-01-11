@@ -187,7 +187,7 @@ public class SwerveModule {
      * See DeviceConfig for more information.
      */
     private void configAngleEncoder() {
-        DeviceConfig.configureSwerveEncoder(m_modLocation + " Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig(), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configureSwerveEncoder(m_modLocation + " Angle Encoder", m_angleEncoder, DeviceConfig.swerveEncoderConfig(m_angleOffset), Constants.LOOP_TIME_HZ);
     }
 
     /**
@@ -195,7 +195,7 @@ public class SwerveModule {
      * See DeviceConfig for more information.
      */
     private void configSteerMotor() {
-        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(m_angleEncoder.getDeviceID(), m_angleOffset), Constants.LOOP_TIME_HZ);
+        DeviceConfig.configureTalonFX(m_modLocation + " Steer Motor", m_steerMotor, DeviceConfig.steerFXConfig(m_angleEncoder.getDeviceID()), Constants.LOOP_TIME_HZ);
     }
 
     /**

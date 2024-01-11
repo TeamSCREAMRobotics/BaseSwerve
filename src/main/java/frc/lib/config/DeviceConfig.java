@@ -48,12 +48,12 @@ public class DeviceConfig {
         return config;
     }
 
-    public static TalonFXConfiguration steerFXConfig(int remoteSensorID, Rotation2d sensorOffset){
+    public static TalonFXConfiguration steerFXConfig(int remoteSensorID){
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.Audio.BeepOnBoot = false;
         config.Audio.BeepOnConfig = false;
         config.MotorOutput = FXMotorOutputConfig(SteerConstants.MOTOR_INVERT, SteerConstants.NEUTRAL_MODE);
-        config.Feedback = FXFeedbackConfig(FeedbackSensorSourceValue.FusedCANcoder, remoteSensorID, SteerConstants.GEAR_RATIO, sensorOffset);
+        config.Feedback = FXSteerFeedbackConfig(FeedbackSensorSourceValue.FusedCANcoder, remoteSensorID, SteerConstants.GEAR_RATIO, Rotation2d.fromRotations(0));
         config.ClosedLoopGeneral = FXClosedLoopGeneralConfig(true);
         config.CurrentLimits = FXCurrentLimitsConfig(
             SteerConstants.CURRENT_LIMIT_ENABLE, 
@@ -64,10 +64,11 @@ public class DeviceConfig {
         return config;
     }
 
-    public static CANcoderConfiguration swerveEncoderConfig(){
+    public static CANcoderConfiguration swerveEncoderConfig(Rotation2d angleOffset){
         CANcoderConfiguration config = new CANcoderConfiguration();
         config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
         config.MagnetSensor.SensorDirection = SwerveConstants.MODULE_TYPE.CANcoderInvert;
+        config.MagnetSensor.MagnetOffset = angleOffset.getRotations();
         return config;
     }
 
@@ -140,6 +141,15 @@ public class DeviceConfig {
         config.FeedbackSensorSource = sensor;
         config.FeedbackRemoteSensorID = remoteSensorID;
         config.SensorToMechanismRatio = sensorToMechGR;
+        config.FeedbackRotorOffset = sensorOffset.getRotations();
+        return config;
+    }
+
+    public static FeedbackConfigs FXSteerFeedbackConfig(FeedbackSensorSourceValue sensor, int remoteSensorID, double rotorToSensorGR, Rotation2d sensorOffset){
+        FeedbackConfigs config = new FeedbackConfigs();
+        config.FeedbackSensorSource = sensor;
+        config.FeedbackRemoteSensorID = remoteSensorID;
+        config.RotorToSensorRatio = rotorToSensorGR;
         config.FeedbackRotorOffset = sensorOffset.getRotations();
         return config;
     }
