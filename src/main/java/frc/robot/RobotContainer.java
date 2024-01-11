@@ -77,7 +77,7 @@ public class RobotContainer {
      * @return The selected autonomous command.
      */
     public Command getAutonomousCommand() {
-        System.out.println("Selected auto routine: " + Autonomous.getSelected().getName());
+        System.out.println("[Auto] Selected auto routine: " + Autonomous.getSelected().getName());
         return Autonomous.getSelected();
     }
 
@@ -99,6 +99,7 @@ public class RobotContainer {
         if(m_alliance.isPresent()){
             return m_alliance.get();
         } else {
+            DriverStation.reportError("[ERROR] Could not retrieve Alliance", true);
             return Alliance.Blue;
         }
     }

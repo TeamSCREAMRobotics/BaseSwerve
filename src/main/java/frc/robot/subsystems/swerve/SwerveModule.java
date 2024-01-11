@@ -48,7 +48,7 @@ public class SwerveModule {
     private SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(DriveConstants.KS, DriveConstants.KV, DriveConstants.KA);
 
     /**
-     * Constructs a SwerveModule object with the given location, module number, and module constants.
+     * Constructs a SwerveModule object with the given location and module constants.
      *
      * @param moduleLocation The ModuleLocation to get the location and number from.
      * @param constants The constants to use for the module.
@@ -86,7 +86,7 @@ public class SwerveModule {
     }
 
     /**
-     * Returns the location associated with this module.
+     * Returns the module location associated with this module.
      *
      * @return The module location.
      */
@@ -165,9 +165,9 @@ public class SwerveModule {
     }
 
     /**
-     * Retrieves the current agnle of the angle motor.
+     * Retrieves the current angle of the steer motor.
      *
-     * @return The angle of the rotation motor as a Rotation2d.
+     * @return The angle of the steer motor as a Rotation2d.
      */
     private Rotation2d getAngle() {
         return m_internalState.angle;

@@ -37,7 +37,7 @@ public class Swerve extends SubsystemBase {
     /**
      * Constructs a new instance of the Swerve class.
      * 
-     * Initializes the gyro, swerve modules, odometry, and auto builder.
+     * Initializes the gyro, swerve modules, odometry & odometry thread, and auto builder.
      */
     public Swerve() {
         m_pigeon2 = new Pigeon2(Ports.PIGEON_ID, Ports.CAN_BUS_NAME);
@@ -97,7 +97,7 @@ public class Swerve extends SubsystemBase {
     }
 
     /**
-     * Returns a new fie;d-relative ChassisSpeeds based on the given inputs.
+     * Returns a new field-relative ChassisSpeeds based on the given inputs.
      *
      * @param translation A Translation2d representing the desired movement (m/s) in the x and y directions.
      * @param angularVel The desired angular velocity (rad/s)
@@ -262,10 +262,4 @@ public class Swerve extends SubsystemBase {
             mod.configDriveMotorPID(constants);
         }
     }
-
-    /**
-     * Called periodically through SubsystemBase
-     */
-    @Override
-    public void periodic() {}
 }

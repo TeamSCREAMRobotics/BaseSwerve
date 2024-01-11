@@ -16,7 +16,7 @@ import frc.robot.subsystems.swerve.Swerve;
  */
 public class TeleopSwerve extends Command {
     private Swerve swerve;
-    private DoubleSupplier[] translation;
+    private DoubleSupplier[] translationSup;
     private DoubleSupplier rotationSup;
     private BooleanSupplier fieldRelativeSup;
     private Rotation2d lastAngle;
@@ -27,18 +27,18 @@ public class TeleopSwerve extends Command {
      * Constructs a TeleopSwerve command with the given parameters.
      *
      * @param swerve The Swerve subsystem to control.
-     * @param translationSup A supplier for the translation value.
+     * @param translationSup A supplier array for the translation value.
      * @param strafeSup A supplier for the strafe value.
      * @param rotationSup A supplier for the rotation value.
-     * @param fieldCentricSup A supplier for the drive mode. Robot centric = false; Field centric = true
+     * @param fieldRelativeSup A supplier for the drive mode. Robot relative = false; Field relative = true
      */
-    public TeleopSwerve(Swerve swerve, DoubleSupplier[] translation, DoubleSupplier rotationSup, BooleanSupplier fieldCentricSup) {
+    public TeleopSwerve(Swerve swerve, DoubleSupplier[] translationSup, DoubleSupplier rotationSup, BooleanSupplier fieldRelativeSup) {
         this.swerve = swerve;
         addRequirements(swerve);
 
-        this.translation = translation;
+        this.translationSup = translationSup;
         this.rotationSup = rotationSup;
-        this.fieldRelativeSup = fieldCentricSup;
+        this.fieldRelativeSup = fieldRelativeSup;
     }
 
     @Override
@@ -50,13 +50,12 @@ public class TeleopSwerve extends Command {
 
     /**
      * Executes the swerve drive command.
-     * <p>This method applies a deadband to the translation, strafe, and rotation values
-     * and then passes them to the swerve drive subsystem to drive the robot.
+     * Passes the translation, strafe, and rotation values to the swerve subsystem to drive the robot.
      */
     @Override
     public void execute() {
         
-        Translation2d translationVal = new Translation2d(translation[0].getAsDouble(), translation[1].getAsDouble()).times(SwerveConstants.MAX_SPEED);
+        Translation2d translationVal = new Translation2d(translationSup[0].getAsDouble(), translationSup[1].getAsDouble()).times(SwerveConstants.MAX_SPEED);
         double rotationVal = getRotation(rotationSup.getAsDouble());
         boolean fieldRelativeVal = fieldRelativeSup.getAsBoolean();
 

@@ -21,7 +21,7 @@ public class SwerveTab extends ShuffleboardTabBase {
     }
     
     //Represents a set of entries for the Swerve subsystem.
-    //Each module has three entries: CANcoder, Integrated, and Velocity readings.
+    //Each module has two entries: Encoder and integrated sensor readings.
     private GenericEntry m_FLEncoder;
     private GenericEntry m_FLIntegrated;
 
